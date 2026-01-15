@@ -2,8 +2,10 @@ import random
 
 # p = 0.2
 
+
 def known_gen_grid():
-    return [[0,0,0],[1,1,1],[0,0,0]]
+    return [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
+
 
 def gen_grid(size, p):
     grid = [[0 for i in range(size)] for i in range(size)]
@@ -47,14 +49,14 @@ def find_path(grid, path):
             continue
         # print("heres the new coords:")
         # print(new_x, new_y)
-        
+
         if len(path) > 1:
             if (new_x, new_y) == path[-2]:
                 # print("why dont u skip that")
                 continue
 
         if (new_x, new_y) in path:
-            print(new_x, new_y)
+            # print(new_x, new_y)
             return 2
 
         if grid[new_x][new_y] == 1:
@@ -66,31 +68,34 @@ def find_path(grid, path):
             if result != 1 and result != 2:
                 # print(f"adding result: {result}")
                 found_paths += result
-        
+
     # print("ok we done")
     # print(found_paths)
-        # if len(found_path) > 0:
-        #     # print("look we found one")
-        #     return found_path
-        # else:
-        #    return 1
+    # if len(found_path) > 0:
+    #     # print("look we found one")
+    #     return found_path
+    # else:
+    #    return 1
 
     return found_paths
 
 
 size = 5
+p = 0.4
+
+acceptable = 0
+
 # for p in range(50, 51):
 for i in range(1):
     # p = p / 100
-    p = 0.5
     print(f"\x1b[37mp value of {p}:")
     grid = gen_grid(size, p)
     # grid = known_gen_grid()
     print_grid(grid)
-    
+
     paths = []
     failed = False
-    
+
     # find_path(grid, [(0, 0)])
     for x in range(1, size):
         if grid[x][0] == 0:
