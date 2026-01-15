@@ -3,6 +3,10 @@ import random
 # p = 0.2
 
 
+def reset_color():
+    print(f"\x1b[37m")
+
+
 def known_gen_grid():
     return [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
 
@@ -19,17 +23,20 @@ def gen_grid(size, p):
 
 
 def print_grid(grid):
+    block = "██"
     for row in grid:
         # print("[", end = '')
         for stone in row:
             if stone == 1:
-                print("\x1b[31m", end="")
-            else:
                 print("\x1b[37m", end="")
+            else:
+                print("\x1b[30m", end="")
 
-            print(f"{stone} ", end="")
+            print(f"{block}", end="")
 
         print()
+
+    print("\x1b[0m", end="")
 
 
 def find_path(grid, path):
@@ -56,6 +63,7 @@ def find_path(grid, path):
                 continue
 
         if (new_x, new_y) in path:
+            # print("this works right?")
             # print(new_x, new_y)
             return 2
 
@@ -80,18 +88,23 @@ def find_path(grid, path):
     return found_paths
 
 
-size = 5
-p = 0.4
+size = 20
+p = 0.6
 
+no_paths = 0
 acceptable = 0
+multiple_paths = 0
+
+trials = 100
 
 # for p in range(50, 51):
-for i in range(1):
+for i in range(trials):
+    print(i)
     # p = p / 100
-    print(f"\x1b[37mp value of {p}:")
+    # print(f"\x1b[37mp value of {p}:")
     grid = gen_grid(size, p)
-    # grid = known_gen_grid()
     print_grid(grid)
+    # grid = known_gen_grid()
 
     paths = []
     failed = False
@@ -126,13 +139,26 @@ for i in range(1):
         # else:
         #     paths += [result]
 
-    print(paths)
-    # if len(paths) == 1:
-    #     print(paths[0])
-    # elif len(paths) > 1:
-    #     print("more than one path")
-    # else:
-    #     print("no paths")
-    # print(paths)
+    if len(paths) == 1:
+        reset_color()
+        print("omg no way one worked!!!")
+        print_grid(grid)
+        reset_color()
+        print(paths[0])
+        print()
+        acceptable += 1
 
-    print()
+    elif len(paths) > 1:
+        print("too many")
+        multiple_paths += 1
+
+    else:
+        print("none at all")
+        no_paths += 1
+
+
+print(f"\x1b[37mp value of {p}:")
+print(f"total trials:\t{trials}")
+print(f"no paths: \t{no_paths} - {no_paths/trials*100}%")
+print(f"multiple paths:\t{multiple_paths} - {multiple_paths/trials*100}%")
+print(f"percolated 👍: \t{acceptable} - {acceptable/trials*100}%")
