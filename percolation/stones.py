@@ -135,7 +135,7 @@ def check_percolated(grid):
 
 
 size = 20
-p = 0.6
+p = 0.5
 
 no_paths = 0
 percolated = 0
