@@ -1,5 +1,7 @@
 import random
 
+import hoshen_kopelman
+
 # p = 0.2
 
 
@@ -27,12 +29,13 @@ def print_grid(grid):
     for row in grid:
         # print("[", end = '')
         for stone in row:
-            if stone == 1:
-                print("\x1b[37m", end="")
-            else:
+            if stone == 0:
                 print("\x1b[30m", end="")
+            else:
+                print(f"\x1b[38;5;{stone-2}m", end="")
 
             print(f"{block}", end="")
+            # print(f"{stone} ", end="")
 
         print()
 
@@ -87,78 +90,139 @@ def find_path(grid, path):
 
     return found_paths
 
+def check_percolated(grid):
+    size = len(grid)
+
+    clusters_left = []
+    clusters_up = []
+    clusters_down = []
+    clusters_right = []
+
+    for i in range(size):
+
+        if grid[i][0] != 0:
+            if grid[i][0] not in clusters_left:
+                clusters_left.append(grid[i][0])
+
+        if grid[i][size - 1] != 0:
+            if grid[i][size - 1] not in clusters_right:
+                clusters_right.append(grid[i][size - 1])
+
+        if grid[0][i] != 0:
+            if grid[0][i] not in clusters_up:
+                clusters_up.append(grid[0][i])
+
+        if grid[size - 1][i] != 0:
+            if grid[size - 1][i] not in clusters_down:
+                clusters_down.append(grid[size - 1][i])
+
+    # print(f"left: {clusters_left}")
+    # print(f"right: {clusters_right}")
+    # print(f"up: {clusters_up}")
+    # print(f"down: {clusters_down}")
+
+    for cluster in clusters_left:
+        if cluster in clusters_right:
+            return True
+
+    for clusters in clusters_up:
+        if cluster in clusters_down:
+            return True
+
+
+    return False
+
+
 
 size = 20
 p = 0.6
 
 no_paths = 0
-acceptable = 0
-multiple_paths = 0
+percolated = 0
 
 trials = 100
 
-# for p in range(50, 51):
 for i in range(trials):
-    print(i)
-    # p = p / 100
-    # print(f"\x1b[37mp value of {p}:")
     grid = gen_grid(size, p)
-    print_grid(grid)
-    # grid = known_gen_grid()
 
-    paths = []
-    failed = False
+    grid = hoshen_kopelman.countClusters(grid)
 
-    # find_path(grid, [(0, 0)])
-    for x in range(1, size):
-        if grid[x][0] == 0:
-            continue
+    # print_grid(grid)
+    
+    check = check_percolated(grid)
 
-        result = find_path(grid, [(x, 0)])
-        if len(result) > 0:
-            paths += result
-
-        # if result == 2:
-        #     failed = True
-        # if result == 1:
-        #     continue
-        # else:
-        #     paths += [result]
-
-    for y in range(1, size):
-        if grid[0][y] == 0:
-            continue
-
-        result = find_path(grid, [(0, y)])
-        if len(result) > 0:
-            paths += result
-        # if result == 2:
-        #     failed = True
-        # if result == 1:
-        #     continue
-        # else:
-        #     paths += [result]
-
-    if len(paths) == 1:
-        reset_color()
-        print("omg no way one worked!!!")
-        print_grid(grid)
-        reset_color()
-        print(paths[0])
-        print()
-        acceptable += 1
-
-    elif len(paths) > 1:
-        print("too many")
-        multiple_paths += 1
-
+    if check:
+        # print("we percolated!!!")
+        percolated += 1
     else:
-        print("none at all")
+        # print("could not get across")
         no_paths += 1
+
+    # print()
+
+
+# old bad way
+# for p in range(50, 51):
+# for i in range(trials):
+#     print(i)
+#     # p = p / 100
+#     # print(f"\x1b[37mp value of {p}:")
+#     grid = gen_grid(size, p)
+#     print_grid(grid)
+#     # grid = known_gen_grid()
+#
+#     paths = []
+#     failed = False
+#
+#     # find_path(grid, [(0, 0)])
+#     for x in range(1, size):
+#         if grid[x][0] == 0:
+#             continue
+#
+#         result = find_path(grid, [(x, 0)])
+#         if len(result) > 0:
+#             paths += result
+#
+#         # if result == 2:
+#         #     failed = True
+#         # if result == 1:
+#         #     continue
+#         # else:
+#         #     paths += [result]
+#
+#     for y in range(1, size):
+#         if grid[0][y] == 0:
+#             continue
+#
+#         result = find_path(grid, [(0, y)])
+#         if len(result) > 0:
+#             paths += result
+#         # if result == 2:
+#         #     failed = True
+#         # if result == 1:
+#         #     continue
+#         # else:
+#         #     paths += [result]
+#
+#     if len(paths) == 1:
+#         reset_color()
+#         print("omg no way one worked!!!")
+#         print_grid(grid)
+#         reset_color()
+#         print(paths[0])
+#         print()
+#         acceptable += 1
+#
+#     elif len(paths) > 1:
+#         print("too many")
+#         multiple_paths += 1
+#
+#     else:
+#         print("none at all")
+#         no_paths += 1
 
 
 print(f"\x1b[37mp value of {p}:")
 print(f"total trials:\t{trials}")
 print(f"no paths: \t{no_paths} - {no_paths/trials*100}%")
-print(f"multiple paths:\t{multiple_paths} - {multiple_paths/trials*100}%")
-print(f"percolated 👍: \t{acceptable} - {acceptable/trials*100}%")
+print(f"percolated 👍: \t{percolated} - {percolated/trials*100}%")
