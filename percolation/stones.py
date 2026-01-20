@@ -1,8 +1,9 @@
 import random
 
-import hoshen_kopelman
+import matplotlib.pyplot as plt
+import numpy as np
 
-# p = 0.2
+import hoshen_kopelman
 
 
 def reset_color():
@@ -90,6 +91,14 @@ def find_path(grid, path):
 
     return found_paths
 
+def sign(num):
+    if num == 0:
+        return 0
+    if num < 0:
+        return -1
+    if num > 0:
+        return 1
+
 def check_percolated(grid):
     size = len(grid)
 
@@ -125,7 +134,7 @@ def check_percolated(grid):
         if cluster in clusters_right:
             return True
 
-    for clusters in clusters_up:
+    for cluster in clusters_up:
         if cluster in clusters_down:
             return True
 
@@ -134,33 +143,72 @@ def check_percolated(grid):
 
 
 
-size = 20
-p = 0.5
+size = 100
+# p = 0.5
 
 no_paths = 0
 percolated = 0
 
-trials = 100
+trials = 1000
 
-for i in range(trials):
-    grid = gen_grid(size, p)
+start = 0.55
+stop = 0.65
+step = 0.005
 
-    grid = hoshen_kopelman.countClusters(grid)
+# should be stop - step but computers cant do math lol
+span = 0.1
 
-    # print_grid(grid)
+points = int(span / step) + 1
+print(points)
+
+probs = np.linspace(start, stop, points)
+print(probs)
+sucesses = [0 for i in range(points)]
+
+index = 0
+
+for p in probs:
+
+    print(f"\r\x1b[2kPercent Done: {round(index / points * 100, 2)}%", end = '')
+
+    percolated = 0
+
+    for i in range(trials):
+        grid = gen_grid(size, p)
     
-    check = check_percolated(grid)
+        grid = hoshen_kopelman.countClusters(grid)
+    
+        # print_grid(grid)
+        
+        check = check_percolated(grid)
+    
+        if check:
+            # print("we percolated!!!")
+            percolated += 1
 
-    if check:
-        # print("we percolated!!!")
-        percolated += 1
-    else:
-        # print("could not get across")
-        no_paths += 1
+    sucesses[index] = percolated / trials
+    index += 1
 
     # print()
 
+print(f"\r\x1b[2KDone!")
 
+first_derivative = [(sucesses[i + 1] - sucesses[i]) / step for i in range(points - 1)]
+second_derivative = [(first_derivative[i + 1] - first_derivative[i]) / step for i in range(points - 2)]
+
+infelctions = []
+
+for i in range(len(second_derivative) - 1):
+    first = sign(second_derivative[i])
+    second = sign(second_derivative[i + 1])
+
+    if first == 0:
+        infelctions.append(float(probs[i]))
+
+    if first == 1 and second == -1:
+        infelctions.append(float(probs[i]))
+
+print(infelctions)
 # old bad way
 # for p in range(50, 51):
 # for i in range(trials):
@@ -222,7 +270,16 @@ for i in range(trials):
 #         no_paths += 1
 
 
-print(f"\x1b[37mp value of {p}:")
-print(f"total trials:\t{trials}")
-print(f"no paths: \t{no_paths} - {no_paths/trials*100}%")
-print(f"percolated 👍: \t{percolated} - {percolated/trials*100}%")
+# print(f"\x1b[37mp value of {p}:")
+# print(f"total trials:\t{trials}")
+# print(f"no paths: \t{no_paths} - {no_paths/trials*100}%")
+# print(f"percolated 👍: \t{percolated} - {percolated/trials*100}%")
+
+fig, ax = plt.subplots()
+ax.set_title("Density vs Percolation")
+ax.set_xlabel("Filled %")
+ax.set_ylabel("Percolation %")
+ax.plot(probs, sucesses)
+plt.show()
+
+fig.savefig("figure")
