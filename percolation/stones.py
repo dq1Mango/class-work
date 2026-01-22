@@ -1,4 +1,6 @@
 import random
+import threading
+from queue import Queue
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -141,6 +143,19 @@ def check_percolated(grid):
 
     return False
 
+def conduct_expirement(size, p, queue):
+    grid = gen_grid(size, p)
+    
+    grid = hoshen_kopelman.countClusters(grid)
+    
+    # print_grid(grid)
+    
+    if check_percolated(grid):
+        # print("we percolated!!!")
+        queue.put(1)
+    else:
+        queue.put(0)
+
 
 
 size = 100
@@ -167,24 +182,28 @@ sucesses = [0 for i in range(points)]
 
 index = 0
 
+num_threads = 4
+
 for p in probs:
 
     print(f"\r\x1b[2kPercent Done: {round(index / points * 100, 2)}%", end = '')
 
     percolated = 0
 
-    for i in range(trials):
-        grid = gen_grid(size, p)
+    threads = [0 for i in range(num_threads)]
     
-        grid = hoshen_kopelman.countClusters(grid)
-    
-        # print_grid(grid)
-        
-        check = check_percolated(grid)
-    
-        if check:
-            # print("we percolated!!!")
-            percolated += 1
+    i = 0
+    while i < trials:
+        queue = Queue()
+        for thread in range(num_threads):
+            t = threading.Thread(target=conduct_expirement, args=(size, p, queue))
+            t.start()
+            threads[thread] = t
+            i += 1
+        for thread in threads:
+            percolated += queue.get()
+            thread.join()
+
 
     sucesses[index] = percolated / trials
     index += 1
