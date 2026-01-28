@@ -1,3 +1,5 @@
+import argparse
+import pickle
 import random
 import threading
 from queue import Queue
@@ -6,6 +8,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import hoshen_kopelman
+
+parser = argparse.ArgumentParser(
+                    prog='ProgramName',
+                    description='What the program does',
+                    epilog='Text at the bottom of help')
+
+parser.add_argument('-f', '--file')           # positional argument
+args = parser.parse_args()
 
 
 def reset_color():
@@ -93,6 +103,7 @@ def find_path(grid, path):
 
     return found_paths
 
+
 def sign(num):
     if num == 0:
         return 0
@@ -100,6 +111,7 @@ def sign(num):
         return -1
     if num > 0:
         return 1
+
 
 def check_percolated(grid):
     size = len(grid)
@@ -140,94 +152,140 @@ def check_percolated(grid):
         if cluster in clusters_down:
             return True
 
-
     return False
 
-def conduct_expirement(size, p, queue):
+
+def conduct_expirement(size, p):
     grid = gen_grid(size, p)
-    
+
     grid = hoshen_kopelman.countClusters(grid)
-    
+
     # print_grid(grid)
-    
+
     if check_percolated(grid):
+        return 1
         # print("we percolated!!!")
-        queue.put(1)
+        # queue.put(1)
     else:
-        queue.put(0)
+        return 0
+        # queue.put(0)
 
 
+print(args.file)
+print()
 
-size = 100
+size = 1000
 # p = 0.5
 
 no_paths = 0
 percolated = 0
 
-trials = 1000
+def run_simulation():
 
-start = 0.55
-stop = 0.65
-step = 0.005
+    trials = 1000
 
-# should be stop - step but computers cant do math lol
-span = 0.1
-
-points = int(span / step) + 1
-print(points)
-
-probs = np.linspace(start, stop, points)
-print(probs)
-sucesses = [0 for i in range(points)]
-
-index = 0
-
-num_threads = 4
-
-for p in probs:
-
-    print(f"\r\x1b[2kPercent Done: {round(index / points * 100, 2)}%", end = '')
-
-    percolated = 0
-
-    threads = [0 for i in range(num_threads)]
     
-    i = 0
-    while i < trials:
-        queue = Queue()
-        for thread in range(num_threads):
-            t = threading.Thread(target=conduct_expirement, args=(size, p, queue))
-            t.start()
-            threads[thread] = t
+    start = 0.55
+    stop = 0.65
+    step = 0.005
+    
+    # should be stop - step but computers cant do math lol
+    span = 0.1
+    
+    points = int(span / step) + 1
+    print(points)
+    
+    probs = np.linspace(start, stop, points)
+    print(probs)
+    sucesses = [0 for i in range(points)]
+    
+    index = 0
+    
+    num_threads = 4
+    
+    for p in probs:
+    
+        print(f"\r\x1b[2kPercent Done: {round(index / points * 100, 2)}%", end="")
+    
+        percolated = 0
+    
+        threads = [0 for i in range(num_threads)]
+    
+        i = 0
+        while i < trials:
+            percolated += conduct_expirement(size, p)
             i += 1
-        for thread in threads:
-            percolated += queue.get()
-            thread.join()
+    
+        sucesses[index] = percolated / trials
+        index += 1
 
+    data = {
+            "sucesses": sucesses,
+            "probs": probs,
+            "start": start,
+            "stop": stop,
+            "step": step,
+            }
 
-    sucesses[index] = percolated / trials
-    index += 1
+    return data
 
     # print()
 
 print(f"\r\x1b[2KDone!")
 
-first_derivative = [(sucesses[i + 1] - sucesses[i]) / step for i in range(points - 1)]
-second_derivative = [(first_derivative[i + 1] - first_derivative[i]) / step for i in range(points - 2)]
 
-infelctions = []
+def load_data(path):
+    with open(path, "rb") as file:
+        return pickle.load(file)
 
-for i in range(len(second_derivative) - 1):
-    first = sign(second_derivative[i])
-    second = sign(second_derivative[i + 1])
 
-    if first == 0:
-        infelctions.append(float(probs[i]))
+def show_graphs(data):
 
-    if first == 1 and second == -1:
-        infelctions.append(float(probs[i]))
+    sucesses = data["sucesses"]
 
-print(infelctions)
+    points = len(sucesses)
+    step = data["step"]
+    probs = data["probs"]
+
+    first_derivative = [
+        (sucesses[i + 1] - sucesses[i]) / step for i in range(points - 1)
+    ]
+    second_derivative = [
+        (first_derivative[i + 1] - first_derivative[i]) / step
+        for i in range(points - 2)
+    ]
+
+    infelctions = []
+
+    for i in range(len(second_derivative) - 1):
+        first = sign(second_derivative[i])
+        second = sign(second_derivative[i + 1])
+
+        if first == 0:
+            infelctions.append(float(probs[i]))
+
+        if first == 1 and second == -1:
+            infelctions.append(float(probs[i]))
+
+    print(infelctions)
+
+    fig, ax = plt.subplots()
+    ax.set_title("Density vs Percolation")
+    ax.set_xlabel("Filled %")
+    ax.set_ylabel("Percolation %")
+    ax.plot(probs, sucesses)
+    plt.show()
+
+    fig.savefig("figure")
+
+
+data = run_simulation()
+
+with open("data.p", "wb") as file:
+    pickle.dump(data, file)
+
+show_graphs(data)
+
 # old bad way
 # for p in range(50, 51):
 # for i in range(trials):
