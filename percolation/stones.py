@@ -10,11 +10,12 @@ import numpy as np
 import hoshen_kopelman
 
 parser = argparse.ArgumentParser(
-                    prog='ProgramName',
-                    description='What the program does',
-                    epilog='Text at the bottom of help')
+    prog="ProgramName",
+    description="What the program does",
+    epilog="Text at the bottom of help",
+)
 
-parser.add_argument('-f', '--file')           # positional argument
+parser.add_argument("-f", "--file")  # positional argument
 args = parser.parse_args()
 
 
@@ -174,64 +175,62 @@ def conduct_expirement(size, p):
 print(args.file)
 print()
 
-size = 1000
+size = 100
 # p = 0.5
 
 no_paths = 0
 percolated = 0
 
+
 def run_simulation():
 
     trials = 1000
 
-    
-    start = 0.55
-    stop = 0.65
-    step = 0.005
-    
+    start = 0
+    stop = 1
+    step = 0.05
+
     # should be stop - step but computers cant do math lol
-    span = 0.1
-    
+    span = 1
+
     points = int(span / step) + 1
     print(points)
-    
+
     probs = np.linspace(start, stop, points)
     print(probs)
     sucesses = [0 for i in range(points)]
-    
+
     index = 0
-    
+
     num_threads = 4
-    
+
     for p in probs:
-    
+
         print(f"\r\x1b[2kPercent Done: {round(index / points * 100, 2)}%", end="")
-    
+
         percolated = 0
-    
+
         threads = [0 for i in range(num_threads)]
-    
+
         i = 0
         while i < trials:
             percolated += conduct_expirement(size, p)
             i += 1
-    
+
         sucesses[index] = percolated / trials
         index += 1
 
     data = {
-            "sucesses": sucesses,
-            "probs": probs,
-            "start": start,
-            "stop": stop,
-            "step": step,
-            }
+        "sucesses": sucesses,
+        "probs": probs,
+        "start": start,
+        "stop": stop,
+        "step": step,
+    }
 
     return data
 
     # print()
-
-print(f"\r\x1b[2KDone!")
 
 
 def load_data(path):
@@ -240,6 +239,13 @@ def load_data(path):
 
 
 def show_graphs(data):
+
+    # print(data)
+    
+    for i in range(len(data["probs"])):
+        print(f"{data['probs'][i]} -- {data['sucesses'][i]}")
+
+    print(data["sucesses"])
 
     sucesses = data["sucesses"]
 
@@ -261,8 +267,8 @@ def show_graphs(data):
         first = sign(second_derivative[i])
         second = sign(second_derivative[i + 1])
 
-        if first == 0:
-            infelctions.append(float(probs[i]))
+        # if first == 0:
+        #     infelctions.append(float(probs[i]))
 
         if first == 1 and second == -1:
             infelctions.append(float(probs[i]))
@@ -279,10 +285,15 @@ def show_graphs(data):
     fig.savefig("figure")
 
 
-data = run_simulation()
+if args.file == None:
+    data = run_simulation()
+    print(f"\r\x1b[2KDone!")
+    with open("data.p", "wb") as file:
+        pickle.dump(data, file)
 
-with open("data.p", "wb") as file:
-    pickle.dump(data, file)
+else:
+    data = load_data(args.file)
+
 
 show_graphs(data)
 
@@ -352,11 +363,11 @@ show_graphs(data)
 # print(f"no paths: \t{no_paths} - {no_paths/trials*100}%")
 # print(f"percolated 👍: \t{percolated} - {percolated/trials*100}%")
 
-fig, ax = plt.subplots()
-ax.set_title("Density vs Percolation")
-ax.set_xlabel("Filled %")
-ax.set_ylabel("Percolation %")
-ax.plot(probs, sucesses)
-plt.show()
-
-fig.savefig("figure")
+# fig, ax = plt.subplots()
+# ax.set_title("Density vs Percolation")
+# ax.set_xlabel("Filled %")
+# ax.set_ylabel("Percolation %")
+# ax.plot(probs, sucesses)
+# plt.show()
+#
+# fig.savefig("figure")
