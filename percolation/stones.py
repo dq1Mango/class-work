@@ -27,11 +27,11 @@ def known_gen_grid():
     return [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
 
 
-def gen_grid(size, p):
-    grid = [[0 for i in range(size)] for i in range(size)]
+def gen_grid(x, y, p):
+    grid = [[0 for i in range(y)] for i in range(x)]
 
-    for i in range(size):
-        for j in range(size):
+    for i in range(x):
+        for j in range(y):
             if random.random() <= p:
                 grid[i][j] = 1
 
@@ -115,30 +115,32 @@ def sign(num):
 
 
 def check_percolated(grid):
-    size = len(grid)
+    length = len(grid)
+    width = len(grid[0])
 
     clusters_left = []
     clusters_up = []
     clusters_down = []
     clusters_right = []
 
-    for i in range(size):
+    for i in range(length):
 
         if grid[i][0] != 0:
             if grid[i][0] not in clusters_left:
                 clusters_left.append(grid[i][0])
 
-        if grid[i][size - 1] != 0:
-            if grid[i][size - 1] not in clusters_right:
-                clusters_right.append(grid[i][size - 1])
+        if grid[i][width - 1] != 0:
+            if grid[i][width - 1] not in clusters_right:
+                clusters_right.append(grid[i][width - 1])
 
+    for i in range(width):
         if grid[0][i] != 0:
             if grid[0][i] not in clusters_up:
                 clusters_up.append(grid[0][i])
 
-        if grid[size - 1][i] != 0:
-            if grid[size - 1][i] not in clusters_down:
-                clusters_down.append(grid[size - 1][i])
+        if grid[length - 1][i] != 0:
+            if grid[length - 1][i] not in clusters_down:
+                clusters_down.append(grid[length - 1][i])
 
     # print(f"left: {clusters_left}")
     # print(f"right: {clusters_right}")
@@ -156,8 +158,8 @@ def check_percolated(grid):
     return False
 
 
-def conduct_expirement(size, p):
-    grid = gen_grid(size, p)
+def conduct_expirement(x, y, p):
+    grid = gen_grid(x, y, p)
 
     grid = hoshen_kopelman.countClusters(grid)
 
@@ -182,9 +184,9 @@ no_paths = 0
 percolated = 0
 
 
-def run_simulation():
+def run_simulation(x, y):
 
-    trials = 1000
+    trials = 100
 
     start = 0
     stop = 1
@@ -214,7 +216,7 @@ def run_simulation():
 
         i = 0
         while i < trials:
-            percolated += conduct_expirement(size, p)
+            percolated += conduct_expirement(x, y, p)
             i += 1
 
         sucesses[index] = percolated / trials
@@ -231,6 +233,38 @@ def run_simulation():
     return data
 
     # print()
+
+def rectangle_simulation():
+    results = [0 for i in range(10)]
+
+    area = 100 ** 2
+    index = 0
+    for width in range(10, 101, 10):
+        length = round(area / width)
+        data = run_simulation(length, width)
+        for i in range(len(data["sucesses"])):
+            if data["sucesses"][i] >= 0.5:
+                results[index] = data["probs"][i]
+                break
+
+        index += 1
+    
+    x_axis = [i for i in range(10, 101, 10)]
+
+    print(results)
+
+    fig, ax = plt.subplots()
+    ax.set_title("Dimensions vs Percolation")
+    ax.set_xlabel("Shorter Axis")
+    ax.set_ylabel("Percolation Threshold")
+    ax.plot(x_axis, results)
+    plt.show()
+
+    fig.savefig("useless_figure")
+
+    
+
+
 
 
 def load_data(path):
@@ -291,11 +325,16 @@ if args.file == None:
     with open("data.p", "wb") as file:
         pickle.dump(data, file)
 
+    show_graphs(data)
+
+elif args.file == "magic":
+    rectangle_simulation()
+
 else:
     data = load_data(args.file)
+    show_graphs(data)
 
 
-show_graphs(data)
 
 # old bad way
 # for p in range(50, 51):
