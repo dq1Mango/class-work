@@ -76,15 +76,15 @@ func (g *Grid) print_grid() {
 		}
 		fmt.Println()
 	}
+	color.Set(color.FgWhite)
 }
 
 func clear_screen() {
 	print("\u001b[2J")
 }
 
-func random_step() Point {
+func random_step(r *rand.Rand) Point {
 
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	value := r.Float64()
 
 	if value < 0.25 {
@@ -123,18 +123,16 @@ func init_model(size int, p float64) Model {
 }
 
 func (m *Model) add_walker(point Point) {
-	fmt.Println("adding walker")
 	m.walkers = append(m.walkers, point)
-	fmt.Println(m.walkers)
 }
 
-func (m Model) tick() {
+func (m *Model) tick(r *rand.Rand) {
 
 	for index, walker := range m.walkers {
 		var new_point Point
 
 		for {
-			step := random_step()
+			step := random_step(r)
 			new_point = add_points(walker, step)
 			if m.grid.is_valid_point(new_point) {
 				m.walkers[index] = new_point
@@ -157,8 +155,8 @@ func (m Model) tick() {
 func main() {
 	fmt.Println("is this how go works?")
 
-	size := 11
-	p := 1.0
+	size := 41
+	p := 0.1
 
 	tps := 5
 
@@ -168,9 +166,15 @@ func main() {
 
 	model := init_model(size, p)
 
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	for range 100 {
+		start := time.Now()
+		model.tick(r)
+		stop := time.Now()
+		// fmt.Println("im pretty stupid: ", model.walkers)
 		clear_screen()
-		model.tick()
+		fmt.Println("took this long: ", stop.Sub(start))
 		model.grid.print_grid()
 		time.Sleep(delay)
 
