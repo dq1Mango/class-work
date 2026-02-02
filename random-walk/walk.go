@@ -26,9 +26,11 @@ func (p Point) add(p2 Point) {
 }
 
 type Model struct {
-	grid    Grid
-	walkers []Point
-	p       float64
+	grid     Grid
+	walkers  []Point
+	p        float64
+	people   int
+	infected int
 }
 
 func gen_grid(size int) Grid {
@@ -113,10 +115,15 @@ func init_model(size int, p float64) Model {
 
 	*grid.index(middle) = 1
 
+	walkers := make([]Point, 1, size*size)
+	walkers[0] = middle
+
 	model := Model{
-		grid:    grid,
-		walkers: []Point{middle},
-		p:       p,
+		grid:     grid,
+		walkers:  walkers,
+		p:        p,
+		people:   size * size,
+		infected: 1,
 	}
 
 	return model
@@ -131,6 +138,8 @@ func (m *Model) tick(r *rand.Rand) {
 	for index, walker := range m.walkers {
 		var new_point Point
 
+		// start := time.Now()
+
 		for {
 			step := random_step(r)
 			new_point = add_points(walker, step)
@@ -140,13 +149,25 @@ func (m *Model) tick(r *rand.Rand) {
 			}
 		}
 
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		// stop := time.Now()
+		// fmt.Println("im pretty stupid: ", model.walkers)
+		// fmt.Println("getting the new point took this long: ", stop.Sub(start))
+
+		// start = time.Now()
+		// r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		value := r.Float64()
 
-		if value < m.p {
-			*m.grid.index(new_point) = 1
-			m.add_walker(new_point)
+		if *m.grid.index(new_point) == 0 {
+			if value < m.p {
+				*m.grid.index(new_point) = 1
+				m.add_walker(new_point)
+				m.infected++
+			}
 		}
+
+		// stop = time.Now()
+
+		// fmt.Println("maybe spreading took this long: ", stop.Sub(start))
 
 	}
 
@@ -155,7 +176,7 @@ func (m *Model) tick(r *rand.Rand) {
 func main() {
 	fmt.Println("is this how go works?")
 
-	size := 41
+	size := 1001
 	p := 0.1
 
 	tps := 5
@@ -168,19 +189,23 @@ func main() {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	for range 100 {
-		start := time.Now()
+	i := 0
+	for model.infected < model.people {
+		fmt.Println("iter: ", i, ", infected: ", float64(model.infected)/float64(model.people))
+
+		// start := time.Now()
 		model.tick(r)
-		stop := time.Now()
+		// stop := time.Now()
 		// fmt.Println("im pretty stupid: ", model.walkers)
-		clear_screen()
-		fmt.Println("took this long: ", stop.Sub(start))
-		model.grid.print_grid()
-		time.Sleep(delay)
+		// fmt.Println("took this long: ", stop.Sub(start))
+		// model.grid.print_grid()
+		// time.Sleep(delay)
+		// clear_screen()
+		i++
 
 	}
 
 	color.Set(color.FgWhite)
-	fmt.Println(delay)
+	// fmt.Println(delay)
 	// model.grid.print_grid()
 }
