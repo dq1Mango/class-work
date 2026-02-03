@@ -9,6 +9,8 @@ import (
 	"github.com/fatih/color"
 )
 
+// some clever stack overflow code i found
+
 type Grid [][]int
 
 type Point struct {
@@ -25,13 +27,39 @@ func (p Point) add(p2 Point) {
 	p.col += p2.col
 }
 
+type Walker struct {
+	location Point
+	ttl      int
+}
+
+type SiteState int
+
+const (
+	Susceptible SiteState = iota
+	Removed
+)
+
 type Model struct {
 	grid     Grid
-	walkers  []Point
+	walkers  []Walker
 	p        float64
+	tau      int
 	people   int
 	infected int
 }
+
+func remove[T any](s []T, i int) []T {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+// // this isnt dumb at all
+// type Walkers []Walker
+//
+// func (w Walkers) remove(i int) {
+// 	w[i] = w[len(w)-1]
+// 	w = w[:len(w)-1]
+// }
 
 func gen_grid(size int) Grid {
 
@@ -101,7 +129,7 @@ func random_step(r *rand.Rand) Point {
 
 }
 
-func init_model(size int, p float64) Model {
+func init_model(size int, p float64, tau int) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
@@ -115,8 +143,11 @@ func init_model(size int, p float64) Model {
 
 	*grid.index(middle) = 1
 
-	walkers := make([]Point, 1, size*size)
-	walkers[0] = middle
+	walkers := make([]Walker, 1)
+	walkers[0] = Walker{
+		location: middle,
+		ttl:      tau,
+	}
 
 	model := Model{
 		grid:     grid,
@@ -129,22 +160,30 @@ func init_model(size int, p float64) Model {
 	return model
 }
 
-func (m *Model) add_walker(point Point) {
-	m.walkers = append(m.walkers, point)
+func (m *Model) add_walker(point Point, ttl int) {
+	m.walkers = append(m.walkers, Walker{
+		location: point,
+		ttl:      ttl,
+	})
 }
 
 func (m *Model) tick(r *rand.Rand) {
 
-	for index, walker := range m.walkers {
+	chopping_block := make([]int, 0)
+
+	for index := range m.walkers {
+
+		walker := &m.walkers[index]
 		var new_point Point
 
 		// start := time.Now()
 
 		for {
 			step := random_step(r)
-			new_point = add_points(walker, step)
+			new_point = add_points(walker.location, step)
 			if m.grid.is_valid_point(new_point) {
-				m.walkers[index] = new_point
+				walker.location = new_point
+				// m.walkers[index].location = new_point
 				break
 			}
 		}
@@ -160,9 +199,14 @@ func (m *Model) tick(r *rand.Rand) {
 		if *m.grid.index(new_point) == 0 {
 			if value < m.p {
 				*m.grid.index(new_point) = 1
-				m.add_walker(new_point)
+				m.add_walker(new_point, m.tau)
 				m.infected++
 			}
+		}
+
+		walker.ttl -= 1
+		if walker.ttl == 0 {
+			chopping_block = append(chopping_block, index)
 		}
 
 		// stop = time.Now()
@@ -171,13 +215,29 @@ func (m *Model) tick(r *rand.Rand) {
 
 	}
 
+	// this isnt great but maybe its fine
+	for _, block := range chopping_block {
+		m.walkers = remove(m.walkers, block)
+	}
+
 }
+
+// func testing() {
+// 	data := []int {0, 1 , 2, 3}
+//
+// 	for _, idk := range data {
+// 		idk = 67
+// 	}
+//
+// 	fmt.Println(data)
+// }
 
 func main() {
 	fmt.Println("is this how go works?")
 
-	size := 1001
+	size := 21
 	p := 0.1
+	tau := 20
 
 	tps := 5
 
@@ -185,7 +245,7 @@ func main() {
 	fmt.Println(delay)
 	fmt.Println(1.0 / float64(tps))
 
-	model := init_model(size, p)
+	model := init_model(size, p, tau)
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -198,9 +258,9 @@ func main() {
 		// stop := time.Now()
 		// fmt.Println("im pretty stupid: ", model.walkers)
 		// fmt.Println("took this long: ", stop.Sub(start))
-		// model.grid.print_grid()
-		// time.Sleep(delay)
-		// clear_screen()
+		model.grid.print_grid()
+		time.Sleep(delay)
+		clear_screen()
 		i++
 
 	}
