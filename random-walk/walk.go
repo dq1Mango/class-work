@@ -22,6 +22,7 @@ type SiteState int
 const (
 	Susceptible SiteState = iota
 	Removed
+	Visited
 )
 
 var StateColor = map[SiteState]color.NRGBA{
@@ -34,6 +35,12 @@ var StateColor = map[SiteState]color.NRGBA{
 	Removed: {
 		R: 255,
 		G: 255,
+		B: 255,
+		A: 255,
+	},
+	Visited: {
+		R: 0,
+		G: 0,
 		B: 255,
 		A: 255,
 	},
@@ -173,6 +180,8 @@ func (g *Grid) print_grid() {
 				textColor.Set(textColor.FgBlack)
 			case 1:
 				textColor.Set(textColor.FgWhite)
+			case 2:
+				textColor.Set(textColor.FgBlue)
 
 			}
 			fmt.Print(block)
@@ -247,9 +256,6 @@ func (m *Model) add_walker(walker Walker) {
 
 func (m *Model) tick(r *rand.Rand) {
 
-	// chopping_block := make([]int, 0)
-	// walkers_to_add := make([]Walker, 0)
-
 	index := -1
 	// for index < len(m.walkers)-1 {
 	for _, walker := range m.walkers.Iterate() {
@@ -257,10 +263,6 @@ func (m *Model) tick(r *rand.Rand) {
 
 		// walker := &m.walkers[index]
 
-		// if walker.location.col == 0 && walker.location.row == 0 {
-		// 	fmt.Printf("problem is here", m.grid)
-		// 	panic("ahhhhhh")
-		// }
 		var new_point Point
 
 		// start := time.Now()
@@ -281,23 +283,19 @@ func (m *Model) tick(r *rand.Rand) {
 
 		// start = time.Now()
 		// r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		value := r.Float64()
 
-		if *m.grid.index(new_point) == Susceptible {
+		state := m.grid.index(new_point)
+		if *state == Susceptible || *state == Visited {
+			value := r.Float64()
 			if value < m.p {
-				*m.grid.index(new_point) = Removed
+				*state = Removed
 				// walkers_to_add = append(walkers_to_add, Walker{location: new_point, ttl: m.tau})
 				m.walkers.add_walker(Walker{location: new_point, ttl: m.tau})
 				m.infected++
+			} else {
+				*state = Visited
 			}
 		}
-
-		// walker.ttl -= 1
-		// if walker.ttl == 0 {
-		// 	// m.walkers = remove(m.walkers, index)
-		// 	m.walkers = slices.Delete(m.walkers, index, index+1)
-		// 	// chopping_block = append(chopping_block, index)
-		// }
 
 		// stop = time.Now()
 
@@ -306,15 +304,6 @@ func (m *Model) tick(r *rand.Rand) {
 	}
 
 	m.walkers.tick()
-
-	// for _, walker := range walkers_to_add {
-	// 	m.add_walker(walker)
-	// }
-
-	// this isnt great but maybe its fine
-	// for _, block := range chopping_block {
-	// 	m.walkers = remove(m.walkers, block)
-	// }
 
 }
 
@@ -336,13 +325,14 @@ func main() {
 
 	fmt.Println("is this how go works?")
 
-	size := 101
+	size := 501
 	p := 0.2
 	tau := 10
 
-	tps := 5
+	tps := 1
 
-	// interval := 10
+	interval := 1
+	fmt.Println(interval)
 
 	var delay time.Duration = time.Duration(1.0 / float64(tps) * math.Pow10(9))
 	fmt.Println(delay)
@@ -354,7 +344,11 @@ func main() {
 
 	i := 0
 	for model.infected < model.people {
-		// fmt.Println("iter: ", i, ", infected: ", float64(model.infected)/float64(model.people))
+		infected_ratio := float64(model.infected) / float64(model.people)
+		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
+		if infected_ratio > 0.25 {
+			break
+		}
 
 		// start := time.Now()
 		model.tick(r)
@@ -368,43 +362,50 @@ func main() {
 		i++
 
 		// if i%interval == 0 {
-		// 	make_graph(model, fmt.Sprintf("image-%d.png", i/interval))
+		// 	make_graph(model, fmt.Sprintf("image-%d.png", i/interval), 30)
 		// }
 
-		if i > 200 {
-			break
-		}
+		// if i > 1000 {
+		// 	break
+		// }
 
 	}
-
-	make_graph(model, "image.png")
-
-	// textColor.Set(textColor.FgWhite)
-	// fmt.Println(delay)
 	// model.grid.print_grid()
+
+	make_graph(model, "image.png", 2)
+
 }
 
-func make_graph(model Model, name string) {
+func make_graph(model Model, name string, scale int) {
 
 	grid := model.grid
 
 	size := len(grid)
 
-	img := image.NewNRGBA(image.Rect(0, 0, size, size))
+	img := image.NewNRGBA(image.Rect(0, 0, size*scale, size*scale))
 
-	for x := range grid {
-		for y := range grid[0] {
-			img.Set(x, y, StateColor[grid[x][y]])
+	for y, row := range grid {
+		for x := range row {
+			for i := range scale {
+				for j := range scale {
+
+					img.Set(y*scale+i, x*scale+j, StateColor[grid[x][y]])
+				}
+			}
 		}
 	}
 
 	for _, walker := range model.walkers.Iterate() {
-		img.Set(walker.location.col, walker.location.row, color.NRGBA{
-			R: 255,
-			G: 0,
-			B: 0,
-			A: 255,
-		})
+		for i := range scale {
+			for j := range scale {
+				img.Set(walker.location.col*scale+i, walker.location.row*scale+j, color.NRGBA{
+					R: 255,
+					G: 0,
+					B: 0,
+					A: 255,
+				})
+			}
+		}
 	}
 
 	f, err := os.Create(name)
