@@ -13,6 +13,7 @@ import (
 	textColor "github.com/fatih/color"
 	// "github.com/go-echarts/go-echarts/v2/charts"
 	// "github.com/go-echarts/go-echarts/v2/opts"
+	// "slices"
 )
 
 // some clever stack overflow code i found
@@ -59,16 +60,68 @@ type Walker struct {
 	ttl      int
 }
 
+type Walkers []*[]Walker
+
+func make_walkers(tau int) Walkers {
+	walkers := make([]*[]Walker, tau+1)
+
+	for i := range walkers {
+		tmp := make([]Walker, 0)
+		walkers[i] = &tmp
+	}
+
+	return walkers
+}
+
+func (w Walkers) add_walker(walker Walker) {
+	last := len(w) - 1
+	*w[last] = append(*w[last], walker)
+
+}
+
+func (w Walkers) tick() {
+	for i := range len(w) - 1 {
+		w[i] = w[i+1]
+	}
+
+	tmp := make([]Walker, 0)
+
+	w[len(w)-1] = &tmp
+}
+
+func (w Walkers) Iterate() []*Walker {
+	size := 0
+	for i := range len(w) - 1 {
+		size += len(*w[i])
+	}
+
+	flattened := make([]*Walker, 0, size)
+
+	for i := range len(w) - 1 {
+		for j := range *w[i] {
+			flattened = append(flattened, &(*w[i])[j])
+		}
+	}
+
+	// fmt.Println("", flattened)
+	return flattened
+
+}
+
 type Model struct {
 	grid     Grid
-	walkers  []Walker
+	walkers  Walkers
 	p        float64
 	tau      int
 	people   int
 	infected int
 }
 
-func remove[T any](s []T, i int) []T {
+// func remove[T any](slice []T, s int) []T {
+// 	return slices.Delete(slice, s, s+1)
+// }
+
+func unordered_remove[T any](s []T, i int) []T {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
@@ -163,11 +216,18 @@ func init_model(size int, p float64, tau int) Model {
 
 	*grid.index(middle) = 1
 
-	walkers := make([]Walker, 1)
-	walkers[0] = Walker{
+	// walkers := make([]Walker, 1)
+	// walkers[0] = Walker{
+	// 	location: middle,
+	// 	ttl:      tau,
+	// }
+
+	walkers := make_walkers(tau)
+	walkers.add_walker(Walker{
 		location: middle,
 		ttl:      tau,
-	}
+	})
+	walkers.tick()
 
 	model := Model{
 		grid:     grid,
@@ -180,20 +240,27 @@ func init_model(size int, p float64, tau int) Model {
 	return model
 }
 
-func (m *Model) add_walker(point Point, ttl int) {
-	m.walkers = append(m.walkers, Walker{
-		location: point,
-		ttl:      ttl,
-	})
+func (m *Model) add_walker(walker Walker) {
+	m.walkers.add_walker(walker)
+	// m.walkers = append(m.walkers, walker)
 }
 
 func (m *Model) tick(r *rand.Rand) {
 
-	chopping_block := make([]int, 0)
+	// chopping_block := make([]int, 0)
+	// walkers_to_add := make([]Walker, 0)
 
-	for index := range m.walkers {
+	index := -1
+	// for index < len(m.walkers)-1 {
+	for _, walker := range m.walkers.Iterate() {
+		index++
 
-		walker := &m.walkers[index]
+		// walker := &m.walkers[index]
+
+		// if walker.location.col == 0 && walker.location.row == 0 {
+		// 	fmt.Printf("problem is here", m.grid)
+		// 	panic("ahhhhhh")
+		// }
 		var new_point Point
 
 		// start := time.Now()
@@ -216,18 +283,21 @@ func (m *Model) tick(r *rand.Rand) {
 		// r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		value := r.Float64()
 
-		if *m.grid.index(new_point) == 0 {
+		if *m.grid.index(new_point) == Susceptible {
 			if value < m.p {
-				*m.grid.index(new_point) = 1
-				m.add_walker(new_point, m.tau)
+				*m.grid.index(new_point) = Removed
+				// walkers_to_add = append(walkers_to_add, Walker{location: new_point, ttl: m.tau})
+				m.walkers.add_walker(Walker{location: new_point, ttl: m.tau})
 				m.infected++
 			}
 		}
 
-		walker.ttl -= 1
-		if walker.ttl == 0 {
-			chopping_block = append(chopping_block, index)
-		}
+		// walker.ttl -= 1
+		// if walker.ttl == 0 {
+		// 	// m.walkers = remove(m.walkers, index)
+		// 	m.walkers = slices.Delete(m.walkers, index, index+1)
+		// 	// chopping_block = append(chopping_block, index)
+		// }
 
 		// stop = time.Now()
 
@@ -235,10 +305,16 @@ func (m *Model) tick(r *rand.Rand) {
 
 	}
 
+	m.walkers.tick()
+
+	// for _, walker := range walkers_to_add {
+	// 	m.add_walker(walker)
+	// }
+
 	// this isnt great but maybe its fine
-	for _, block := range chopping_block {
-		m.walkers = remove(m.walkers, block)
-	}
+	// for _, block := range chopping_block {
+	// 	m.walkers = remove(m.walkers, block)
+	// }
 
 }
 
@@ -249,22 +325,24 @@ func testing() {
 	// 	idk = 67
 	// }
 
-	data = remove(data, 1)
+	data = unordered_remove(data, 1)
 
 	fmt.Println(data)
 }
 
 func main() {
-	testing()
-	return
+	// testing()
+	// return
 
 	fmt.Println("is this how go works?")
 
-	size := 1001
+	size := 101
 	p := 0.2
 	tau := 10
 
 	tps := 5
+
+	// interval := 10
 
 	var delay time.Duration = time.Duration(1.0 / float64(tps) * math.Pow10(9))
 	fmt.Println(delay)
@@ -289,20 +367,24 @@ func main() {
 		// clear_screen()
 		i++
 
-		if i > 1000 {
+		// if i%interval == 0 {
+		// 	make_graph(model, fmt.Sprintf("image-%d.png", i/interval))
+		// }
+
+		if i > 200 {
 			break
 		}
 
 	}
 
-	make_graph(model)
+	make_graph(model, "image.png")
 
 	// textColor.Set(textColor.FgWhite)
 	// fmt.Println(delay)
 	// model.grid.print_grid()
 }
 
-func make_graph(model Model) {
+func make_graph(model Model, name string) {
 
 	grid := model.grid
 
@@ -316,7 +398,7 @@ func make_graph(model Model) {
 		}
 	}
 
-	for _, walker := range model.walkers {
+	for _, walker := range model.walkers.Iterate() {
 		img.Set(walker.location.col, walker.location.row, color.NRGBA{
 			R: 255,
 			G: 0,
@@ -325,7 +407,7 @@ func make_graph(model Model) {
 		})
 	}
 
-	f, err := os.Create("image.png")
+	f, err := os.Create(name)
 	if err != nil {
 		// log.Fatal(err)
 	}
@@ -338,6 +420,8 @@ func make_graph(model Model) {
 	if err := f.Close(); err != nil {
 		// log.Fatal(err)
 	}
+
+	// exec.Command("chafa", "image.png").Run()
 }
 
 // func make_graph(grid Grid) {
