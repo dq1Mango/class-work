@@ -67,7 +67,10 @@ type Walker struct {
 	ttl      int
 }
 
-type Walkers []*[]Walker
+type Walkers struct {
+	queue []*[]Walker
+	alive int
+}
 
 func make_walkers(tau int) Walkers {
 	walkers := make([]*[]Walker, tau+1)
@@ -77,36 +80,45 @@ func make_walkers(tau int) Walkers {
 		walkers[i] = &tmp
 	}
 
-	return walkers
+	return Walkers{queue: walkers, alive: 0}
 }
 
-func (w Walkers) add_walker(walker Walker) {
-	last := len(w) - 1
-	*w[last] = append(*w[last], walker)
+func (w *Walkers) add_walker(walker Walker) {
+	q := w.queue
+	last := len(q) - 1
+	*q[last] = append(*q[last], walker)
+
+	w.alive += 1
 
 }
 
-func (w Walkers) tick() {
-	for i := range len(w) - 1 {
-		w[i] = w[i+1]
+func (w *Walkers) tick() {
+
+	q := w.queue
+	w.alive -= len(*q[0])
+
+	for i := range len(q) - 1 {
+		q[i] = q[i+1]
 	}
 
 	tmp := make([]Walker, 0)
 
-	w[len(w)-1] = &tmp
+	q[len(q)-1] = &tmp
 }
 
-func (w Walkers) Iterate() []*Walker {
+func (w *Walkers) Iterate() []*Walker {
+	q := w.queue
+
 	size := 0
-	for i := range len(w) - 1 {
-		size += len(*w[i])
+	for i := range len(q) - 1 {
+		size += len(*q[i])
 	}
 
 	flattened := make([]*Walker, 0, size)
 
-	for i := range len(w) - 1 {
-		for j := range *w[i] {
-			flattened = append(flattened, &(*w[i])[j])
+	for i := range len(q) - 1 {
+		for j := range *q[i] {
+			flattened = append(flattened, &(*q[i])[j])
 		}
 	}
 
@@ -278,8 +290,6 @@ func (m *Model) tick(r *rand.Rand) {
 		}
 
 		// stop := time.Now()
-		// fmt.Println("im pretty stupid: ", model.walkers)
-		// fmt.Println("getting the new point took this long: ", stop.Sub(start))
 
 		// start = time.Now()
 		// r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -325,9 +335,9 @@ func main() {
 
 	fmt.Println("is this how go works?")
 
-	size := 501
-	p := 0.2
-	tau := 10
+	size := 201
+	p := 0.25
+	tau := 8
 
 	tps := 1
 
@@ -346,14 +356,19 @@ func main() {
 	for model.infected < model.people {
 		infected_ratio := float64(model.infected) / float64(model.people)
 		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
-		if infected_ratio > 0.25 {
+		if infected_ratio > 0.2 {
+			make_graph(model, "image.png", 5)
+			break
+		}
+
+		if model.walkers.alive == 0 {
+			fmt.Println("Failed to spread")
 			break
 		}
 
 		// start := time.Now()
 		model.tick(r)
 		// stop := time.Now()
-		// fmt.Println("im pretty stupid: ", model.walkers)
 		// fmt.Println("took this long: ", stop.Sub(start))
 
 		// model.grid.print_grid()
@@ -371,8 +386,6 @@ func main() {
 
 	}
 	// model.grid.print_grid()
-
-	make_graph(model, "image.png", 2)
 
 }
 
