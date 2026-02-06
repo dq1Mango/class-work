@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"math/rand"
 	"os"
+	"os/exec"
 	"time"
 
 	textColor "github.com/fatih/color"
@@ -361,12 +362,9 @@ func average_spread_rate(size int, p float64, tau int, r *rand.Rand) float64 {
 
 }
 
-func main() {
-	// testing()
-	// return
+type Data []opts.Chart3DData
 
-	fmt.Println("is this how go works?")
-
+func run_simulation() Data {
 	size := 201
 	// p := 0.5
 	// tau := 5
@@ -376,7 +374,7 @@ func main() {
 	tau_values := 20
 	trials := 11
 	num_points := tau_values * tau_values
-	data := make([]opts.Chart3DData, 0, num_points)
+	data := make(Data, 0, num_points)
 	// average := 0.0
 
 	for P := range tau_values {
@@ -400,9 +398,55 @@ func main() {
 		}
 	}
 
+	return data
+
+}
+
+type Arguments struct {
+	file    string
+	is_file bool
+}
+
+func parse_args() Arguments {
+	args := os.Args[1:]
+	if len(args) >= 2 {
+		if args[0] == "--file" || args[0] == "-f" {
+			return Arguments{
+				file:    args[1],
+				is_file: true,
+			}
+		}
+	}
+
+	return Arguments{
+		file:    "",
+		is_file: false,
+	}
+}
+
+func main() {
+	// testing()
+	// return
+
+	var data Data
+
+	args := parse_args()
+
+	if args.is_file {
+		json_data, err := os.ReadFile(args.file)
+		if err != nil {
+			panic(err)
+		}
+
+		json.Unmarshal(json_data, &data)
+	} else {
+		data = run_simulation()
+
+	}
+
 	make_chart(data)
 
-	file, err := os.Create("surface.json")
+	file, err := os.Create("data.json")
 
 	if err != nil {
 		panic(err)
@@ -423,11 +467,11 @@ func make_chart(data []opts.Chart3DData) {
 		charts.WithTitleOpts(opts.Title{
 			Title: "3D Surface Example",
 		}),
-		// charts.WithVisualMapOpts(opts.VisualMap{
-		// 	Calculable: true,
-		// 	Max:        1,
-		// 	Min:        -1,
-		// }),
+		charts.WithVisualMapOpts(opts.VisualMap{
+			Max:       1,
+			Min:       -1,
+			Dimension: "x",
+		}),
 	)
 
 	surface.AddSeries("surface", data)
@@ -438,6 +482,11 @@ func make_chart(data []opts.Chart3DData) {
 	f, _ := os.Create("surface.html")
 	defer f.Close()
 	surface.Render(f)
+	err := exec.Command("xdg-open", "surface.html").Run()
+	if err != nil {
+		fmt.Println("couldnt open chart:", err)
+	}
+	exec.Command("hyprctl", "dispatch", "workspace", "2").Run()
 
 }
 
