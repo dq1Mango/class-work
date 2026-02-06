@@ -1,18 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/color"
 	"image/png"
-	"math"
 	"math/rand"
 	"os"
 	"time"
 
 	textColor "github.com/fatih/color"
-	// "github.com/go-echarts/go-echarts/v2/charts"
-	// "github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/go-echarts/go-echarts/v2/charts"
+	"github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/montanaflynn/stats"
 	// "slices"
 )
 
@@ -244,10 +245,12 @@ func init_model(size int, p float64, tau int) Model {
 	// }
 
 	walkers := make_walkers(tau)
-	walkers.add_walker(Walker{
-		location: middle,
-		ttl:      tau,
-	})
+	for range 2 {
+		walkers.add_walker(Walker{
+			location: middle,
+			ttl:      tau,
+		})
+	}
 	walkers.tick()
 
 	model := Model{
@@ -318,15 +321,44 @@ func (m *Model) tick(r *rand.Rand) {
 }
 
 func testing() {
-	data := []int{0, 1, 2, 3}
+	// data := []int{0, 1, 2, 3}
+	point := Point{row: 1, col: 1}
+	data := []Point{point, point}
 
 	// for _, idk := range data {
 	// 	idk = 67
 	// }
 
-	data = unordered_remove(data, 1)
+	// data = unordered_remove(data, 1)
+
+	data[0].row = 2
 
 	fmt.Println(data)
+}
+
+func average_spread_rate(size int, p float64, tau int, r *rand.Rand) float64 {
+	model := init_model(size, p, tau)
+	infected_stop := int(0.2 * float64(model.people))
+	i := 0
+
+	for model.infected < infected_stop {
+		// infected_ratio := float64(model.infected) / float64(model.people)
+
+		if model.walkers.alive == 0 {
+			// fmt.Println("Failed to spread")
+			return 0
+			// break
+		}
+
+		// start := time.Now()
+		model.tick(r)
+		// stop := time.Now()
+		// fmt.Println("took this long: ", stop.Sub(start))
+		i++
+	}
+
+	return float64(model.infected) / float64(i)
+
 }
 
 func main() {
@@ -336,28 +368,95 @@ func main() {
 	fmt.Println("is this how go works?")
 
 	size := 201
-	p := 0.25
-	tau := 8
-
-	tps := 1
-
-	interval := 1
-	fmt.Println(interval)
-
-	var delay time.Duration = time.Duration(1.0 / float64(tps) * math.Pow10(9))
-	fmt.Println(delay)
-	fmt.Println(1.0 / float64(tps))
-
-	model := init_model(size, p, tau)
+	// p := 0.5
+	// tau := 5
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	tau_values := 20
+	trials := 11
+	num_points := tau_values * tau_values
+	data := make([]opts.Chart3DData, 0, num_points)
+	// average := 0.0
+
+	for P := range tau_values {
+		p := float64(P) / float64(tau_values)
+		for tau := range tau_values {
+			fmt.Println("This much done: ", float64(P*tau_values+tau)/float64(num_points), "%")
+
+			values := make([]float64, 0, trials)
+			for range trials {
+				values = append(values, average_spread_rate(size, p, tau, r))
+			}
+
+			median, err := stats.Median(values)
+			if err != nil {
+				panic(fmt.Sprint("ahhhh", err))
+			}
+
+			data = append(data, opts.Chart3DData{
+				Value: []interface{}{p, float64(tau), median}})
+			// Value: []interface{}{1, 2, 3},
+		}
+	}
+
+	make_chart(data)
+
+	file, err := os.Create("surface.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(data)
+
+}
+
+func make_chart(data []opts.Chart3DData) {
+	surface := charts.NewSurface3D()
+
+	surface.SetGlobalOptions(
+		charts.WithTitleOpts(opts.Title{
+			Title: "3D Surface Example",
+		}),
+		// charts.WithVisualMapOpts(opts.VisualMap{
+		// 	Calculable: true,
+		// 	Max:        1,
+		// 	Min:        -1,
+		// }),
+	)
+
+	surface.AddSeries("surface", data)
+	// SetSeriesOptions(
+	// 	charts.WithShading("realistic"),
+	// )
+
+	f, _ := os.Create("surface.html")
+	defer f.Close()
+	surface.Render(f)
+
+}
+
+func one_trial(model Model, r *rand.Rand) {
+	// tps := 1
+
+	// interval := 1
+	// fmt.Println(interval)
+	//
+	// var delay time.Duration = time.Duration(1.0 / float64(tps) * math.Pow10(9))
+	// fmt.Println(delay)
+	// fmt.Println(1.0 / float64(tps))
 
 	i := 0
 	for model.infected < model.people {
 		infected_ratio := float64(model.infected) / float64(model.people)
 		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
 		if infected_ratio > 0.2 {
-			make_graph(model, "image.png", 5)
+			pretty_picture(model, "image.png", 5)
 			break
 		}
 
@@ -385,11 +484,10 @@ func main() {
 		// }
 
 	}
-	// model.grid.print_grid()
 
 }
 
-func make_graph(model Model, name string, scale int) {
+func pretty_picture(model Model, name string, scale int) {
 
 	grid := model.grid
 
