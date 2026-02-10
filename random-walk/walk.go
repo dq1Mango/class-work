@@ -219,6 +219,11 @@ func clear_screen() {
 	print("\u001b[2J")
 }
 
+func clear_line() {
+	print("\u001b[2K")
+	print("\r")
+}
+
 func random_step(r *rand.Rand) Point {
 
 	value := r.Float64()
@@ -393,7 +398,8 @@ func run_simulation() Data {
 	for P := range tau_values {
 		p := float64(P) / float64(tau_values)
 		for tau := range tau_values {
-			fmt.Println("This much done: ", float64(P*tau_values+tau)/float64(num_points), "%")
+			clear_line()
+			fmt.Print("This much done: ", float64(P*tau_values+tau)/float64(num_points)*100.0, "%")
 
 			values := make([]float64, 0, trials)
 			for range trials {
@@ -458,22 +464,44 @@ func main() {
 	} else {
 		data = run_simulation()
 
+		file, err := os.Create("immune-data.json")
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer file.Close()
+
+		encoder := json.NewEncoder(file)
+		encoder.SetIndent("", "  ")
+		encoder.Encode(data)
+
 	}
 
 	make_chart(data)
 
-	file, err := os.Create("immune-data.json")
+}
 
-	if err != nil {
-		panic(err)
+func Pointer[T any](t T) *T {
+	return &t
+}
+
+func find_max(data []opts.Chart3DData) float32 {
+	greatest := float64(0)
+	for _, value := range data {
+		v := value.Value[2]
+		switch v := v.(type) {
+		case float64:
+			if v > greatest {
+				greatest = v
+			}
+		default:
+			panic("howd that get in here")
+		}
+
 	}
 
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	encoder.Encode(data)
-
+	return float32(greatest)
 }
 
 func make_chart(data []opts.Chart3DData) {
@@ -481,16 +509,30 @@ func make_chart(data []opts.Chart3DData) {
 
 	surface.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{
-			Title: "3D Surface Example",
+			Title: "Random Walker Data",
+		}),
+		charts.WithXAxis3DOpts(opts.XAxis3D{
+			Name: "Infection Chance (%)",
+		}),
+		charts.WithYAxis3DOpts(opts.YAxis3D{
+			Name: "# of Steps",
+		}),
+		charts.WithZAxis3DOpts(opts.ZAxis3D{
+			Name: "Average Spread Rate",
 		}),
 		charts.WithVisualMapOpts(opts.VisualMap{
-			Max:       1,
-			Min:       -1,
-			Dimension: "z",
+			Max:        find_max(data),
+			Min:        0,
+			Dimension:  "z",
+			Calculable: Pointer(true),
+			// Range:      []float32{1, 100},
+			InRange: &opts.VisualMapInRange{
+				Color: []string{"blue", "red"},
+			},
 		}),
 	)
 
-	surface.AddSeries("surface", data)
+	surface.AddSeries("data", data)
 	// SetSeriesOptions(
 	// 	charts.WithShading("realistic"),
 	// )
