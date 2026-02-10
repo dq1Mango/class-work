@@ -18,6 +18,8 @@ import (
 	// "slices"
 )
 
+const END_RATIO = 0.1
+
 // some clever stack overflow code i found
 type SiteState int
 
@@ -25,6 +27,7 @@ const (
 	Susceptible SiteState = iota
 	Removed
 	Visited
+	Immune
 )
 
 var StateColor = map[SiteState]color.NRGBA{
@@ -44,6 +47,12 @@ var StateColor = map[SiteState]color.NRGBA{
 		R: 0,
 		G: 0,
 		B: 255,
+		A: 255,
+	},
+	Immune: {
+		R: 0,
+		G: 255,
+		B: 0,
 		A: 255,
 	},
 }
@@ -136,6 +145,7 @@ type Model struct {
 	tau      int
 	people   int
 	infected int
+	time     int
 }
 
 // func remove[T any](slice []T, s int) []T {
@@ -307,7 +317,8 @@ func (m *Model) tick(r *rand.Rand) {
 				m.walkers.add_walker(Walker{location: new_point, ttl: m.tau})
 				m.infected++
 			} else {
-				*state = Visited
+				// *state = Visited
+				*state = Immune
 			}
 		}
 
@@ -319,27 +330,29 @@ func (m *Model) tick(r *rand.Rand) {
 
 	m.walkers.tick()
 
+	m.time++
+
 }
 
 func testing() {
-	// data := []int{0, 1, 2, 3}
-	point := Point{row: 1, col: 1}
-	data := []Point{point, point}
-
-	// for _, idk := range data {
-	// 	idk = 67
-	// }
-
-	// data = unordered_remove(data, 1)
-
-	data[0].row = 2
-
-	fmt.Println(data)
+	// // data := []int{0, 1, 2, 3}
+	// point := Point{row: 1, col: 1}
+	// data := []Point{point, point}
+	//
+	// // for _, idk := range data {
+	// // 	idk = 67
+	// // }
+	//
+	// // data = unordered_remove(data, 1)
+	//
+	// data[0].row = 2
+	//
+	// fmt.Println(data)
 }
 
 func average_spread_rate(size int, p float64, tau int, r *rand.Rand) float64 {
 	model := init_model(size, p, tau)
-	infected_stop := int(0.2 * float64(model.people))
+	infected_stop := int(END_RATIO * float64(model.people))
 	i := 0
 
 	for model.infected < infected_stop {
@@ -371,7 +384,7 @@ func run_simulation() Data {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	tau_values := 20
+	tau_values := 50
 	trials := 11
 	num_points := tau_values * tau_values
 	data := make(Data, 0, num_points)
@@ -393,7 +406,7 @@ func run_simulation() Data {
 			}
 
 			data = append(data, opts.Chart3DData{
-				Value: []interface{}{p, float64(tau), median}})
+				Value: []any{p, float64(tau), median}})
 			// Value: []interface{}{1, 2, 3},
 		}
 	}
@@ -428,6 +441,9 @@ func main() {
 	// testing()
 	// return
 
+	// one_trial()
+	// return
+
 	var data Data
 
 	args := parse_args()
@@ -446,7 +462,7 @@ func main() {
 
 	make_chart(data)
 
-	file, err := os.Create("data.json")
+	file, err := os.Create("immune-data.json")
 
 	if err != nil {
 		panic(err)
@@ -470,7 +486,7 @@ func make_chart(data []opts.Chart3DData) {
 		charts.WithVisualMapOpts(opts.VisualMap{
 			Max:       1,
 			Min:       -1,
-			Dimension: "x",
+			Dimension: "z",
 		}),
 	)
 
@@ -490,7 +506,12 @@ func make_chart(data []opts.Chart3DData) {
 
 }
 
-func one_trial(model Model, r *rand.Rand) {
+func one_trial() {
+	size := 201
+	p := 0.4
+	tau := 10
+	model := init_model(size, p, tau)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// tps := 1
 
 	// interval := 1
@@ -504,7 +525,7 @@ func one_trial(model Model, r *rand.Rand) {
 	for model.infected < model.people {
 		infected_ratio := float64(model.infected) / float64(model.people)
 		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
-		if infected_ratio > 0.2 {
+		if infected_ratio > END_RATIO {
 			pretty_picture(model, "image.png", 5)
 			break
 		}
@@ -533,6 +554,8 @@ func one_trial(model Model, r *rand.Rand) {
 		// }
 
 	}
+
+	pretty_picture(model, "immune", 5)
 
 }
 
@@ -568,7 +591,7 @@ func pretty_picture(model Model, name string, scale int) {
 		}
 	}
 
-	f, err := os.Create(name)
+	f, err := os.Create(name + ".png")
 	if err != nil {
 		// log.Fatal(err)
 	}
@@ -581,6 +604,27 @@ func pretty_picture(model Model, name string, scale int) {
 	if err := f.Close(); err != nil {
 		// log.Fatal(err)
 	}
+
+	file, err := os.Create(name + "-data.png")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	// encoder.Encode(model)
+	encoder.Encode(struct {
+		Time       int `json:"time"`
+		Infected   int `json:"infected"`
+		Population int `json:"population"`
+	}{
+		model.time,
+		model.infected,
+		model.people,
+	})
 
 	// exec.Command("chafa", "image.png").Run()
 }
