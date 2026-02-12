@@ -134,7 +134,7 @@ func gen_grid(size int) Grid {
 
 func heart_equation(t float64) (float64, float64) {
 	y := 16 * math.Pow(math.Sin(t), 3)
-	x := 13*math.Sin(t) - 5*math.Sin(2*t) - 2*math.Sin(3*t) - math.Sin(4*t)
+	x := 13*math.Cos(t) - 5*math.Cos(2*t) - 2*math.Cos(3*t) - math.Cos(4*t)
 
 	y /= 15
 	x /= 15
@@ -156,12 +156,16 @@ func gen_heart_grid(size int, radius float64) Grid {
 	points := 100
 
 	for i := range points {
-		t := float64(i) * 2 * math.Pi
+		t := float64(i) / float64(points) * 2 * math.Pi
+		fmt.Println("t? ", t)
 
 		x, y := heart_equation(t)
+		fmt.Println("got this x, y", x, y)
 		point := Point{row: int(math.Round(x * radius)), col: int(math.Round(y * radius))}
 
 		real_point := add_points(point, mid_point)
+
+		fmt.Println("filled this square: ", real_point)
 
 		*grid.index(real_point) = Filled
 
