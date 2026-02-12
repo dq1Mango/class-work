@@ -505,6 +505,10 @@ func main() {
 
 	case "threshold":
 		make_threshold_chart(data)
+	case "derivative":
+		make_derivative_chart(data)
+	case "cross":
+		cross_sections(data)
 
 	default:
 		fmt.Println("uknown chart type: ", *args.chart)
@@ -605,7 +609,7 @@ func cast_to_float(input []any) ([]float64, error) {
 //
 // }
 
-func make_threshold_chart(Data []opts.Chart3DData) {
+func formatXY(Data []opts.Chart3DData) [][]float64 {
 	data := make([][]float64, 50)
 
 	for index := range data {
@@ -631,6 +635,14 @@ func make_threshold_chart(Data []opts.Chart3DData) {
 		// }
 	}
 
+	return data
+
+}
+
+func make_threshold_chart(Data []opts.Chart3DData) {
+
+	data := formatXY(Data)
+
 	threshold := make([]float64, 50)
 
 	for p, row := range data {
@@ -654,6 +666,88 @@ func make_threshold_chart(Data []opts.Chart3DData) {
 	for _, value := range threshold {
 		fmt.Println(value)
 	}
+
+}
+
+const DATA_SIZE = 50
+
+// MUST BE tau by p
+func cast_to_echart_format(data [][]float64) []opts.Chart3DData {
+	// fmt.Println(data)
+
+	output := make([]opts.Chart3DData, 0, len(data)*len(data[0]))
+
+	for i, row := range data {
+		for j, k := range row {
+			if k == 0 {
+				continue
+			}
+
+			output = append(output, opts.Chart3DData{Value: []any{j, float64(i) / DATA_SIZE, k}})
+		}
+	}
+
+	return output
+}
+
+func make_derivative_chart(Data []opts.Chart3DData) {
+	data := formatXY(Data)
+
+	d_tau := make([][]float64, 50)
+	d_p := make([][]float64, 50)
+
+	for i := range d_tau {
+		d_tau[i] = make([]float64, 50-1)
+		d_p[i] = make([]float64, 50-1)
+
+	}
+
+	for i := range DATA_SIZE - 1 {
+		for j := range DATA_SIZE - 2 {
+			if data[i][j] == 0 {
+				continue
+			}
+
+			d_p[i][j] = (data[i][j+1] - data[i][j])
+		}
+
+	}
+
+	for j := range DATA_SIZE - 1 {
+		for i := range DATA_SIZE - 2 {
+			d_tau[i][j] = (data[i+1][j] - data[i][j])
+
+		}
+	}
+
+	// make_3d_chart(cast_to_echart_format(d_tau))
+	make_3d_chart(cast_to_echart_format(d_p))
+
+}
+
+func cross_sections(Data []opts.Chart3DData) {
+	data := formatXY(Data)
+
+	tau_sections := []int{5, 10, 20}
+
+	for _, tau := range tau_sections {
+		fmt.Println("tau value:", tau)
+
+		for i := range data[tau] {
+			fmt.Println(data[tau][i])
+		}
+	}
+
+	// p_sections := []int{10, 30, 49}
+	//
+	// for _, p := range p_sections {
+	// 	fmt.Println("p value:", p)
+	//
+	// 	for i := range data[p] {
+	// 		fmt.Println(data[i][p])
+	// 		// fmt.Println(val)
+	// 	}
+	// }
 
 }
 
