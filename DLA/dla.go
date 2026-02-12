@@ -127,6 +127,58 @@ func gen_grid(size int) Grid {
 	return grid
 }
 
+// func heart_equation_derive(x, y float64) float64 {
+// 	return 3 * math.Pow(x * x + y * y - 1, 2)
+//
+// }
+
+func heart_equation(t float64) (float64, float64) {
+	y := 16 * math.Pow(math.Sin(t), 3)
+	x := 13*math.Sin(t) - 5*math.Sin(2*t) - 2*math.Sin(3*t) - math.Sin(4*t)
+
+	y /= 15
+	x /= 15
+
+	return x, y
+}
+
+func gen_heart_grid(size int, radius float64) Grid {
+
+	if int(radius) > size/2 {
+		panic(fmt.Errorf("ahhhhh: radius too large for grid size"))
+	}
+
+	grid := gen_grid(size)
+
+	mid := (size - 1) / 2
+	mid_point := Point{row: mid, col: mid}
+
+	points := 100
+
+	for i := range points {
+		t := float64(i) * 2 * math.Pi
+
+		x, y := heart_equation(t)
+		point := Point{row: int(math.Round(x * radius)), col: int(math.Round(y * radius))}
+
+		real_point := add_points(point, mid_point)
+
+		*grid.index(real_point) = Filled
+
+	}
+
+	return grid
+
+	// heart := [][]int {
+	// 	{0, 0, 1, 0, 0},
+	// 	{0, 1, 0, 1, 0},
+	// 	{1, 0, 0, 0, 1},
+	// 	{0, 1, 0, 1, 0},
+	// 	{0, 0, 1, 0, 0},
+	// }
+
+}
+
 func (g Grid) index(point Point) *SiteState {
 	return &g[point.row][point.col]
 }
@@ -193,14 +245,15 @@ func init_model(size int, p float64) Model {
 		panic("grid size must be odd you doofus")
 	}
 
-	mid := (size - 1) / 2
+	// mid := (size - 1) / 2
 
-	middle := Point{row: mid, col: mid}
+	// middle := Point{row: mid, col: mid}
 
-	grid := gen_grid(size)
+	// grid := gen_grid(size)
+	//
+	// *grid.index(middle) = 1
 
-	*grid.index(middle) = 1
-
+	grid := gen_heart_grid(size, 50)
 	// walkers := make([]Walker, 1)
 	// walkers[0] = Walker{
 	// 	location: middle,
