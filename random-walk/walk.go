@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"image"
 	"image/color"
 	"image/png"
+	"math"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -18,7 +20,7 @@ import (
 	// "slices"
 )
 
-const END_RATIO = 0.1
+const END_RATIO = 0.2
 
 // some clever stack overflow code i found
 type SiteState int
@@ -322,8 +324,8 @@ func (m *Model) tick(r *rand.Rand) {
 				m.walkers.add_walker(Walker{location: new_point, ttl: m.tau})
 				m.infected++
 			} else {
-				// *state = Visited
-				*state = Immune
+				*state = Visited
+				// *state = Immune
 			}
 		}
 
@@ -365,6 +367,7 @@ func average_spread_rate(size int, p float64, tau int, r *rand.Rand) float64 {
 
 		if model.walkers.alive == 0 {
 			// fmt.Println("Failed to spread")
+
 			return 0
 			// break
 		}
@@ -422,25 +425,38 @@ func run_simulation() Data {
 }
 
 type Arguments struct {
-	file    string
-	is_file bool
+	file *string
+	// operation *string
+	chart  *string
+	output *string
 }
 
 func parse_args() Arguments {
-	args := os.Args[1:]
-	if len(args) >= 2 {
-		if args[0] == "--file" || args[0] == "-f" {
-			return Arguments{
-				file:    args[1],
-				is_file: true,
-			}
-		}
+	// args := os.Args[1:]
+	// if len(args) >= 2 {
+	// 	if args[0] == "--file" || args[0] == "-f" {
+	// 		return Arguments{
+	// 			file:    args[1],
+	// 			is_file: true,
+	// 		}
+	// 	}
+	// }
+	//
+	// return Arguments{
+	// 	file:    "",
+	// 	is_file: false,
+	// }
+
+	args := Arguments{
+		file: flag.String("file", "", "path to data file"),
+		// operation: flag.String("op", "", "operation to perform"),
+		chart:  flag.String("chart", "", "type of chart to make"),
+		output: flag.String("out", "", "prefix of output files"),
 	}
 
-	return Arguments{
-		file:    "",
-		is_file: false,
-	}
+	flag.Parse()
+
+	return args
 }
 
 func main() {
@@ -454,17 +470,22 @@ func main() {
 
 	args := parse_args()
 
-	if args.is_file {
-		json_data, err := os.ReadFile(args.file)
+	if args.output == nil {
+		panic("no output file name specified")
+	}
+
+	if file := args.file; file != nil {
+		json_data, err := os.ReadFile(*file)
 		if err != nil {
 			panic(err)
 		}
 
 		json.Unmarshal(json_data, &data)
+
 	} else {
 		data = run_simulation()
 
-		file, err := os.Create("immune-data.json")
+		file, err := os.Create(*args.output + "data.png")
 
 		if err != nil {
 			panic(err)
@@ -478,7 +499,16 @@ func main() {
 
 	}
 
-	make_chart(data)
+	switch *args.chart {
+	case "3d":
+		make_3d_chart(data)
+
+	case "threshold":
+		make_threshold_chart(data)
+
+	default:
+		fmt.Println("uknown chart type: ", *args.chart)
+	}
 
 }
 
@@ -504,7 +534,7 @@ func find_max(data []opts.Chart3DData) float32 {
 	return float32(greatest)
 }
 
-func make_chart(data []opts.Chart3DData) {
+func make_3d_chart(data []opts.Chart3DData) {
 	surface := charts.NewSurface3D()
 
 	surface.SetGlobalOptions(
@@ -532,7 +562,7 @@ func make_chart(data []opts.Chart3DData) {
 		}),
 	)
 
-	surface.AddSeries("data", data)
+	surface.AddSeries("", data)
 	// SetSeriesOptions(
 	// 	charts.WithShading("realistic"),
 	// )
@@ -548,9 +578,88 @@ func make_chart(data []opts.Chart3DData) {
 
 }
 
+func cast_to_float(input []any) ([]float64, error) {
+	output := make([]float64, len(input))
+
+	for i, elem := range input {
+		switch e := elem.(type) {
+		case float64:
+			output[i] = e
+
+		default:
+			return []float64{}, fmt.Errorf("not of type float64")
+		}
+	}
+
+	return output, nil
+}
+
+// func shittyCode101(input []any) (int, int, float64, error) {
+// 	floats, err := cast_to_float(input)
+// 	if err != nil {
+// 		return 0, 0, 0, err
+// 	}
+//
+// 	return
+//
+//
+// }
+
+func make_threshold_chart(Data []opts.Chart3DData) {
+	data := make([][]float64, 50)
+
+	for index := range data {
+		data[index] = make([]float64, 50)
+	}
+
+	for _, value := range Data {
+
+		values, err := cast_to_float(value.Value)
+		if err != nil {
+			panic(err)
+		}
+
+		// fmt.Println(values)
+
+		data[int(values[1])][int(math.Round(values[0]*50))] = values[2]
+
+		// switch v := value.Value[0].(type) {
+		// case float64:
+		// 	data[row_dex][col_dex] = v
+		// default:
+		// 	panic("howd that get in here")
+		// }
+	}
+
+	threshold := make([]float64, 50)
+
+	for p, row := range data {
+		j := 0
+		for j < len(row) && row[j] == 0 {
+			j++
+		}
+
+		j--
+
+		threshold[p] = float64(j) / 50
+
+	}
+
+	// fmt.Println(threshold)
+
+	// for i := len(threshold) - 1; i >= 0; i-- {
+	// 	fmt.Println(threshold[i])
+	// }
+
+	for _, value := range threshold {
+		fmt.Println(value)
+	}
+
+}
+
 func one_trial() {
 	size := 201
-	p := 0.4
+	p := 0.2
 	tau := 10
 	model := init_model(size, p, tau)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -568,7 +677,7 @@ func one_trial() {
 		infected_ratio := float64(model.infected) / float64(model.people)
 		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
 		if infected_ratio > END_RATIO {
-			pretty_picture(model, "image.png", 5)
+			pretty_picture(model, "image", 5)
 			break
 		}
 
@@ -597,7 +706,7 @@ func one_trial() {
 
 	}
 
-	pretty_picture(model, "immune", 5)
+	// pretty_picture(model, "immune", 5)
 
 }
 
