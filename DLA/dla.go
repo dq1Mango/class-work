@@ -252,7 +252,7 @@ func init_model(size int, p float64) Model {
 	//
 	// *grid.index(middle) = 1
 
-	heart_radius := 40.0
+	heart_radius := 30.0
 	grid := gen_heart_grid(size, heart_radius)
 	// walkers := make([]Walker, 1)
 	// walkers[0] = Walker{
