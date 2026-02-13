@@ -40,8 +40,8 @@ var StateColor = map[SiteState]color.NRGBA{
 	},
 	Filled: {
 		R: 255,
-		G: 255,
-		B: 255,
+		G: 0,
+		B: 0,
 		A: 255,
 	},
 	// Visited: {
@@ -99,11 +99,6 @@ type Model struct {
 // 	return slices.Delete(slice, s, s+1)
 // }
 
-func unordered_remove[T any](s []T, i int) []T {
-	s[i] = s[len(s)-1]
-	return s[:len(s)-1]
-}
-
 // // this isnt dumb at all
 // type Walkers []Walker
 //
@@ -132,11 +127,15 @@ func gen_grid(size int) Grid {
 //
 // }
 
-func heart_equation(t float64) (float64, float64) {
-	y := 16 * math.Pow(math.Sin(t), 3)
-	x := 13*math.Cos(t) - 5*math.Cos(2*t) - 2*math.Cos(3*t) - math.Cos(4*t)
+func round(x float64) int {
+	return int(math.Round(x))
+}
 
-	y /= 15
+func heart_equation(t float64) (float64, float64) {
+	x := 16 * math.Pow(math.Sin(t), 3)
+	y := 13*math.Cos(t) - 5*math.Cos(2*t) - 2*math.Cos(3*t) - math.Cos(4*t)
+
+	y /= -15
 	x /= 15
 
 	return x, y
@@ -153,19 +152,15 @@ func gen_heart_grid(size int, radius float64) Grid {
 	mid := (size - 1) / 2
 	mid_point := Point{row: mid, col: mid}
 
-	points := 100
+	points := 1000
 
 	for i := range points {
 		t := float64(i) / float64(points) * 2 * math.Pi
-		fmt.Println("t? ", t)
 
 		x, y := heart_equation(t)
-		fmt.Println("got this x, y", x, y)
-		point := Point{row: int(math.Round(x * radius)), col: int(math.Round(y * radius))}
+		point := Point{col: int(math.Round(x * radius)), row: int(math.Round(y * radius))}
 
 		real_point := add_points(point, mid_point)
-
-		fmt.Println("filled this square: ", real_point)
 
 		*grid.index(real_point) = Filled
 
@@ -257,7 +252,8 @@ func init_model(size int, p float64) Model {
 	//
 	// *grid.index(middle) = 1
 
-	grid := gen_heart_grid(size, 50)
+	heart_radius := 40.0
+	grid := gen_heart_grid(size, heart_radius)
 	// walkers := make([]Walker, 1)
 	// walkers[0] = Walker{
 	// 	location: middle,
@@ -298,7 +294,7 @@ func (m *Model) countNeibors(point Point) int {
 	neighbors := 0
 	for _, step := range CARDINALS {
 		new_point := add_points(point, step)
-		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Filled {
+		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) > 0 {
 			neighbors++
 		}
 	}
@@ -306,18 +302,25 @@ func (m *Model) countNeibors(point Point) int {
 	return neighbors
 }
 
-func (m *Model) tick(r *rand.Rand) {
+func (m *Model) onPerimeter(point Point) bool {
+	if point.row == 0 || point.row == m.size-1 || point.col == 0 || point.col == m.size-1 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (m *Model) tick(r *rand.Rand) bool {
 
 	// index := -1
 	walker := m.random_start(r)
+	var new_point Point
 	// fmt.Println("starting here:", walker)
 	for true {
 
 		// index++
 
 		// walker := &m.walkers[index]
-
-		var new_point Point
 
 		// start := time.Now()
 
@@ -333,14 +336,22 @@ func (m *Model) tick(r *rand.Rand) {
 
 		neihbors := m.countNeibors(new_point)
 		if neihbors > 0 {
-			*m.grid.index(new_point) = Filled
+			*m.grid.index(new_point) = SiteState(m.time)
+			// *m.grid.index(new_point) = Filled
 			m.infected++
+
 			break
 		}
 
 	}
 
 	m.time++
+
+	if m.onPerimeter(new_point) {
+		return true
+	} else {
+		return false
+	}
 
 }
 
@@ -441,13 +452,6 @@ func main() {
 	case "3d":
 		make_3d_chart(data)
 
-	case "threshold":
-		make_threshold_chart(data)
-	case "derivative":
-		make_derivative_chart(data)
-	case "cross":
-		cross_sections(data)
-
 	default:
 		fmt.Println("uknown chart type: ", *args.chart)
 	}
@@ -547,148 +551,6 @@ func cast_to_float(input []any) ([]float64, error) {
 //
 // }
 
-func formatXY(Data []opts.Chart3DData) [][]float64 {
-	data := make([][]float64, 50)
-
-	for index := range data {
-		data[index] = make([]float64, 50)
-	}
-
-	for _, value := range Data {
-
-		values, err := cast_to_float(value.Value)
-		if err != nil {
-			panic(err)
-		}
-
-		// fmt.Println(values)
-
-		data[int(values[1])][int(math.Round(values[0]*50))] = values[2]
-
-		// switch v := value.Value[0].(type) {
-		// case float64:
-		// 	data[row_dex][col_dex] = v
-		// default:
-		// 	panic("howd that get in here")
-		// }
-	}
-
-	return data
-
-}
-
-func make_threshold_chart(Data []opts.Chart3DData) {
-
-	data := formatXY(Data)
-
-	threshold := make([]float64, 50)
-
-	for p, row := range data {
-		j := 0
-		for j < len(row) && row[j] == 0 {
-			j++
-		}
-
-		j--
-
-		threshold[p] = float64(j) / 50
-
-	}
-
-	// fmt.Println(threshold)
-
-	// for i := len(threshold) - 1; i >= 0; i-- {
-	// 	fmt.Println(threshold[i])
-	// }
-
-	for _, value := range threshold {
-		fmt.Println(value)
-	}
-
-}
-
-const DATA_SIZE = 50
-
-// MUST BE tau by p
-func cast_to_echart_format(data [][]float64) []opts.Chart3DData {
-	// fmt.Println(data)
-
-	output := make([]opts.Chart3DData, 0, len(data)*len(data[0]))
-
-	for i, row := range data {
-		for j, k := range row {
-			if k == 0 {
-				continue
-			}
-
-			output = append(output, opts.Chart3DData{Value: []any{j, float64(i) / DATA_SIZE, k}})
-		}
-	}
-
-	return output
-}
-
-func make_derivative_chart(Data []opts.Chart3DData) {
-	data := formatXY(Data)
-
-	d_tau := make([][]float64, 50)
-	d_p := make([][]float64, 50)
-
-	for i := range d_tau {
-		d_tau[i] = make([]float64, 50-1)
-		d_p[i] = make([]float64, 50-1)
-
-	}
-
-	for i := range DATA_SIZE - 1 {
-		for j := range DATA_SIZE - 2 {
-			if data[i][j] == 0 {
-				continue
-			}
-
-			d_p[i][j] = (data[i][j+1] - data[i][j])
-		}
-
-	}
-
-	for j := range DATA_SIZE - 1 {
-		for i := range DATA_SIZE - 2 {
-			d_tau[i][j] = (data[i+1][j] - data[i][j])
-
-		}
-	}
-
-	// make_3d_chart(cast_to_echart_format(d_tau))
-	make_3d_chart(cast_to_echart_format(d_p))
-
-}
-
-func cross_sections(Data []opts.Chart3DData) {
-	data := formatXY(Data)
-
-	tau_sections := []int{5, 10, 20}
-
-	for _, tau := range tau_sections {
-		fmt.Println("tau value:", tau)
-
-		for i := range data[tau] {
-			fmt.Println(data[tau][i])
-		}
-	}
-
-	// p_sections := []int{10, 30, 49}
-	//
-	// for _, p := range p_sections {
-	// 	fmt.Println("p value:", p)
-	//
-	// 	for i := range data[p] {
-	// 		fmt.Println(data[i][p])
-	// 		// fmt.Println(val)
-	// 	}
-	// }
-
-}
-
 func one_trial() {
 	size := 201
 	p := 0.2
@@ -703,36 +565,28 @@ func one_trial() {
 	// fmt.Println(delay)
 	// fmt.Println(1.0 / float64(tps))
 
-	i := 0
-	for model.infected < model.people {
-		infected_ratio := float64(model.infected) / float64(model.people)
-		// fmt.Println("iter: ", i, ", infected: ", infected_ratio)
-		if infected_ratio > END_RATIO {
-			pretty_picture(model, "image", 5)
+	for true {
+		end := model.tick(r)
+
+		if end {
 			break
 		}
-
-		// start := time.Now()
-		model.tick(r)
-		// stop := time.Now()
-		// fmt.Println("took this long: ", stop.Sub(start))
-
-		// model.grid.print_grid()
-		// time.Sleep(delay)
-		// clear_screen()
-		i++
-
-		// if i%interval == 0 {
-		// 	make_graph(model, fmt.Sprintf("image-%d.png", i/interval), 30)
-		// }
-
-		// if i > 1000 {
-		// 	break
-		// }
-
 	}
+	pretty_picture(model, "image", 5)
 
 	// pretty_picture(model, "immune", 5)
+
+}
+
+func calc_color(percent float64) color.NRGBA {
+	RStart, REnd := 255.0, 1.0
+
+	// WOW !!! great code
+	return color.NRGBA{
+		R: uint8(RStart + (REnd-RStart)*percent),
+		A: 255,
+		// A: uint8(int(color_start.A) + round(float64(color_end.A-color_start.A)*percent)),
+	}
 
 }
 
@@ -746,10 +600,17 @@ func pretty_picture(model Model, name string, scale int) {
 
 	for y, row := range grid {
 		for x := range row {
+
+			var color color.Color
+			if grid[x][y] == Empty {
+				color = StateColor[Empty]
+			} else {
+				color = calc_color(float64(grid[x][y]) / float64(model.time))
+			}
+
 			for i := range scale {
 				for j := range scale {
-
-					img.Set(y*scale+i, x*scale+j, StateColor[grid[x][y]])
+					img.Set(y*scale+i, x*scale+j, color)
 				}
 			}
 		}
