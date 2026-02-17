@@ -43,18 +43,6 @@ var StateColor = map[SiteState]color.NRGBA{
 		B: 0,
 		A: 255,
 	},
-	// Visited: {
-	// 	R: 0,
-	// 	G: 0,
-	// 	B: 255,
-	// 	A: 255,
-	// },
-	// Immune: {
-	// 	R: 0,
-	// 	G: 255,
-	// 	B: 0,
-	// 	A: 255,
-	// },
 }
 
 type Grid [][]SiteState
@@ -88,15 +76,15 @@ func add_points(p1, p2 Point) Point {
 	return Point{x: p1.x + p2.x, y: p1.y + p2.y}
 }
 
-func (p *Point) add(p2 Point) {
-	p.x += p2.x
-	p.y += p2.y
-}
+// func (p *Point) add(p2 Point) {
+// 	p.x += p2.x
+// 	p.y += p2.y
+// }
 
-func (p *Point) flip() {
-	p.x *= -1
-	p.y *= -1
-}
+// func (p *Point) flip() {
+// 	p.x *= -1
+// 	p.y *= -1
+// }
 
 func abs(x int) int {
 	return max(x, x*-1)
@@ -579,17 +567,6 @@ func cast_to_float(input []any) ([]float64, error) {
 
 	return output, nil
 }
-
-// func shittyCode101(input []any) (int, int, float64, error) {
-// 	floats, err := cast_to_float(input)
-// 	if err != nil {
-// 		return 0, 0, 0, err
-// 	}
-//
-// 	return
-//
-//
-// }
 
 func one_trial() {
 	// parameters:
