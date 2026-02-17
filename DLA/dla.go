@@ -13,7 +13,6 @@ import (
 	"os/exec"
 	"time"
 
-	textColor "github.com/fatih/color"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	// "github.com/montanaflynn/stats"
@@ -61,42 +60,42 @@ var StateColor = map[SiteState]color.NRGBA{
 type Grid [][]SiteState
 
 type Point struct {
-	row int
-	col int
+	x int
+	y int
 }
 
 var CARDINALS = []Point{
-	{row: 0, col: -1},
-	{row: 0, col: 1},
-	{row: 1, col: 0},
-	{row: -1, col: 0},
+	{x: 0, y: -1},
+	{x: 0, y: 1},
+	{x: 1, y: 0},
+	{x: -1, y: 0},
 }
 
-func mid_point(size int) Point {
+func mid_point() Point {
 	// mid := (size - 1) / 2
 
-	return Point{row: 0, col: 0}
+	return Point{x: 0, y: 0}
 }
 
 func real_mid_point(size int) Point {
 
 	mid := (size - 1) / 2
 
-	return Point{row: mid, col: mid}
+	return Point{x: mid, y: mid}
 }
 
 func add_points(p1, p2 Point) Point {
-	return Point{row: p1.row + p2.row, col: p1.col + p2.col}
+	return Point{x: p1.x + p2.x, y: p1.y + p2.y}
 }
 
 func (p *Point) add(p2 Point) {
-	p.row += p2.row
-	p.col += p2.col
+	p.x += p2.x
+	p.y += p2.y
 }
 
 func (p *Point) flip() {
-	p.row *= -1
-	p.col *= -1
+	p.x *= -1
+	p.y *= -1
 }
 
 func abs(x int) int {
@@ -104,7 +103,7 @@ func abs(x int) int {
 }
 
 func (p *Point) radius() int {
-	return max(abs(p.row), abs(p.col))
+	return max(abs(p.x), abs(p.y))
 }
 
 type Walker struct {
@@ -182,11 +181,9 @@ func gen_heart_grid(size int, radius float64) Grid {
 		t := float64(i) / float64(points) * 2 * math.Pi
 
 		x, y := heart_equation(t)
-		point := Point{col: int(math.Round(x * radius)), row: int(math.Round(y * radius))}
+		point := Point{x: int(math.Round(x * radius)), y: int(math.Round(y * radius))}
 
-		real_point := add_points(point, mid_point(size))
-
-		*grid.index(real_point) = Filled
+		*grid.index(point) = Filled
 
 	}
 
@@ -203,19 +200,19 @@ func gen_heart_grid(size int, radius float64) Grid {
 }
 
 func (g Grid) raw_index(point Point) *SiteState {
-	return &g[point.row][point.col]
+	return &g[point.y][point.x]
 }
 
 func (g Grid) index(point Point) *SiteState {
 	real_point := add_points(point, real_mid_point(len(g)))
 
-	return &g[real_point.row][real_point.col]
+	return &g[real_point.y][real_point.x]
 }
 
 func (g *Grid) is_valid_point(point Point) bool {
 	radius := len(*g) / 2
 
-	if point.row >= -radius && point.row <= radius && point.col >= -radius && point.col <= radius {
+	if point.x >= -radius && point.x <= radius && point.y >= -radius && point.y <= radius {
 		return true
 	} else {
 		return false
@@ -226,27 +223,6 @@ func (g *Grid) is_valid_point(point Point) bool {
 	// } else {
 	// 	return false
 	// }
-}
-
-func (g *Grid) print_grid() {
-	block := "██"
-
-	for _, row := range *g {
-		for _, node := range row {
-			switch node {
-			case 0:
-				textColor.Set(textColor.FgBlack)
-			case 1:
-				textColor.Set(textColor.FgWhite)
-			case 2:
-				textColor.Set(textColor.FgBlue)
-
-			}
-			fmt.Print(block)
-		}
-		fmt.Println()
-	}
-	textColor.Set(textColor.FgWhite)
 }
 
 func clear_screen() {
@@ -263,13 +239,13 @@ func random_step(r *rand.Rand) Point {
 	value := r.Float64()
 
 	if value < 0.25 {
-		return Point{row: 1, col: 0}
+		return Point{x: 1, y: 0}
 	} else if value < 0.5 {
-		return Point{row: -1, col: 0}
+		return Point{x: -1, y: 0}
 	} else if value < 0.75 {
-		return Point{row: 0, col: 1}
+		return Point{x: 0, y: 1}
 	} else {
-		return Point{row: 0, col: -1}
+		return Point{x: 0, y: -1}
 	}
 
 }
@@ -284,11 +260,19 @@ func init_model(size int, p float64, distance int) Model {
 		panic("spawning distacne must be non-negative")
 	}
 
-	// grid := gen_grid(size)
-	// *grid.index(mid_point(size)) = 1
+	// grid_type := "normal"
+	// grid_type := "heart"
+	heart := true
 
-	heart_radius := 30.0
-	grid := gen_heart_grid(size, heart_radius)
+	var grid Grid
+	if !heart {
+		grid = gen_grid(size)
+		*grid.index(mid_point()) = 1
+	} else {
+
+		heart_radius := 30.0
+		grid = gen_heart_grid(size, heart_radius)
+	}
 	// walkers := make([]Walker, 1)
 	// walkers[0] = Walker{
 	// 	location: middle,
@@ -320,13 +304,13 @@ func (m *Model) random_start(r *rand.Rand) Point {
 
 	switch side {
 	case 0:
-		point = Point{row: value, col: -spawn_radius}
+		point = Point{x: value, y: -spawn_radius}
 	case 1:
-		point = Point{row: value, col: spawn_radius}
+		point = Point{x: value, y: spawn_radius}
 	case 2:
-		point = Point{row: -spawn_radius, col: value}
+		point = Point{x: -spawn_radius, y: value}
 	case 3:
-		point = Point{row: spawn_radius, col: value}
+		point = Point{x: spawn_radius, y: value}
 	default:
 		panic("erm")
 	}
@@ -346,14 +330,14 @@ func (m *Model) countNeibors(point Point) int {
 	return neighbors
 }
 
-func (m *Model) onPerimeter(point Point) bool {
-	radius := m.size / 2
-	if point.row == -radius || point.row == radius || point.col == -radius || point.col == radius {
-		return true
-	} else {
-		return false
-	}
-}
+// func (m *Model) onPerimeter(point Point) bool {
+// 	radius := m.size / 2
+// 	if point.row == -radius || point.row == radius || point.col == -radius || point.col == radius {
+// 		return true
+// 	} else {
+// 		return false
+// 	}
+// }
 
 func (m *Model) tick(r *rand.Rand) bool {
 
@@ -396,11 +380,11 @@ func (m *Model) tick(r *rand.Rand) bool {
 					return false
 				}
 
-				if m.onPerimeter(new_point) {
-					return true
-				} else {
-					return false
-				}
+				// if m.onPerimeter(new_point) {
+				// 	return true
+				// } else {
+				// 	return false
+				// }
 
 			}
 		}
@@ -608,6 +592,7 @@ func cast_to_float(input []any) ([]float64, error) {
 // }
 
 func one_trial() {
+	// parameters:
 	size := 201
 	p := 1.0
 	distance := 10
@@ -651,24 +636,24 @@ func pretty_picture(model Model, name string, scale int) {
 
 	grid := model.grid
 
-	size := len(grid)
+	cropped := model.size - model.distance*2
 
-	img := image.NewNRGBA(image.Rect(0, 0, size*scale, size*scale))
+	img := image.NewNRGBA(image.Rect(0, 0, cropped*scale, cropped*scale))
 
-	for y, row := range grid {
-		for x := range row {
+	for y, row := range grid[model.distance : model.size-model.distance] {
+		for x, value := range row[model.distance : model.size-model.distance] {
 
 			var color color.Color
-			if grid[x][y] == Empty {
+			if value == Empty {
 				color = StateColor[Empty]
 			} else {
-				// color = StateColor[Filled]
-				color = calc_color(float64(grid[x][y]) / float64(model.infected))
+				color = StateColor[Filled]
+				// color = calc_color(float64(grid[x][y]) / float64(model.infected))
 			}
 
 			for i := range scale {
 				for j := range scale {
-					img.Set(y*scale+i, x*scale+j, color)
+					img.Set(x*scale+j, y*scale+i, color)
 				}
 			}
 		}
