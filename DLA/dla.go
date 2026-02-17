@@ -72,13 +72,39 @@ var CARDINALS = []Point{
 	{row: -1, col: 0},
 }
 
+func mid_point(size int) Point {
+	// mid := (size - 1) / 2
+
+	return Point{row: 0, col: 0}
+}
+
+func real_mid_point(size int) Point {
+
+	mid := (size - 1) / 2
+
+	return Point{row: mid, col: mid}
+}
+
 func add_points(p1, p2 Point) Point {
 	return Point{row: p1.row + p2.row, col: p1.col + p2.col}
 }
 
-func (p Point) add(p2 Point) {
+func (p *Point) add(p2 Point) {
 	p.row += p2.row
 	p.col += p2.col
+}
+
+func (p *Point) flip() {
+	p.row *= -1
+	p.col *= -1
+}
+
+func abs(x int) int {
+	return max(x, x*-1)
+}
+
+func (p *Point) radius() int {
+	return max(abs(p.row), abs(p.col))
 }
 
 type Walker struct {
@@ -92,7 +118,8 @@ type Model struct {
 	p        float64
 	people   int
 	infected int
-	time     int
+	radius   int
+	distance int
 }
 
 // func remove[T any](slice []T, s int) []T {
@@ -149,9 +176,6 @@ func gen_heart_grid(size int, radius float64) Grid {
 
 	grid := gen_grid(size)
 
-	mid := (size - 1) / 2
-	mid_point := Point{row: mid, col: mid}
-
 	points := 1000
 
 	for i := range points {
@@ -160,7 +184,7 @@ func gen_heart_grid(size int, radius float64) Grid {
 		x, y := heart_equation(t)
 		point := Point{col: int(math.Round(x * radius)), row: int(math.Round(y * radius))}
 
-		real_point := add_points(point, mid_point)
+		real_point := add_points(point, mid_point(size))
 
 		*grid.index(real_point) = Filled
 
@@ -178,18 +202,30 @@ func gen_heart_grid(size int, radius float64) Grid {
 
 }
 
-func (g Grid) index(point Point) *SiteState {
+func (g Grid) raw_index(point Point) *SiteState {
 	return &g[point.row][point.col]
 }
 
-func (g *Grid) is_valid_point(point Point) bool {
-	size := len(*g)
+func (g Grid) index(point Point) *SiteState {
+	real_point := add_points(point, real_mid_point(len(g)))
 
-	if point.row >= 0 && point.row < size && point.col >= 0 && point.col < size {
+	return &g[real_point.row][real_point.col]
+}
+
+func (g *Grid) is_valid_point(point Point) bool {
+	radius := len(*g) / 2
+
+	if point.row >= -radius && point.row <= radius && point.col >= -radius && point.col <= radius {
 		return true
 	} else {
 		return false
 	}
+
+	// if point.row >= 0 && point.row < size && point.col >= 0 && point.col < size {
+	// 	return true
+	// } else {
+	// 	return false
+	// }
 }
 
 func (g *Grid) print_grid() {
@@ -238,19 +274,18 @@ func random_step(r *rand.Rand) Point {
 
 }
 
-func init_model(size int, p float64) Model {
+func init_model(size int, p float64, distance int) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
 	}
 
-	// mid := (size - 1) / 2
-
-	// middle := Point{row: mid, col: mid}
+	if distance <= 0 {
+		panic("spawning distacne must be non-negative")
+	}
 
 	// grid := gen_grid(size)
-	//
-	// *grid.index(middle) = 1
+	// *grid.index(mid_point(size)) = 1
 
 	heart_radius := 30.0
 	grid := gen_heart_grid(size, heart_radius)
@@ -266,28 +301,37 @@ func init_model(size int, p float64) Model {
 		p:        p,
 		people:   size * size,
 		infected: 1,
+		radius:   0,
+		distance: 10,
 	}
 
 	return model
+
 }
 
 func (m *Model) random_start(r *rand.Rand) Point {
 	value := int(r.Float64() * float64(m.size))
+	value -= m.size / 2
+	spawn_radius := m.radius + m.distance
 
 	side := r.Int31n(4)
 
+	var point Point
+
 	switch side {
 	case 0:
-		return Point{row: value, col: 0}
+		point = Point{row: value, col: -spawn_radius}
 	case 1:
-		return Point{row: value, col: m.size - 1}
+		point = Point{row: value, col: spawn_radius}
 	case 2:
-		return Point{row: 0, col: value}
+		point = Point{row: -spawn_radius, col: value}
 	case 3:
-		return Point{row: m.size - 1, col: value}
+		point = Point{row: spawn_radius, col: value}
 	default:
 		panic("erm")
 	}
+
+	return point
 }
 
 func (m *Model) countNeibors(point Point) int {
@@ -303,7 +347,8 @@ func (m *Model) countNeibors(point Point) int {
 }
 
 func (m *Model) onPerimeter(point Point) bool {
-	if point.row == 0 || point.row == m.size-1 || point.col == 0 || point.col == m.size-1 {
+	radius := m.size / 2
+	if point.row == -radius || point.row == radius || point.col == -radius || point.col == radius {
 		return true
 	} else {
 		return false
@@ -335,23 +380,34 @@ func (m *Model) tick(r *rand.Rand) bool {
 		}
 
 		neihbors := m.countNeibors(new_point)
-		if neihbors > 0 {
-			*m.grid.index(new_point) = SiteState(m.time)
-			// *m.grid.index(new_point) = Filled
-			m.infected++
+		for range neihbors {
+			if r.Float64() <= m.p {
+				*m.grid.index(new_point) = SiteState(m.infected)
+				// *m.grid.index(new_point) = Filled
+				m.infected++
 
-			break
+				if new_point.radius() > m.radius {
+					m.radius = new_point.radius()
+				}
+
+				if m.radius+m.distance >= m.size/2 {
+					return true
+				} else {
+					return false
+				}
+
+				if m.onPerimeter(new_point) {
+					return true
+				} else {
+					return false
+				}
+
+			}
 		}
 
 	}
-
-	m.time++
-
-	if m.onPerimeter(new_point) {
-		return true
-	} else {
-		return false
-	}
+	fmt.Println("shouldnt reach this")
+	return true
 
 }
 
@@ -553,8 +609,9 @@ func cast_to_float(input []any) ([]float64, error) {
 
 func one_trial() {
 	size := 201
-	p := 0.2
-	model := init_model(size, p)
+	p := 1.0
+	distance := 10
+	model := init_model(size, p, distance)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// tps := 1
 
@@ -605,7 +662,8 @@ func pretty_picture(model Model, name string, scale int) {
 			if grid[x][y] == Empty {
 				color = StateColor[Empty]
 			} else {
-				color = calc_color(float64(grid[x][y]) / float64(model.time))
+				// color = StateColor[Filled]
+				color = calc_color(float64(grid[x][y]) / float64(model.infected))
 			}
 
 			for i := range scale {
@@ -642,11 +700,13 @@ func pretty_picture(model Model, name string, scale int) {
 	encoder.SetIndent("", "  ")
 	// encoder.Encode(model)
 	encoder.Encode(struct {
-		Time       int `json:"time"`
-		Infected   int `json:"infected"`
-		Population int `json:"population"`
+		P          float64 `json:"p"`
+		Size       int     `json:"size"`
+		Infected   int     `json:"infected"`
+		Population int     `json:"population"`
 	}{
-		model.time,
+		model.p,
+		model.size,
 		model.infected,
 		model.people,
 	})
