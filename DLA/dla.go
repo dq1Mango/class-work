@@ -15,7 +15,7 @@ import (
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	// "github.com/montanaflynn/stats"
+	"github.com/montanaflynn/stats"
 	// "slices"
 )
 
@@ -198,6 +198,7 @@ func (g Grid) index(point Point) *SiteState {
 }
 
 func (g *Grid) is_valid_point(point Point) bool {
+
 	radius := len(*g) / 2
 
 	if point.x >= -radius && point.x <= radius && point.y >= -radius && point.y <= radius {
@@ -205,12 +206,6 @@ func (g *Grid) is_valid_point(point Point) bool {
 	} else {
 		return false
 	}
-
-	// if point.row >= 0 && point.row < size && point.col >= 0 && point.col < size {
-	// 	return true
-	// } else {
-	// 	return false
-	// }
 }
 
 func clear_screen() {
@@ -250,7 +245,7 @@ func init_model(size int, p float64, distance int) Model {
 
 	// grid_type := "normal"
 	// grid_type := "heart"
-	heart := true
+	heart := false
 
 	var grid Grid
 	if !heart {
@@ -274,7 +269,7 @@ func init_model(size int, p float64, distance int) Model {
 		people:   size * size,
 		infected: 1,
 		radius:   0,
-		distance: 10,
+		distance: distance,
 	}
 
 	return model
@@ -318,6 +313,38 @@ func (m *Model) countNeibors(point Point) int {
 	return neighbors
 }
 
+func (m *Model) countOnRadius(radius int) int {
+	count := 0
+
+	if radius == 0 {
+		return 1
+	}
+
+	for i := range radius*2 + 1 {
+		i -= radius
+
+		if *m.grid.index(Point{x: i, y: -radius}) > 0 {
+			count++
+		}
+		if *m.grid.index(Point{x: i, y: radius}) > 0 {
+			count++
+		}
+	}
+	// dont wanna double count the corners
+	for i := range radius*2 - 1 {
+		i -= radius
+
+		if *m.grid.index(Point{x: -radius, y: i}) > 0 {
+			count++
+		}
+		if *m.grid.index(Point{x: radius, y: i}) > 0 {
+			count++
+		}
+	}
+
+	return count
+}
+
 // func (m *Model) onPerimeter(point Point) bool {
 // 	radius := m.size / 2
 // 	if point.row == -radius || point.row == radius || point.col == -radius || point.col == radius {
@@ -329,22 +356,17 @@ func (m *Model) countNeibors(point Point) int {
 
 func (m *Model) tick(r *rand.Rand) bool {
 
-	// index := -1
 	walker := m.random_start(r)
 	var new_point Point
-	// fmt.Println("starting here:", walker)
+
 	for true {
-
-		// index++
-
-		// walker := &m.walkers[index]
 
 		// start := time.Now()
 
 		for {
 			step := random_step(r)
 			new_point = add_points(walker, step)
-			if m.grid.is_valid_point(new_point) {
+			if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Empty {
 				walker = new_point
 				// m.walkers[index].location = new_point
 				break
@@ -383,6 +405,64 @@ func (m *Model) tick(r *rand.Rand) bool {
 
 }
 
+func (m *Model) run_trial(r *rand.Rand) Data {
+	model := m
+
+	for true {
+		end := model.tick(r)
+
+		if end {
+			break
+		}
+	}
+
+	data := make(Data, 0, model.radius)
+	running_total := 1
+
+	for r := 1; r < model.radius; r++ {
+		running_total += model.countOnRadius(r)
+		data = append(data, DataPoint{radius: r, filled: running_total})
+	}
+	return data
+
+}
+
+func run_simulation() stats.Series {
+	size := 201
+	distance := 20
+	num_points := 100.0
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	series := make(stats.Series, 0, int(num_points))
+
+	for p := 0.001; p < 0.1; p += 0.001 {
+		// p := p / num_points
+
+		clear_line()
+		fmt.Print("this much done: ", p*100, "%")
+
+		model := init_model(size, p, distance)
+
+		data := model.run_trial(r)
+		casted := data.toSeries()
+		logged := logLog(casted)
+
+		_, gradient, err := LinearRegression(logged)
+
+		if err != nil {
+			panic(err)
+		}
+
+		series = append(series, stats.Coordinate{X: p, Y: gradient})
+
+	}
+
+	// pretty_picture(model, "testing", 5)
+	return series
+
+}
+
 func testing() {
 	// // data := []int{0, 1, 2, 3}
 	// point := Point{row: 1, col: 1}
@@ -399,7 +479,12 @@ func testing() {
 	// fmt.Println(data)
 }
 
-type Data []opts.Chart3DData
+type DataPoint struct {
+	radius int
+	filled int
+}
+
+type Data []DataPoint
 
 type Arguments struct {
 	file *string
@@ -436,6 +521,54 @@ func parse_args() Arguments {
 	return args
 }
 
+func (d *Data) toSeries() stats.Series {
+	series := make([]stats.Coordinate, 0, len(*d))
+
+	for _, point := range *d {
+		series = append(series, stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)})
+	}
+
+	return series
+}
+
+func logLog(series stats.Series) stats.Series {
+
+	logged := make(stats.Series, 0, len(series))
+
+	for _, point := range series {
+		logged = append(logged, stats.Coordinate{X: math.Log(point.X), Y: math.Log(point.Y)})
+	}
+
+	return logged
+}
+
+func LinearRegression(s stats.Series) (float64, float64, error) {
+
+	if len(s) == 0 {
+		return 0, 0, nil
+	}
+
+	// Placeholder for the math to be done
+	var sum [5]float64
+
+	// Loop over data keeping index in place
+	i := 0
+	for ; i < len(s); i++ {
+		sum[0] += s[i].X
+		sum[1] += s[i].Y
+		sum[2] += s[i].X * s[i].X
+		sum[3] += s[i].X * s[i].Y
+		sum[4] += s[i].Y * s[i].Y
+	}
+
+	// Find gradient and intercept
+	f := float64(i)
+	gradient := (f*sum[3] - sum[0]*sum[1]) / (f*sum[2] - sum[0]*sum[0])
+	intercept := (sum[1] / f) - (gradient * sum[0] / f)
+
+	return intercept, gradient, nil
+}
+
 func main() {
 	// testing()
 	// return
@@ -443,42 +576,58 @@ func main() {
 	one_trial()
 	return
 
-	var data Data
+	var data stats.Series
 
 	args := parse_args()
-	//
-	// if args.output == nil {
-	// 	panic("no output file name specified")
-	// }
-	//
-	// if file := args.file; file != nil {
-	// 	json_data, err := os.ReadFile(*file)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	//
-	// 	json.Unmarshal(json_data, &data)
-	//
-	// } else {
-	// 	data = run_simulation()
-	//
-	// 	file, err := os.Create(*args.output + "data.png")
-	//
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	//
-	// 	defer file.Close()
-	//
-	// 	encoder := json.NewEncoder(file)
-	// 	encoder.SetIndent("", "  ")
-	// 	encoder.Encode(data)
-	//
-	// }
+
+	if *args.output == "" {
+		panic("no output file name specified")
+	}
+
+	if file := *args.file; file != "" {
+		json_data, err := os.ReadFile(file)
+		if err != nil {
+			panic(err)
+		}
+
+		json.Unmarshal(json_data, &data)
+
+	} else {
+		// data = run_simulation()
+		size := 201
+		p := 0.01
+		distance := 20
+
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		model := init_model(size, p, distance)
+
+		dataa := model.run_trial(r)
+		data := logLog(dataa.toSeries())
+
+		for _, d := range data {
+			fmt.Println(d.X)
+		}
+
+		for _, d := range data {
+			fmt.Println(d.Y)
+		}
+		// fmt.Println(intercept, gradient)
+
+		file, err := os.Create(*args.output + "data.json")
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer file.Close()
+
+		encoder := json.NewEncoder(file)
+		encoder.SetIndent("", "  ")
+		encoder.Encode(data)
+
+	}
 
 	switch *args.chart {
-	case "3d":
-		make_3d_chart(data)
 
 	default:
 		fmt.Println("uknown chart type: ", *args.chart)
@@ -552,27 +701,27 @@ func make_3d_chart(data []opts.Chart3DData) {
 
 }
 
-func cast_to_float(input []any) ([]float64, error) {
-	output := make([]float64, len(input))
-
-	for i, elem := range input {
-		switch e := elem.(type) {
-		case float64:
-			output[i] = e
-
-		default:
-			return []float64{}, fmt.Errorf("not of type float64")
-		}
-	}
-
-	return output, nil
-}
+// func cast_to_float(input []any) ([]float64, error) {
+// 	output := make([]float64, len(input))
+//
+// 	for i, elem := range input {
+// 		switch e := elem.(type) {
+// 		case float64:
+// 			output[i] = e
+//
+// 		default:
+// 			return []float64{}, fmt.Errorf("not of type float64")
+// 		}
+// 	}
+//
+// 	return output, nil
+// }
 
 func one_trial() {
 	// parameters:
 	size := 201
-	p := 1.0
-	distance := 10
+	p := 0.5
+	distance := 20
 	model := init_model(size, p, distance)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// tps := 1
