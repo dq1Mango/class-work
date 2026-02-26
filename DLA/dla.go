@@ -354,6 +354,35 @@ func (m *Model) countOnRadius(radius int) int {
 // 	}
 // }
 
+func (m *Model) walkers_on_perimiter() []Walker {
+
+	radius := m.radius + m.distance
+
+	var points []Point
+
+	for i := range radius*2 + 1 {
+		i -= radius
+		points = append(points, Point{x: i, y: -radius})
+		points = append(points, Point{x: i, y: radius})
+	}
+	// dont wanna double count the corners
+	for i := range radius*2 - 1 {
+		i -= radius
+
+		points = append(points, Point{x: -radius, y: i})
+		points = append(points, Point{x: radius, y: i})
+	}
+
+	walkers := make([]Walker, 0, len(points))
+
+	for _, walker := range points {
+		walkers = append(walkers, Walker{location: walker, ttl: 1})
+	}
+
+	return walkers
+
+}
+
 func (m *Model) tick(r *rand.Rand) bool {
 
 	walker := m.random_start(r)
@@ -405,11 +434,89 @@ func (m *Model) tick(r *rand.Rand) bool {
 
 }
 
+func (m *Model) different_tick(r *rand.Rand) bool {
+
+	walkers := m.walkers_on_perimiter()
+	// fmt.Println(walkers)
+
+	still_alive := true
+
+	for still_alive {
+		still_alive = false
+
+		for i := range walkers {
+			walker := &walkers[i]
+
+			if walker.ttl == 0 {
+				continue
+			}
+
+			still_alive = true
+
+			// start := time.Now()
+
+			var new_point Point
+
+			if m.countNeibors(walker.location) < 3 {
+				for {
+					step := random_step(r)
+					new_point = add_points(walker.location, step)
+
+					if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Empty {
+						walker.location = new_point
+						// m.walkers[index].location = new_point
+						break
+					}
+
+				}
+			} else {
+				new_point = walker.location
+			}
+
+			neihbors := m.countNeibors(new_point)
+			for range neihbors {
+				if r.Float64() <= m.p {
+					*m.grid.index(new_point) = SiteState(m.infected)
+					// *m.grid.index(new_point) = Filled
+					m.infected++
+
+					walker.ttl = 0
+					if walker.ttl != walkers[i].ttl {
+						panic("deep copy alert")
+					}
+
+					if new_point.radius() > m.radius {
+						m.radius = new_point.radius()
+					}
+
+					if m.radius+m.distance >= m.size/2 {
+						return true
+					}
+					// if m.onPerimeter(new_point) {
+					// 	return true
+					// } else {
+					// 	return false
+					// }
+
+				}
+			}
+
+		}
+
+	}
+	// fmt.Println("shouldnt reach this")
+	return false
+
+}
+
 func (m *Model) run_trial(r *rand.Rand) Data {
 	model := m
 
 	for true {
 		end := model.tick(r)
+		// end := model.different_tick(r)
+
+		// fmt.Println("ticked me off")
 
 		if end {
 			break
@@ -436,7 +543,7 @@ func run_simulation() stats.Series {
 
 	series := make(stats.Series, 0, int(num_points))
 
-	for p := 0.001; p < 0.1; p += 0.001 {
+	for p := 0.01; p < 1.0; p += 0.01 {
 		// p := p / num_points
 
 		clear_line()
@@ -573,9 +680,6 @@ func main() {
 	// testing()
 	// return
 
-	one_trial()
-	return
-
 	var data stats.Series
 
 	args := parse_args()
@@ -583,6 +687,9 @@ func main() {
 	if *args.output == "" {
 		panic("no output file name specified")
 	}
+
+	one_trial(*args.output)
+	return
 
 	if file := *args.file; file != "" {
 		json_data, err := os.ReadFile(file)
@@ -594,15 +701,17 @@ func main() {
 
 	} else {
 		// data = run_simulation()
-		size := 201
-		p := 0.01
-		distance := 20
+		// size := 201
+		// p := 0.01
+		// distance := 20
 
-		r := rand.New(rand.NewSource(time.Now().UnixNano()))
-		model := init_model(size, p, distance)
+		// r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		// model := init_model(size, p, distance)
 
-		dataa := model.run_trial(r)
-		data := logLog(dataa.toSeries())
+		data = run_simulation()
+
+		// dataa := model.run_trial(r)
+		// data := logLog(dataa.toSeries())
 
 		for _, d := range data {
 			fmt.Println(d.X)
@@ -717,10 +826,10 @@ func make_3d_chart(data []opts.Chart3DData) {
 // 	return output, nil
 // }
 
-func one_trial() {
+func one_trial(filename string) {
 	// parameters:
 	size := 201
-	p := 0.5
+	p := 0.1
 	distance := 20
 	model := init_model(size, p, distance)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -733,14 +842,24 @@ func one_trial() {
 	// fmt.Println(delay)
 	// fmt.Println(1.0 / float64(tps))
 
-	for true {
-		end := model.tick(r)
-
-		if end {
-			break
-		}
+	data := model.run_trial(r)
+	// for _, point := range data {
+	// 	fmt.Println(point.radius)
+	// }
+	for _, point := range data {
+		fmt.Println(point.filled)
 	}
-	pretty_picture(model, "image", 5)
+	casted := data.toSeries()
+	logged := logLog(casted)
+
+	_, gradient, err := LinearRegression(logged)
+	fmt.Println(gradient)
+
+	if err != nil {
+		panic(err)
+	}
+
+	pretty_picture(model, filename, 5)
 
 	// pretty_picture(model, "immune", 5)
 
@@ -762,12 +881,15 @@ func pretty_picture(model Model, name string, scale int) {
 
 	grid := model.grid
 
-	cropped := model.size - model.distance*2
+	// cropped := model.size - model.distance*2
+	cropped := model.size
 
 	img := image.NewNRGBA(image.Rect(0, 0, cropped*scale, cropped*scale))
 
-	for y, row := range grid[model.distance : model.size-model.distance] {
-		for x, value := range row[model.distance : model.size-model.distance] {
+	// for y, row := range grid[model.distance : model.size-model.distance] {
+	// 	for x, value := range row[model.distance : model.size-model.distance] {
+	for y, row := range grid {
+		for x, value := range row {
 
 			var color color.Color
 			if value == Empty {
@@ -799,28 +921,28 @@ func pretty_picture(model Model, name string, scale int) {
 		// log.Fatal(err)
 	}
 
-	file, err := os.Create(name + "-data.png")
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	// encoder.Encode(model)
-	encoder.Encode(struct {
-		P          float64 `json:"p"`
-		Size       int     `json:"size"`
-		Infected   int     `json:"infected"`
-		Population int     `json:"population"`
-	}{
-		model.p,
-		model.size,
-		model.infected,
-		model.people,
-	})
+	// file, err := os.Create(name + "-data.png")
+	//
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// defer file.Close()
+	//
+	// encoder := json.NewEncoder(file)
+	// encoder.SetIndent("", "  ")
+	// // encoder.Encode(model)
+	// encoder.Encode(struct {
+	// 	P          float64 `json:"p"`
+	// 	Size       int     `json:"size"`
+	// 	Infected   int     `json:"infected"`
+	// 	Population int     `json:"population"`
+	// }{
+	// 	model.p,
+	// 	model.size,
+	// 	model.infected,
+	// 	model.people,
+	// })
 
 	// exec.Command("chafa", "image.png").Run()
 }
