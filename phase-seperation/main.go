@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/AlexEidt/Vidio"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/montanaflynn/stats"
@@ -94,9 +95,11 @@ func (p *Point) radius() int {
 
 type Model struct {
 	grid  Grid
+	grids []Grid
 	size  int
 	time  int
 	ticks int
+	inc   int
 }
 
 // func remove[T any](slice []T, s int) []T {
@@ -145,15 +148,30 @@ func (g Grid) index(point Point) *SiteState {
 	return &g[real_point.y][real_point.x]
 }
 
-func (g *Grid) is_valid_point(point Point) bool {
+func (g Grid) is_valid_point(point Point) bool {
 
-	radius := len(*g) / 2
+	radius := len(g) / 2
 
 	if point.x >= -radius && point.x <= radius && point.y >= -radius && point.y <= radius {
 		return true
 	} else {
 		return false
 	}
+}
+
+func (g Grid) clone() Grid {
+
+	cloned := make(Grid, 0, len(g))
+
+	for _, row := range g {
+		new_row := make([]SiteState, 0, len(g))
+		for _, value := range row {
+			new_row = append(new_row, SiteState(value))
+		}
+		cloned = append(cloned, new_row)
+	}
+
+	return cloned
 }
 
 func (m *Model) index(point Point) *SiteState {
@@ -169,23 +187,23 @@ func clear_line() {
 	print("\r")
 }
 
-func random_step(r *rand.Rand) Point {
+// func random_step(r *rand.Rand) Point {
+//
+// 	value := r.Float64()
+//
+// 	if value < 0.25 {
+// 		return Point{x: 1, y: 0}
+// 	} else if value < 0.5 {
+// 		return Point{x: -1, y: 0}
+// 	} else if value < 0.75 {
+// 		return Point{x: 0, y: 1}
+// 	} else {
+// 		return Point{x: 0, y: -1}
+// 	}
+//
+// }
 
-	value := r.Float64()
-
-	if value < 0.25 {
-		return Point{x: 1, y: 0}
-	} else if value < 0.5 {
-		return Point{x: -1, y: 0}
-	} else if value < 0.75 {
-		return Point{x: 0, y: 1}
-	} else {
-		return Point{x: 0, y: -1}
-	}
-
-}
-
-func init_model(size int, ticks int, r *rand.Rand) Model {
+func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
@@ -210,7 +228,6 @@ func init_model(size int, ticks int, r *rand.Rand) Model {
 				}
 			}
 		}
-		*grid.index(mid_point()) = 1
 	} else {
 
 		// heart_radius := 30.0
@@ -224,9 +241,11 @@ func init_model(size int, ticks int, r *rand.Rand) Model {
 
 	model := Model{
 		grid:  grid,
+		grids: []Grid{grid.clone()},
 		size:  size,
 		time:  0,
 		ticks: ticks,
+		inc:   ticks / frames,
 	}
 
 	return model
@@ -247,8 +266,20 @@ func (m *Model) countNeibors(point Point) int {
 	return neighbors
 }
 
-func (m *Model) countNonNeibors(point Point) int {
-	return 4 - m.countNeibors(point)
+func (m *Model) getNonNeihbors(point Point) []Point {
+	var nonNeighbors []Point
+
+	politics := *m.grid.index(point)
+
+	for _, step := range CARDINALS {
+		new_point := add_points(point, step)
+		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != politics {
+			nonNeighbors = append(nonNeighbors, new_point)
+		}
+	}
+
+	return nonNeighbors
+
 }
 
 func (m *Model) randomPoint(r *rand.Rand) Point {
@@ -257,14 +288,14 @@ func (m *Model) randomPoint(r *rand.Rand) Point {
 	return Point{x: r.Intn(m.size) - radius, y: r.Intn(m.size) - radius}
 }
 
-func (m *Model) shouldSwitch(point Point, r *rand.Rand) bool {
-	nonNeihbors := m.countNeibors(point)
+func (m *Model) shouldSwitch(point Point, r *rand.Rand) ([]Point, bool) {
+	nonNeihbors := m.getNonNeihbors(point)
 
 	slope := 0.25
 
-	probability := float64(nonNeihbors) * slope
+	probability := float64(len(nonNeihbors)) * slope
 
-	return r.Float64() < probability
+	return nonNeihbors, r.Float64() < probability
 }
 
 func (m *Model) tick(r *rand.Rand) {
@@ -273,17 +304,46 @@ func (m *Model) tick(r *rand.Rand) {
 	state := *m.grid.index(selected)
 	// start := time.Now()
 
-	if m.shouldSwitch(selected, r) {
-		var new_point Point
-		for {
-			step := random_step(r)
-			new_point = add_points(selected, step)
-			if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == state {
-				*m.index(selected) = *m.grid.index(new_point)
-				*m.grid.index(new_point) = state
+	if choices, should := m.shouldSwitch(selected, r); should == true {
+
+		choice := r.Intn(len(choices))
+		new_point := choices[choice]
+
+		*m.index(selected) = *m.grid.index(new_point)
+		*m.grid.index(new_point) = state
+
+		if m.time%m.inc == 0 {
+			m.grids = append(m.grids, m.grid.clone())
+
+		}
+		m.time++
+	}
+
+}
+
+func (m *Model) balazsTick(r *rand.Rand) {
+
+	selected := m.randomPoint(r)
+	state := *m.grid.index(selected)
+	// start := time.Now()
+
+	if _, should := m.shouldSwitch(selected, r); should == true {
+
+		var newPoint Point
+		for true {
+			newPoint = m.randomPoint(r)
+
+			if *m.index(newPoint) != state {
+				*m.index(selected) = *m.grid.index(newPoint)
+				*m.grid.index(newPoint) = state
 
 				break
 			}
+		}
+
+		if m.time%m.inc == 0 {
+			clone := m.grid.clone()
+			m.grids = append(m.grids, clone)
 		}
 
 		m.time++
@@ -292,10 +352,10 @@ func (m *Model) tick(r *rand.Rand) {
 }
 
 func (m *Model) run_trial(r *rand.Rand) Data {
-	model := m
 
 	for m.time < m.ticks {
-		model.tick(r)
+		// model.tick(r)
+		m.balazsTick(r)
 	}
 
 	return make([]DataPoint, 0)
@@ -316,19 +376,9 @@ func run_simulation() stats.Series {
 		clear_line()
 		fmt.Print("this much done: ", p*100, "%")
 
-		model := init_model(size, 1000, r)
+		model := init_model(size, 1000, 100, r)
 
-		data := model.run_trial(r)
-		casted := data.toSeries()
-		logged := logLog(casted)
-
-		_, gradient, err := LinearRegression(logged)
-
-		if err != nil {
-			panic(err)
-		}
-
-		series = append(series, stats.Coordinate{X: p, Y: gradient})
+		_ = model.run_trial(r)
 
 	}
 
@@ -338,19 +388,17 @@ func run_simulation() stats.Series {
 }
 
 func testing() {
-	// // data := []int{0, 1, 2, 3}
-	// point := Point{row: 1, col: 1}
-	// data := []Point{point, point}
-	//
-	// // for _, idk := range data {
-	// // 	idk = 67
-	// // }
-	//
-	// // data = unordered_remove(data, 1)
-	//
-	// data[0].row = 2
-	//
-	// fmt.Println(data)
+
+	grid := gen_grid(3)
+
+	*grid.index(Point{x: 0, y: 0}) = 1
+	// fmt.Println(grid.index(Point{x: 0, y: 0}) == &grid[1][1])
+	// data = unordered_remove(data, 1)
+
+	clone := grid.clone()
+	*grid.index(Point{x: 0, y: 0}) = 2
+
+	fmt.Println(clone)
 }
 
 type DataPoint struct {
@@ -403,44 +451,6 @@ func (d *Data) toSeries() stats.Series {
 	}
 
 	return series
-}
-
-func logLog(series stats.Series) stats.Series {
-
-	logged := make(stats.Series, 0, len(series))
-
-	for _, point := range series {
-		logged = append(logged, stats.Coordinate{X: math.Log(point.X), Y: math.Log(point.Y)})
-	}
-
-	return logged
-}
-
-func LinearRegression(s stats.Series) (float64, float64, error) {
-
-	if len(s) == 0 {
-		return 0, 0, nil
-	}
-
-	// Placeholder for the math to be done
-	var sum [5]float64
-
-	// Loop over data keeping index in place
-	i := 0
-	for ; i < len(s); i++ {
-		sum[0] += s[i].X
-		sum[1] += s[i].Y
-		sum[2] += s[i].X * s[i].X
-		sum[3] += s[i].X * s[i].Y
-		sum[4] += s[i].Y * s[i].Y
-	}
-
-	// Find gradient and intercept
-	f := float64(i)
-	gradient := (f*sum[3] - sum[0]*sum[1]) / (f*sum[2] - sum[0]*sum[0])
-	intercept := (sum[1] / f) - (gradient * sum[0] / f)
-
-	return intercept, gradient, nil
 }
 
 func main() {
@@ -595,11 +605,12 @@ func make_3d_chart(data []opts.Chart3DData) {
 
 func one_trial(filename string) {
 	// parameters:
-	size := 201
-	ticks := int(10e3)
+	size := 101
+	ticks := int(1e6)
+	frames := 100
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	model := init_model(size, ticks, r)
+	model := init_model(size, ticks, frames, r)
 	// tps := 1
 
 	// interval := 1
@@ -617,9 +628,8 @@ func one_trial(filename string) {
 		fmt.Println(point.filled)
 	}
 
-	pretty_picture(model, filename, 5)
-
-	// pretty_picture(model, "immune", 5)
+	// pretty_picture(model.grid, filename, true)
+	model.makeGif(101, 10, filename)
 
 }
 
@@ -635,13 +645,16 @@ func calc_color(percent float64) color.NRGBA {
 
 }
 
-func pretty_picture(model Model, name string, scale int) {
+func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
 
-	grid := model.grid
+	size := len(grid)
+	screen_size := 960
+
+	scale := screen_size / size
 
 	// cropped := model.size - model.distance*2
 
-	img := image.NewNRGBA(image.Rect(0, 0, model.size, model.size))
+	img := image.NewNRGBA(image.Rect(0, 0, size*scale, size*scale))
 
 	// for y, row := range grid[model.distance : model.size-model.distance] {
 	// 	for x, value := range row[model.distance : model.size-model.distance] {
@@ -664,19 +677,23 @@ func pretty_picture(model Model, name string, scale int) {
 		}
 	}
 
-	f, err := os.Create(name + ".png")
-	if err != nil {
-		// log.Fatal(err)
+	if save {
+		f, err := os.Create(name + ".png")
+		if err != nil {
+			// log.Fatal(err)
+		}
+
+		if err := png.Encode(f, img); err != nil {
+			f.Close()
+			// log.Fatal(err)
+		}
+
+		if err := f.Close(); err != nil {
+			// log.Fatal(err)
+		}
 	}
 
-	if err := png.Encode(f, img); err != nil {
-		f.Close()
-		// log.Fatal(err)
-	}
-
-	if err := f.Close(); err != nil {
-		// log.Fatal(err)
-	}
+	return img
 
 	// file, err := os.Create(name + "-data.png")
 	//
@@ -702,6 +719,23 @@ func pretty_picture(model Model, name string, scale int) {
 	// })
 
 	// exec.Command("chafa", "image.png").Run()
+}
+
+func (m *Model) makeGif(frames int, fps int, name string) {
+
+	first := pretty_picture(m.grids[0], "", false)
+
+	bounds := first.Bounds()
+	w, h := bounds.Max.X, bounds.Max.Y
+
+	options := vidio.Options{FPS: float64(fps), Loop: 0, Delay: 1000}
+	gif, _ := vidio.NewVideoWriter(name+".gif", w, h, &options)
+	defer gif.Close()
+
+	for i := range m.grids {
+		img := pretty_picture(m.grids[i], name+"-"+fmt.Sprintf("%d", i), false).Pix
+		gif.Write(img)
+	}
 }
 
 // func make_graph(grid Grid) {
