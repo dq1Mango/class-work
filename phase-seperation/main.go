@@ -266,6 +266,20 @@ func (m *Model) countNeibors(point Point) int {
 	return neighbors
 }
 
+func (m *Model) countNonNeibors(point Point) int {
+	neighbors := 0
+	politics := *m.grid.index(point)
+
+	for _, step := range CARDINALS {
+		new_point := add_points(point, step)
+		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != politics {
+			neighbors++
+		}
+	}
+
+	return neighbors
+}
+
 func (m *Model) getNonNeihbors(point Point) []Point {
 	var nonNeighbors []Point
 
@@ -321,19 +335,72 @@ func (m *Model) tick(r *rand.Rand) {
 
 }
 
+// func (m *Model) enthalpicSwitch(point Point, r *rand.Rand) ([]Point, bool) {
+//
+// 	neihbors := m.countNeibors(point)
+//
+// 	var options []Point
+//
+// 	politics := *m.grid.index(point)
+//
+// 	for _, step := range CARDINALS {
+// 		new_point := add_points(point, step)
+// 		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != politics {
+// 			nonNeighbors = append(nonNeighbors, new_point)
+// 		}
+// 	}
+//
+// 	return nonNeighbors
+//
+// 	nonNeihbors := m.getNonNeihbors(point)
+//
+// 	slope := 0.25
+//
+// 	probability := float64(len(nonNeihbors)) * slope
+//
+// 	return nonNeihbors, r.Float64() < probability
+// }
+
+func (m *Model) logicalTick(r *rand.Rand) {
+
+	selected := m.randomPoint(r)
+	state := *m.grid.index(selected)
+	// start := time.Now()
+
+	if choices, should := m.shouldSwitch(selected, r); should == true {
+
+		choice := r.Intn(len(choices))
+		new_point := choices[choice]
+
+		*m.index(selected) = *m.grid.index(new_point)
+		*m.grid.index(new_point) = state
+
+		if m.time%m.inc == 0 {
+			m.grids = append(m.grids, m.grid.clone())
+
+		}
+		m.time++
+	}
+
+}
+
 func (m *Model) balazsTick(r *rand.Rand) {
 
 	selected := m.randomPoint(r)
 	state := *m.grid.index(selected)
 	// start := time.Now()
 
-	if _, should := m.shouldSwitch(selected, r); should == true {
+	nonNeihbors := m.countNonNeibors(selected)
+	// if _, should := m.shouldSwitch(selected, r); should == true {
+	if nonNeihbors > 0 {
 
 		var newPoint Point
-		for true {
+		// for true {
+		for range 100 {
 			newPoint = m.randomPoint(r)
 
-			if *m.index(newPoint) != state {
+			if *m.index(newPoint) != state && m.countNeibors(newPoint) <= nonNeihbors {
+				// if *m.index(newPoint) != state {
 				*m.index(selected) = *m.grid.index(newPoint)
 				*m.grid.index(newPoint) = state
 
@@ -355,6 +422,7 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 	for m.time < m.ticks {
 		// model.tick(r)
+		// m.logicalTick(r)
 		m.balazsTick(r)
 	}
 
@@ -728,8 +796,9 @@ func (m *Model) makeGif(frames int, fps int, name string) {
 	bounds := first.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
 
-	options := vidio.Options{FPS: float64(fps), Loop: 0, Delay: 1000}
-	gif, _ := vidio.NewVideoWriter(name+".gif", w, h, &options)
+	// options := vidio.Options{FPS: float64(fps), Loop: 0, Delay: 1000}
+	options := vidio.Options{FPS: float64(fps)}
+	gif, _ := vidio.NewVideoWriter(name+".mp4", w, h, &options)
 	defer gif.Close()
 
 	for i := range m.grids {
