@@ -95,10 +95,12 @@ func (p *Point) radius() int {
 
 type Model struct {
 	grid  Grid
+	table Grid
 	grids []Grid
 	size  int
 	time  int
 	ticks int
+	fails int
 	inc   int
 }
 
@@ -203,6 +205,50 @@ func clear_line() {
 //
 // }
 
+// func circleEquation(x float64) float64 {
+// 	return math.Sqrt(1- x*x)
+// }
+
+func (g Grid) draw_circle(center Point, radius int, value SiteState) {
+
+	circleEquation := func(x float64) float64 {
+		return math.Sqrt(float64(radius*radius) - x*x)
+	}
+
+	for x := -radius; x <= radius; x++ {
+		height := round(circleEquation(float64(x)))
+
+		for y := -height; y <= height; y++ {
+			point := add_points(Point{x: x, y: y}, center)
+			// fmt.Println(point)
+			*g.index(point) = value
+		}
+	}
+}
+
+func gen_yinyang_grid(size int) Grid {
+	yinyang := gen_grid(size)
+
+	radius := size / 2
+
+	for y := -radius; y <= radius; y++ {
+		for x := -radius; x < 0; x++ {
+			*yinyang.index(Point{x, y}) = Oil
+		}
+		for x := 0; x <= radius; x++ {
+			*yinyang.index(Point{x, y}) = Water
+		}
+	}
+
+	yinyang.draw_circle(Point{x: 0, y: -radius / 2}, radius/2, SiteState(0))
+	yinyang.draw_circle(Point{x: 0, y: radius / 2}, radius/2, SiteState(1))
+
+	yinyang.draw_circle(Point{x: 0, y: -radius / 2}, radius/6, SiteState(1))
+	yinyang.draw_circle(Point{x: 0, y: radius / 2}, radius/6, SiteState(0))
+
+	return yinyang
+}
+
 func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 
 	if size%2 == 0 {
@@ -239,8 +285,14 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 	// 	ttl:      tau,
 	// }
 
+	table := gen_yinyang_grid(size)
+
+	// pretty_picture(table, "yinyang", true)
+	// panic("done")
+
 	model := Model{
 		grid:  grid,
+		table: table,
 		grids: []Grid{grid.clone()},
 		size:  size,
 		time:  0,
@@ -252,32 +304,25 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 
 }
 
-func (m *Model) countNeibors(point Point) int {
-	neighbors := 0
-	politics := *m.grid.index(point)
+func (m *Model) calcTheoreticalEnthalpy(point Point, state SiteState) int {
+	enthalpy := 0
 
 	for _, step := range CARDINALS {
 		new_point := add_points(point, step)
-		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == politics {
-			neighbors++
+		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != state {
+			enthalpy++
 		}
 	}
 
-	return neighbors
+	if *m.table.index(point) != state {
+		enthalpy++
+	}
+
+	return enthalpy
 }
 
-func (m *Model) countNonNeibors(point Point) int {
-	neighbors := 0
-	politics := *m.grid.index(point)
-
-	for _, step := range CARDINALS {
-		new_point := add_points(point, step)
-		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != politics {
-			neighbors++
-		}
-	}
-
-	return neighbors
+func (m *Model) calcEnthalpy(point Point) int {
+	return m.calcTheoreticalEnthalpy(point, *m.index(point))
 }
 
 func (m *Model) getNonNeihbors(point Point) []Point {
@@ -390,22 +435,31 @@ func (m *Model) balazsTick(r *rand.Rand) {
 	state := *m.grid.index(selected)
 	// start := time.Now()
 
-	nonNeihbors := m.countNonNeibors(selected)
-	// if _, should := m.shouldSwitch(selected, r); should == true {
-	if nonNeihbors > 0 {
+	// nonNeihbors := m.countNonNeibors(selected)
+	enthalpy := m.calcEnthalpy(selected)
+
+	if enthalpy > 0 {
 
 		var newPoint Point
-		// for true {
+
+		success := false
 		for range 100 {
 			newPoint = m.randomPoint(r)
-
-			if *m.index(newPoint) != state && m.countNeibors(newPoint) <= nonNeihbors {
+			// 														//																	this <= is CRITICAL!!!
+			if *m.index(newPoint) != state && m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
 				// if *m.index(newPoint) != state {
 				*m.index(selected) = *m.grid.index(newPoint)
 				*m.grid.index(newPoint) = state
 
+				success = true
 				break
 			}
+		}
+
+		if !success {
+			m.fails++
+			return
+			// fmt.Println("we failed")
 		}
 
 		if m.time%m.inc == 0 {
@@ -425,6 +479,8 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// m.logicalTick(r)
 		m.balazsTick(r)
 	}
+
+	// fmt.Println("we failed:", m.fails, "times")
 
 	return make([]DataPoint, 0)
 
@@ -674,8 +730,11 @@ func make_3d_chart(data []opts.Chart3DData) {
 func one_trial(filename string) {
 	// parameters:
 	size := 101
-	ticks := int(1e6)
-	frames := 100
+	ticks := int(2e4)
+
+	fps := 15
+	vid_time := 10 // in seconds
+	frames := fps * vid_time
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	model := init_model(size, ticks, frames, r)
@@ -697,7 +756,7 @@ func one_trial(filename string) {
 	}
 
 	// pretty_picture(model.grid, filename, true)
-	model.makeGif(101, 10, filename)
+	model.makeVid(fps, filename)
 
 }
 
@@ -789,7 +848,9 @@ func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
 	// exec.Command("chafa", "image.png").Run()
 }
 
-func (m *Model) makeGif(frames int, fps int, name string) {
+func (m *Model) makeVid(fps int, name string) {
+
+	// start := time.Now()
 
 	first := pretty_picture(m.grids[0], "", false)
 
@@ -801,11 +862,22 @@ func (m *Model) makeGif(frames int, fps int, name string) {
 	gif, _ := vidio.NewVideoWriter(name+".mp4", w, h, &options)
 	defer gif.Close()
 
+	// prettyTime := 0.0
+
 	for i := range m.grids {
+
+		// prettyStart := time.Now()
 		img := pretty_picture(m.grids[i], name+"-"+fmt.Sprintf("%d", i), false).Pix
+		// prettyTime += time.Since(prettyStart).Seconds()
 		gif.Write(img)
 	}
+
+	// elapsedTime := time.Since(start)
+	// fmt.Printf("elapsed time: %.2f\n", elapsedTime.Seconds())
+	// fmt.Println(prettyTime)
 }
+
+// func (m *Model)
 
 // func make_graph(grid Grid) {
 // 	chart := charts.NewHeatMap()
