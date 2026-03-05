@@ -29,6 +29,8 @@ const (
 	// Immune
 )
 
+// possible states of sites
+// (possibly change this to 1 and -1) for easier enthalpy calculations
 var StateColor = map[SiteState]color.NRGBA{
 	Oil: {
 		R: 0,
@@ -44,8 +46,7 @@ var StateColor = map[SiteState]color.NRGBA{
 	},
 }
 
-type Grid [][]SiteState
-
+// representing a cartesian point on the grid
 type Point struct {
 	x int
 	y int
@@ -93,52 +94,8 @@ func (p *Point) radius() int {
 	return max(abs(p.x), abs(p.y))
 }
 
-type Model struct {
-	grid  Grid
-	table Grid
-	grids []Grid
-	size  int
-	time  int
-	ticks int
-	fails int
-	inc   int
-}
-
-// func remove[T any](slice []T, s int) []T {
-// 	return slices.Delete(slice, s, s+1)
-// }
-
-// // this isnt dumb at all
-// type Walkers []Walker
-//
-// func (w Walkers) remove(i int) {
-// 	w[i] = w[len(w)-1]
-// 	w = w[:len(w)-1]
-// }
-
-func gen_grid(size int) Grid {
-
-	if size%2 == 0 {
-		panic("grid size must be odd you doofus")
-	}
-
-	grid := make(Grid, size)
-
-	for row := range grid {
-		grid[row] = make([]SiteState, size)
-	}
-
-	return grid
-}
-
-// func heart_equation_derive(x, y float64) float64 {
-// 	return 3 * math.Pow(x * x + y * y - 1, 2)
-//
-// }
-
-func round(x float64) int {
-	return int(math.Round(x))
-}
+// abstraction of a 2d grid such that sites can be acsessd with cartesian coordinates
+type Grid [][]SiteState
 
 func (g Grid) raw_index(point Point) *SiteState {
 	return &g[point.y][point.x]
@@ -168,6 +125,7 @@ func (g Grid) clone() Grid {
 	for _, row := range g {
 		new_row := make([]SiteState, 0, len(g))
 		for _, value := range row {
+
 			new_row = append(new_row, SiteState(value))
 		}
 		cloned = append(cloned, new_row)
@@ -176,8 +134,46 @@ func (g Grid) clone() Grid {
 	return cloned
 }
 
+// model holds the different parametes that define the simulation
+// as well as the grids themselves
+type Model struct {
+	grid  Grid
+	table Grid
+	grids []Grid
+	size  int
+	time  int
+	ticks int
+	fails int
+	inc   int
+}
+
 func (m *Model) index(point Point) *SiteState {
 	return m.grid.index(point)
+}
+
+// generates an empty grid of dimensions *size*
+func gen_grid(size int) Grid {
+
+	if size%2 == 0 {
+		panic("grid size must be odd you doofus")
+	}
+
+	grid := make(Grid, size)
+
+	for row := range grid {
+		grid[row] = make([]SiteState, size)
+	}
+
+	return grid
+}
+
+// func heart_equation_derive(x, y float64) float64 {
+// 	return 3 * math.Pow(x * x + y * y - 1, 2)
+//
+// }
+
+func round(x float64) int {
+	return int(math.Round(x))
 }
 
 func clear_screen() {
@@ -226,6 +222,7 @@ func (g Grid) draw_circle(center Point, radius int, value SiteState) {
 	}
 }
 
+// generates a grid with the yinying pattern
 func gen_yinyang_grid(size int) Grid {
 	yinyang := gen_grid(size)
 
@@ -256,15 +253,19 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 	}
 
 	// grid_type := "normal"
-	// grid_type := "heart"
-	heart := false
+	// grid_type := "yinyang"
+
+	// wether to use the yinyang pattern or not
+	// (this should probably be configurable from cmdline flags)
+	yinyang := true
 
 	var grid Grid
-	if !heart {
+	if !yinyang {
 		grid = gen_grid(size)
 
 		cutoff := 0.5
 
+		// sets each site to a random state
 		for i := range grid {
 			for j := range grid {
 				if r.Float64() < cutoff {
@@ -275,15 +276,16 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 			}
 		}
 	} else {
+		grid = gen_yinyang_grid(size)
+		for _, row := range grid {
+			for j := range row {
+				row[j] = row[j] ^ 1
+			}
+		}
 
 		// heart_radius := 30.0
 		// grid = gen_heart_grid(size, heart_radius)
 	}
-	// walkers := make([]Walker, 1)
-	// walkers[0] = Walker{
-	// 	location: middle,
-	// 	ttl:      tau,
-	// }
 
 	table := gen_yinyang_grid(size)
 
@@ -304,6 +306,7 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 
 }
 
+// calculates the enthalpy a siteState would have at a certain point
 func (m *Model) calcTheoreticalEnthalpy(point Point, state SiteState) int {
 	enthalpy := 0
 
@@ -314,6 +317,8 @@ func (m *Model) calcTheoreticalEnthalpy(point Point, state SiteState) int {
 		}
 	}
 
+	// currently this is set to use the table model,
+	// but this should also be configurable
 	if *m.table.index(point) != state {
 		enthalpy++
 	}
@@ -321,6 +326,7 @@ func (m *Model) calcTheoreticalEnthalpy(point Point, state SiteState) int {
 	return enthalpy
 }
 
+// calculates the enthalpy of a point
 func (m *Model) calcEnthalpy(point Point) int {
 	return m.calcTheoreticalEnthalpy(point, *m.index(point))
 }
@@ -357,6 +363,7 @@ func (m *Model) shouldSwitch(point Point, r *rand.Rand) ([]Point, bool) {
 	return nonNeihbors, r.Float64() < probability
 }
 
+// dont worry abt this
 func (m *Model) tick(r *rand.Rand) {
 
 	selected := m.randomPoint(r)
@@ -406,6 +413,7 @@ func (m *Model) tick(r *rand.Rand) {
 // 	return nonNeihbors, r.Float64() < probability
 // }
 
+// dont worry abt this either
 func (m *Model) logicalTick(r *rand.Rand) {
 
 	selected := m.randomPoint(r)
@@ -429,13 +437,15 @@ func (m *Model) logicalTick(r *rand.Rand) {
 
 }
 
+// this is what actually changes the state
 func (m *Model) balazsTick(r *rand.Rand) {
 
+	// picks a random point
 	selected := m.randomPoint(r)
 	state := *m.grid.index(selected)
 	// start := time.Now()
 
-	// nonNeihbors := m.countNonNeibors(selected)
+	// calculates the enthalpy of the random point
 	enthalpy := m.calcEnthalpy(selected)
 
 	if enthalpy > 0 {
@@ -443,6 +453,7 @@ func (m *Model) balazsTick(r *rand.Rand) {
 		var newPoint Point
 
 		success := false
+		// try 100 times to pick a new point which would decresase or not change the current enthalpy
 		for range 100 {
 			newPoint = m.randomPoint(r)
 			// 														//																	this <= is CRITICAL!!!
@@ -456,6 +467,7 @@ func (m *Model) balazsTick(r *rand.Rand) {
 			}
 		}
 
+		// if we fail to pick such a point we try again with a new inital point
 		if !success {
 			m.fails++
 			return
@@ -472,11 +484,15 @@ func (m *Model) balazsTick(r *rand.Rand) {
 
 }
 
+// runs one *model* to completion
 func (m *Model) run_trial(r *rand.Rand) Data {
 
+	// run the model for the specified number of ticks (m.ticks)
 	for m.time < m.ticks {
 		// model.tick(r)
 		// m.logicalTick(r)
+
+		// tick the model
 		m.balazsTick(r)
 	}
 
@@ -486,6 +502,7 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 }
 
+// ignore all these functions that r not rly used
 func run_simulation() stats.Series {
 	size := 201
 	num_points := 100.0
@@ -577,6 +594,7 @@ func (d *Data) toSeries() stats.Series {
 	return series
 }
 
+// START HERE (duh)
 func main() {
 	// testing()
 	// return
@@ -591,6 +609,8 @@ func main() {
 
 	one_trial(*args.output)
 	return
+
+	// only run one_trial for testing purposes
 
 	if file := *args.file; file != "" {
 		json_data, err := os.ReadFile(file)
@@ -728,32 +748,28 @@ func make_3d_chart(data []opts.Chart3DData) {
 // }
 
 func one_trial(filename string) {
-	// parameters:
+	// set all the parameters:
 	size := 101
-	ticks := int(2e4)
+	ticks := int(3e4)
 
+	// calculate some values that make a nice video
 	fps := 15
 	vid_time := 10 // in seconds
 	frames := fps * vid_time
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	// make the model
 	model := init_model(size, ticks, frames, r)
-	// tps := 1
 
-	// interval := 1
-	// fmt.Println(interval)
-	//
-	// var delay time.Duration = time.Duration(1.0 / float64(tps) * math.Pow10(9))
-	// fmt.Println(delay)
-	// fmt.Println(1.0 / float64(tps))
+	// run a trial
+	_ = model.run_trial(r)
 
-	data := model.run_trial(r)
 	// for _, point := range data {
 	// 	fmt.Println(point.radius)
 	// }
-	for _, point := range data {
-		fmt.Println(point.filled)
-	}
+	// for _, point := range data {
+	// 	fmt.Println(point.filled)
+	// }
 
 	// pretty_picture(model.grid, filename, true)
 	model.makeVid(fps, filename)
