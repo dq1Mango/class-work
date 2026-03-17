@@ -29,6 +29,8 @@ const (
 	// Immune
 )
 
+const ATTEMPTS = 1
+
 // possible states of sites
 // (possibly change this to 1 and -1) for easier enthalpy calculations
 var StateColor = map[SiteState]color.NRGBA{
@@ -138,8 +140,9 @@ func (g Grid) clone() Grid {
 // as well as the grids themselves
 type Model struct {
 	grid  Grid
-	table Grid
 	grids []Grid
+	table Grid
+	useT  bool
 	size  int
 	time  int
 	ticks int
@@ -246,7 +249,7 @@ func gen_yinyang_grid(size int) Grid {
 	return yinyang
 }
 
-func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
+func init_model(size int, ticks int, useTable bool, frames int, r *rand.Rand) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
@@ -257,7 +260,7 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 
 	// wether to use the yinyang pattern or not
 	// (this should probably be configurable from cmdline flags)
-	yinyang := true
+	yinyang := false
 
 	var grid Grid
 	if !yinyang {
@@ -279,6 +282,7 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 		grid = gen_yinyang_grid(size)
 		for _, row := range grid {
 			for j := range row {
+				// wow look at me go
 				row[j] = row[j] ^ 1
 			}
 		}
@@ -287,7 +291,11 @@ func init_model(size int, ticks int, frames int, r *rand.Rand) Model {
 		// grid = gen_heart_grid(size, heart_radius)
 	}
 
-	table := gen_yinyang_grid(size)
+	// make a table if we need one
+	var table Grid
+	if useTable {
+		table = gen_yinyang_grid(size)
+	}
 
 	// pretty_picture(table, "yinyang", true)
 	// panic("done")
@@ -317,10 +325,11 @@ func (m *Model) calcTheoreticalEnthalpy(point Point, state SiteState) int {
 		}
 	}
 
-	// currently this is set to use the table model,
-	// but this should also be configurable
-	if *m.table.index(point) != state {
-		enthalpy++
+	// if we have a table factor it in to the enthalpy calculation aswell
+	if m.useT {
+		if *m.table.index(point) != state {
+			enthalpy++
+		}
 	}
 
 	return enthalpy
@@ -453,11 +462,12 @@ func (m *Model) balazsTick(r *rand.Rand) {
 		var newPoint Point
 
 		success := false
-		// try 100 times to pick a new point which would decresase or not change the current enthalpy
-		for range 100 {
+		// try 'ATTEMPTS' times to pick a new point which would decresase or not change the current enthalpy
+		for range ATTEMPTS { //
 			newPoint = m.randomPoint(r)
-			// 														//																	this <= is CRITICAL!!!
-			if *m.index(newPoint) != state && m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
+			// 														//			this <= is CRITICAL!!!
+			if *m.index(newPoint) != state &&
+				m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
 				// if *m.index(newPoint) != state {
 				*m.index(selected) = *m.grid.index(newPoint)
 				*m.grid.index(newPoint) = state
@@ -487,8 +497,18 @@ func (m *Model) balazsTick(r *rand.Rand) {
 // runs one *model* to completion
 func (m *Model) run_trial(r *rand.Rand) Data {
 
+	precision := m.ticks / 100
+	progress := -1
 	// run the model for the specified number of ticks (m.ticks)
 	for m.time < m.ticks {
+
+		currentProgress := m.time / precision
+		if currentProgress > progress {
+			progress = currentProgress
+			clear_line()
+			fmt.Printf("This much done: %d", progress)
+		}
+
 		// model.tick(r)
 		// m.logicalTick(r)
 
@@ -517,7 +537,7 @@ func run_simulation() stats.Series {
 		clear_line()
 		fmt.Print("this much done: ", p*100, "%")
 
-		model := init_model(size, 1000, 100, r)
+		model := init_model(size, 1000, false, 100, r)
 
 		_ = model.run_trial(r)
 
@@ -588,7 +608,10 @@ func (d *Data) toSeries() stats.Series {
 	series := make([]stats.Coordinate, 0, len(*d))
 
 	for _, point := range *d {
-		series = append(series, stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)})
+		series = append(
+			series,
+			stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)},
+		)
 	}
 
 	return series
@@ -750,7 +773,8 @@ func make_3d_chart(data []opts.Chart3DData) {
 func one_trial(filename string) {
 	// set all the parameters:
 	size := 101
-	ticks := int(3e4)
+	ticks := int(2e5)
+	useTable := false
 
 	// calculate some values that make a nice video
 	fps := 15
@@ -759,7 +783,7 @@ func one_trial(filename string) {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// make the model
-	model := init_model(size, ticks, frames, r)
+	model := init_model(size, ticks, useTable, frames, r)
 
 	// run a trial
 	_ = model.run_trial(r)
