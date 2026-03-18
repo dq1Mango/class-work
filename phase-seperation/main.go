@@ -31,6 +31,8 @@ const (
 
 const ATTEMPTS = 1
 
+const USE_BOLTZMAN = false
+
 // possible states of sites
 // (possibly change this to 1 and -1) for easier enthalpy calculations
 var StateColor = map[SiteState]color.NRGBA{
@@ -139,15 +141,16 @@ func (g Grid) clone() Grid {
 // model holds the different parametes that define the simulation
 // as well as the grids themselves
 type Model struct {
-	grid  Grid
-	grids []Grid
-	table Grid
-	useT  bool
-	size  int
-	time  int
-	ticks int
-	fails int
-	inc   int
+	grid   Grid
+	grids  []Grid
+	table  Grid
+	temp   float64
+	useT   bool
+	size   int
+	time   int
+	ticks  int
+	fails  int
+	frames int
 }
 
 func (m *Model) index(point Point) *SiteState {
@@ -249,7 +252,7 @@ func gen_yinyang_grid(size int) Grid {
 	return yinyang
 }
 
-func init_model(size int, ticks int, useTable bool, frames int, r *rand.Rand) Model {
+func init_model(size int, ticks int, temp float64, useTable bool, frames int, r *rand.Rand) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
@@ -301,13 +304,14 @@ func init_model(size int, ticks int, useTable bool, frames int, r *rand.Rand) Mo
 	// panic("done")
 
 	model := Model{
-		grid:  grid,
-		table: table,
-		grids: []Grid{grid.clone()},
-		size:  size,
-		time:  0,
-		ticks: ticks,
-		inc:   ticks / frames,
+		grid:   grid,
+		table:  table,
+		grids:  []Grid{grid.clone()},
+		temp:   temp,
+		size:   size,
+		time:   0,
+		ticks:  ticks,
+		frames: frames,
 	}
 
 	return model
@@ -372,92 +376,97 @@ func (m *Model) shouldSwitch(point Point, r *rand.Rand) ([]Point, bool) {
 	return nonNeihbors, r.Float64() < probability
 }
 
-// dont worry abt this
-func (m *Model) tick(r *rand.Rand) {
+func (m *Model) TotalEnthalpy() int {
+	enthalpy := 0
+	radius := m.size / 2
 
-	selected := m.randomPoint(r)
-	state := *m.grid.index(selected)
 	// start := time.Now()
 
-	if choices, should := m.shouldSwitch(selected, r); should == true {
-
-		choice := r.Intn(len(choices))
-		new_point := choices[choice]
-
-		*m.index(selected) = *m.grid.index(new_point)
-		*m.grid.index(new_point) = state
-
-		if m.time%m.inc == 0 {
-			m.grids = append(m.grids, m.grid.clone())
-
+	for x := -radius; x < radius; x++ {
+		for y := -radius; y < radius; y++ {
+			enthalpy += m.calcEnthalpy(Point{x: x, y: y})
 		}
-		m.time++
 	}
 
+	// elapsed := time.Now().Sub(start)
+	// fmt.Printf("calculating the enthalpy took: %.2f millis\n", elapsed.Seconds()*1e3)
+
+	return enthalpy
 }
 
-// func (m *Model) enthalpicSwitch(point Point, r *rand.Rand) ([]Point, bool) {
-//
-// 	neihbors := m.countNeibors(point)
-//
-// 	var options []Point
-//
-// 	politics := *m.grid.index(point)
-//
-// 	for _, step := range CARDINALS {
-// 		new_point := add_points(point, step)
-// 		if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) != politics {
-// 			nonNeighbors = append(nonNeighbors, new_point)
-// 		}
-// 	}
-//
-// 	return nonNeighbors
-//
-// 	nonNeihbors := m.getNonNeihbors(point)
-//
-// 	slope := 0.25
-//
-// 	probability := float64(len(nonNeihbors)) * slope
-//
-// 	return nonNeihbors, r.Float64() < probability
-// }
+func (m *Model) ApproxEnthalpy(r *rand.Rand) int {
+	samplePercent := 0.1
+	sampleSize := int(samplePercent * float64(m.size*m.size))
 
-// dont worry abt this either
-func (m *Model) logicalTick(r *rand.Rand) {
-
-	selected := m.randomPoint(r)
-	state := *m.grid.index(selected)
-	// start := time.Now()
-
-	if choices, should := m.shouldSwitch(selected, r); should == true {
-
-		choice := r.Intn(len(choices))
-		new_point := choices[choice]
-
-		*m.index(selected) = *m.grid.index(new_point)
-		*m.grid.index(new_point) = state
-
-		if m.time%m.inc == 0 {
-			m.grids = append(m.grids, m.grid.clone())
-
-		}
-		m.time++
+	enthalpy := 0
+	for range sampleSize {
+		point := m.randomPoint(r)
+		enthalpy += m.calcEnthalpy(point)
 	}
 
+	return int(float64(enthalpy) / samplePercent)
+}
+
+func (m *Model) Boltzman(deltaEnthalpy int, r *rand.Rand) float64 {
+	if deltaEnthalpy <= 0 {
+		return 1.0
+	}
+
+	return math.Exp(-float64(deltaEnthalpy) / m.temp)
 }
 
 // this is what actually changes the state
-func (m *Model) balazsTick(r *rand.Rand) {
+func (m *Model) enthalpicTick(r *rand.Rand) {
 
-	// picks a random point
-	selected := m.randomPoint(r)
-	state := *m.grid.index(selected)
-	// start := time.Now()
+	for {
+		// picks a random point
+		selected := m.randomPoint(r)
+		state := *m.grid.index(selected)
+		// start := time.Now()
 
-	// calculates the enthalpy of the random point
-	enthalpy := m.calcEnthalpy(selected)
+		// calculates the enthalpy of the random point
+		enthalpy := m.calcEnthalpy(selected)
 
-	if enthalpy > 0 {
+		if enthalpy > 0 {
+
+			var newPoint Point
+
+			success := false
+			// try 'ATTEMPTS' times to pick a new point which would decresase or not change the current enthalpy
+			for range ATTEMPTS { //
+				newPoint = m.randomPoint(r)
+				// 														//			this <= is CRITICAL!!!
+				if *m.index(newPoint) != state &&
+					m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
+					// if *m.index(newPoint) != state {
+					*m.index(selected) = *m.grid.index(newPoint)
+					*m.grid.index(newPoint) = state
+
+					success = true
+					break
+				}
+			}
+
+			if success {
+				return
+				// fmt.Println("we failed")
+			} else {
+				m.fails++
+			}
+			// if we fail to pick such a point we try again with a new inital point
+		}
+	}
+}
+
+func (m *Model) boltzmanTick(r *rand.Rand) {
+
+	for {
+		selected := m.randomPoint(r)
+		state := *m.grid.index(selected)
+		// start := time.Now()
+
+		// calculates the enthalpy of the random point
+		enthalpy := m.calcEnthalpy(selected)
 
 		var newPoint Point
 
@@ -466,32 +475,29 @@ func (m *Model) balazsTick(r *rand.Rand) {
 		for range ATTEMPTS { //
 			newPoint = m.randomPoint(r)
 			// 														//			this <= is CRITICAL!!!
-			if *m.index(newPoint) != state &&
-				m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
-				// if *m.index(newPoint) != state {
-				*m.index(selected) = *m.grid.index(newPoint)
-				*m.grid.index(newPoint) = state
+			if *m.index(newPoint) != state {
+				deltaEnthalpy := m.calcTheoreticalEnthalpy(newPoint, state) - enthalpy
 
-				success = true
-				break
+				if deltaEnthalpy <= 0 || r.Float64() < m.Boltzman(deltaEnthalpy, r) {
+
+					// if *m.index(newPoint) != state {
+					*m.index(selected) = *m.grid.index(newPoint)
+					*m.grid.index(newPoint) = state
+
+					success = true
+					break
+				}
 			}
 		}
 
 		// if we fail to pick such a point we try again with a new inital point
-		if !success {
-			m.fails++
+		if success {
 			return
 			// fmt.Println("we failed")
+		} else {
+			m.fails++
 		}
-
-		if m.time%m.inc == 0 {
-			clone := m.grid.clone()
-			m.grids = append(m.grids, clone)
-		}
-
-		m.time++
 	}
-
 }
 
 // runs one *model* to completion
@@ -499,6 +505,23 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 	precision := m.ticks / 100
 	progress := -1
+
+	// var tick func(*Model, *rand.Rand)
+	//
+	// if USE_BOLTZMAN {
+	// 	tick = func(m *Model, r *rand.Rand) {
+	// 		m.boltzmanTick(r)
+	// 	}
+	// } else {
+	//
+	// 	tick = func(m *Model, r *rand.Rand) {
+	// 		m.balazsTick(r)
+	// 	}
+	// }
+
+	data := make(Data, 0, m.frames)
+	interval := m.ticks / m.frames
+
 	// run the model for the specified number of ticks (m.ticks)
 	for m.time < m.ticks {
 
@@ -509,16 +532,36 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 			fmt.Printf("This much done: %d", progress)
 		}
 
+		if m.time%interval == 0 {
+			clone := m.grid.clone()
+			m.grids = append(m.grids, clone)
+
+			realEnthalpy := m.TotalEnthalpy()
+
+			data = append(data, DataPoint{time: m.time, enthalpy: realEnthalpy})
+			// almostEnthalpy := m.ApproxEnthalpy(r)
+			//
+			// fmt.Println("realEnthalpy: ", realEnthalpy)
+			// fmt.Println("almostEnthalpy: ", almostEnthalpy)
+			// fmt.Printf(
+			// 	"error: %.2f%%\n",
+			// 	math.Abs(float64(almostEnthalpy-realEnthalpy))/float64(almostEnthalpy)*100,
+			// )
+		}
 		// model.tick(r)
 		// m.logicalTick(r)
 
 		// tick the model
-		m.balazsTick(r)
+		// m.enthalpicTick(r)
+		m.boltzmanTick(r)
+		m.time++
+		// tick(m, r)
+
 	}
 
 	// fmt.Println("we failed:", m.fails, "times")
 
-	return make([]DataPoint, 0)
+	return data
 
 }
 
@@ -537,7 +580,7 @@ func run_simulation() stats.Series {
 		clear_line()
 		fmt.Print("this much done: ", p*100, "%")
 
-		model := init_model(size, 1000, false, 100, r)
+		model := init_model(size, 1000, 1, false, 100, r)
 
 		_ = model.run_trial(r)
 
@@ -563,11 +606,25 @@ func testing() {
 }
 
 type DataPoint struct {
-	radius int
-	filled int
+	time     int
+	enthalpy int
 }
 
 type Data []DataPoint
+
+func (d Data) WriteToCSV(filename string) {
+
+	var csv string
+
+	for _, point := range d {
+		csv += fmt.Sprintf("%d, %d\n", point.time, point.enthalpy)
+	}
+
+	err := os.WriteFile(filename+".csv", []byte(csv), 0644)
+	if err != nil {
+		panic(err)
+	}
+}
 
 type Arguments struct {
 	file *string
@@ -604,18 +661,18 @@ func parse_args() Arguments {
 	return args
 }
 
-func (d *Data) toSeries() stats.Series {
-	series := make([]stats.Coordinate, 0, len(*d))
-
-	for _, point := range *d {
-		series = append(
-			series,
-			stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)},
-		)
-	}
-
-	return series
-}
+// func (d *Data) toSeries() stats.Series {
+// 	series := make([]stats.Coordinate, 0, len(*d))
+//
+// 	for _, point := range *d {
+// 		series = append(
+// 			series,
+// 			stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)},
+// 		)
+// 	}
+//
+// 	return series
+// }
 
 // START HERE (duh)
 func main() {
@@ -774,6 +831,7 @@ func one_trial(filename string) {
 	// set all the parameters:
 	size := 101
 	ticks := int(2e5)
+	temp := 1e-3
 	useTable := false
 
 	// calculate some values that make a nice video
@@ -783,16 +841,19 @@ func one_trial(filename string) {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// make the model
-	model := init_model(size, ticks, useTable, frames, r)
+	model := init_model(size, ticks, temp, useTable, frames, r)
 
 	// run a trial
-	_ = model.run_trial(r)
+	data := model.run_trial(r)
+
+	data.WriteToCSV("data/" + filename)
 
 	// for _, point := range data {
-	// 	fmt.Println(point.radius)
+	// 	fmt.Println(point.time)
 	// }
+	// fmt.Println()
 	// for _, point := range data {
-	// 	fmt.Println(point.filled)
+	// 	fmt.Println(point.enthalpy)
 	// }
 
 	// pretty_picture(model.grid, filename, true)

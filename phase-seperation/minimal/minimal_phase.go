@@ -271,28 +271,28 @@ func (m *Model) tick(r *rand.Rand) {
 
 		var newPoint Point
 
-		success := false
+		// success := false
 		// try 'ATTEMPTS' times to pick a new point which would decresase or not change the current enthalpy
 		for range ATTEMPTS { //
 			newPoint = m.randomPoint(r)
 			// 														//			this <= is CRITICAL!!!
 			if *m.index(newPoint) != state &&
-				m.calcTheoreticalEnthalpy(newPoint, state) <= enthalpy {
+				m.calcTheoreticalEnthalpy(newPoint, state) < enthalpy {
 				// if *m.index(newPoint) != state {
 				*m.index(selected) = *m.grid.index(newPoint)
 				*m.grid.index(newPoint) = state
 
-				success = true
+				// success = true
 				break
 			}
 		}
 
 		// if we fail to pick such a point we try again with a new inital point
-		if !success {
-			m.fails++
-			return
-			// fmt.Println("we failed")
-		}
+		// if !success {
+		// 	m.fails++
+		// 	return
+		// 	// fmt.Println("we failed")
+		// }
 
 		if m.time%m.inc == 0 {
 			clone := m.grid.clone()
@@ -355,7 +355,7 @@ func main() {
 	filename := *args.output
 	// set all the parameters:
 	size := 101
-	ticks := int(2e5)
+	ticks := int(2e6)
 	useTable := false
 
 	// calculate some values that make a nice video
