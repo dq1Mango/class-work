@@ -29,9 +29,13 @@ const (
 	// Immune
 )
 
-const ATTEMPTS = 1
+const (
+	ATTEMPTS = 1
+	SIZE     = 101
+	TICKS    = 1e5
+)
 
-const USE_BOLTZMAN = false
+// const USE_BOLTZMAN = false
 
 // possible states of sites
 // (possibly change this to 1 and -1) for easier enthalpy calculations
@@ -309,7 +313,7 @@ func init_model(size int, ticks int, temp float64, useTable bool, frames int, r 
 		grids:  []Grid{grid.clone()},
 		temp:   temp,
 		size:   size,
-		time:   0,
+		time:   1,
 		ticks:  ticks,
 		frames: frames,
 	}
@@ -503,8 +507,8 @@ func (m *Model) boltzmanTick(r *rand.Rand) {
 // runs one *model* to completion
 func (m *Model) run_trial(r *rand.Rand) Data {
 
-	precision := m.ticks / 100
-	progress := -1
+	// precision := m.ticks / 100
+	// progress := -1
 
 	// var tick func(*Model, *rand.Rand)
 	//
@@ -525,16 +529,16 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 	// run the model for the specified number of ticks (m.ticks)
 	for m.time < m.ticks {
 
-		currentProgress := m.time / precision
-		if currentProgress > progress {
-			progress = currentProgress
-			clear_line()
-			fmt.Printf("This much done: %d", progress)
-		}
+		// currentProgress := m.time / precision
+		// if currentProgress > progress {
+		// 	progress = currentProgress
+		// 	clear_line()
+		// 	fmt.Printf("This much done: %d", progress)
+		// }
 
 		if m.time%interval == 0 {
-			clone := m.grid.clone()
-			m.grids = append(m.grids, clone)
+			// clone := m.grid.clone()
+			// m.grids = append(m.grids, clone)
 
 			realEnthalpy := m.TotalEnthalpy()
 
@@ -554,6 +558,7 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// tick the model
 		// m.enthalpicTick(r)
 		m.boltzmanTick(r)
+
 		m.time++
 		// tick(m, r)
 
@@ -567,23 +572,32 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 // ignore all these functions that r not rly used
 func run_simulation() stats.Series {
-	size := 201
-	num_points := 100.0
+	num_points := 100
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	series := make(stats.Series, 0, int(num_points))
 
-	for p := 0.01; p < 1.0; p += 0.01 {
+	startTemp := 0.0001
+	endTemp := 0.01
+	// endTemp := 0.1
+	dataPoints := 100
+
+	for temp := startTemp; temp <= endTemp; temp += (endTemp - startTemp) / float64(dataPoints) {
 		// p := p / num_points
 
 		clear_line()
-		fmt.Print("this much done: ", p*100, "%")
+		fmt.Print("this much done: ", (temp-startTemp)/(endTemp-startTemp)*100, "%")
 
-		model := init_model(size, 1000, 1, false, 100, r)
+		model := init_model(SIZE, TICKS, temp, false, num_points, r)
 
-		_ = model.run_trial(r)
+		data := model.run_trial(r)
 
+		logged := logLog(data.toSeries())
+
+		_, slope, _ := LinearRegression(logged)
+
+		series = append(series, stats.Coordinate{X: temp, Y: slope})
 	}
 
 	// pretty_picture(model, "testing", 5)
@@ -626,6 +640,58 @@ func (d Data) WriteToCSV(filename string) {
 	}
 }
 
+func WriteToCSV(series stats.Series, filename string) {
+
+	var csv string
+
+	for _, point := range series {
+		csv += fmt.Sprintf("%f, %f\n", point.X, point.Y)
+	}
+
+	err := os.WriteFile(filename+".csv", []byte(csv), 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func LinearRegression(s stats.Series) (float64, float64, error) {
+
+	if len(s) == 0 {
+		return 0, 0, nil
+	}
+
+	// Placeholder for the math to be done
+	var sum [5]float64
+
+	// Loop over data keeping index in place
+	i := 0
+	for ; i < len(s); i++ {
+		sum[0] += s[i].X
+		sum[1] += s[i].Y
+		sum[2] += s[i].X * s[i].X
+		sum[3] += s[i].X * s[i].Y
+		sum[4] += s[i].Y * s[i].Y
+	}
+
+	// Find gradient and intercept
+	f := float64(i)
+	gradient := (f*sum[3] - sum[0]*sum[1]) / (f*sum[2] - sum[0]*sum[0])
+	intercept := (sum[1] / f) - (gradient * sum[0] / f)
+
+	return intercept, gradient, nil
+}
+
+func logLog(series stats.Series) stats.Series {
+
+	logged := make(stats.Series, 0, len(series))
+
+	for _, point := range series {
+		logged = append(logged, stats.Coordinate{X: math.Log(point.X), Y: math.Log(point.Y)})
+	}
+
+	return logged
+}
+
 type Arguments struct {
 	file *string
 	// operation *string
@@ -661,18 +727,18 @@ func parse_args() Arguments {
 	return args
 }
 
-// func (d *Data) toSeries() stats.Series {
-// 	series := make([]stats.Coordinate, 0, len(*d))
-//
-// 	for _, point := range *d {
-// 		series = append(
-// 			series,
-// 			stats.Coordinate{X: float64(point.radius), Y: float64(point.filled)},
-// 		)
-// 	}
-//
-// 	return series
-// }
+func (d *Data) toSeries() stats.Series {
+	series := make([]stats.Coordinate, 0, len(*d))
+
+	for _, point := range *d {
+		series = append(
+			series,
+			stats.Coordinate{X: float64(point.time), Y: float64(point.enthalpy)},
+		)
+	}
+
+	return series
+}
 
 // START HERE (duh)
 func main() {
@@ -714,34 +780,36 @@ func main() {
 		// dataa := model.run_trial(r)
 		// data := logLog(dataa.toSeries())
 
-		for _, d := range data {
-			fmt.Println(d.X)
-		}
+		WriteToCSV(data, *args.output)
 
-		for _, d := range data {
-			fmt.Println(d.Y)
-		}
+		// for _, d := range data {
+		// 	fmt.Println(d.X)
+		// }
+		//
+		// for _, d := range data {
+		// 	fmt.Println(d.Y)
+		// }
 		// fmt.Println(intercept, gradient)
 
-		file, err := os.Create(*args.output + "data.json")
-
-		if err != nil {
-			panic(err)
-		}
-
-		defer file.Close()
-
-		encoder := json.NewEncoder(file)
-		encoder.SetIndent("", "  ")
-		encoder.Encode(data)
+		// file, err := os.Create(*args.output + "data.json")
+		//
+		// if err != nil {
+		// 	panic(err)
+		// }
+		//
+		// defer file.Close()
+		//
+		// encoder := json.NewEncoder(file)
+		// encoder.SetIndent("", "  ")
+		// encoder.Encode(data)
 
 	}
 
-	switch *args.chart {
-
-	default:
-		fmt.Println("uknown chart type: ", *args.chart)
-	}
+	// switch *args.chart {
+	//
+	// default:
+	// 	fmt.Println("uknown chart type: ", *args.chart)
+	// }
 
 }
 
@@ -829,19 +897,18 @@ func make_3d_chart(data []opts.Chart3DData) {
 
 func one_trial(filename string) {
 	// set all the parameters:
-	size := 101
-	ticks := int(2e5)
-	temp := 1e-3
+	temp := 1e0
 	useTable := false
 
 	// calculate some values that make a nice video
-	fps := 15
-	vid_time := 10 // in seconds
-	frames := fps * vid_time
+	// fps := 15
+	// vid_time := 10 // in seconds
+	// frames := fps * vid_time
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// make the model
-	model := init_model(size, ticks, temp, useTable, frames, r)
+	// model := init_model(SIZE, TICKS, temp, useTable, frames, r)
+	model := init_model(SIZE, TICKS, temp, useTable, 100, r)
 
 	// run a trial
 	data := model.run_trial(r)
@@ -857,7 +924,7 @@ func one_trial(filename string) {
 	// }
 
 	// pretty_picture(model.grid, filename, true)
-	model.makeVid(fps, filename)
+	// model.makeVid(fps, filename)
 
 }
 
