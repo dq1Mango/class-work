@@ -22,6 +22,8 @@ import (
 
 type SiteState int
 
+// possible states of sites
+// (possibly change this to 1 and -1) for easier enthalpy calculations
 const (
 	Oil SiteState = iota
 	Water
@@ -37,8 +39,6 @@ const (
 
 // const USE_BOLTZMAN = false
 
-// possible states of sites
-// (possibly change this to 1 and -1) for easier enthalpy calculations
 var StateColor = map[SiteState]color.NRGBA{
 	Oil: {
 		R: 0,
@@ -256,7 +256,36 @@ func gen_yinyang_grid(size int) Grid {
 	return yinyang
 }
 
-func init_model(size int, ticks int, temp float64, useTable bool, frames int, r *rand.Rand) Model {
+func genCheckerGrid(size, dimension int) Grid {
+	checker := gen_grid(size)
+
+	stride := size / dimension
+
+	for x := 0; x < size-stride; x += 2 * stride {
+		// x := round(x)
+		for y := 0; y < size-stride; y += 2 * stride {
+			fmt.Println("x:", x, "y: ", y)
+			// y := round(y)
+			for dx := range stride {
+				for dy := range stride {
+					*checker.raw_index(Point{x: x + dx, y: y + dy}) = SiteState(Water)
+				}
+			}
+		}
+
+	}
+	return checker
+}
+
+func init_model(
+	size int,
+	ticks int,
+	temp float64,
+	useTable bool,
+	checkerSize int,
+	frames int,
+	r *rand.Rand,
+) Model {
 
 	if size%2 == 0 {
 		panic("grid size must be odd you doofus")
@@ -301,7 +330,12 @@ func init_model(size int, ticks int, temp float64, useTable bool, frames int, r 
 	// make a table if we need one
 	var table Grid
 	if useTable {
-		table = gen_yinyang_grid(size)
+		if yinyang {
+			table = gen_yinyang_grid(size)
+		} else {
+			table = genCheckerGrid(size, checkerSize)
+			pretty_picture(table, "checkerboard", true)
+		}
 	}
 
 	// pretty_picture(table, "yinyang", true)
@@ -316,6 +350,7 @@ func init_model(size int, ticks int, temp float64, useTable bool, frames int, r 
 		time:   1,
 		ticks:  ticks,
 		frames: frames,
+		useT:   useTable,
 	}
 
 	return model
@@ -537,8 +572,8 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// }
 
 		if m.time%interval == 0 {
-			// clone := m.grid.clone()
-			// m.grids = append(m.grids, clone)
+			clone := m.grid.clone()
+			m.grids = append(m.grids, clone)
 
 			realEnthalpy := m.TotalEnthalpy()
 
@@ -589,7 +624,7 @@ func run_simulation() stats.Series {
 		clear_line()
 		fmt.Print("this much done: ", (temp-startTemp)/(endTemp-startTemp)*100, "%")
 
-		model := init_model(SIZE, TICKS, temp, false, num_points, r)
+		model := init_model(SIZE, TICKS, temp, false, 0, num_points, r)
 
 		data := model.run_trial(r)
 
@@ -897,18 +932,18 @@ func make_3d_chart(data []opts.Chart3DData) {
 
 func one_trial(filename string) {
 	// set all the parameters:
-	temp := 1e0
-	useTable := false
+	temp := 1e-2
+	useTable := true
 
 	// calculate some values that make a nice video
-	// fps := 15
-	// vid_time := 10 // in seconds
-	// frames := fps * vid_time
+	fps := 10
+	vid_time := 10 // in seconds
+	frames := fps * vid_time
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// make the model
-	// model := init_model(SIZE, TICKS, temp, useTable, frames, r)
-	model := init_model(SIZE, TICKS, temp, useTable, 100, r)
+	model := init_model(SIZE, TICKS, temp, useTable, 10, frames, r)
+	// model := init_model(SIZE, TICKS, temp, useTable, 10, 100, r)
 
 	// run a trial
 	data := model.run_trial(r)
@@ -924,7 +959,7 @@ func one_trial(filename string) {
 	// }
 
 	// pretty_picture(model.grid, filename, true)
-	// model.makeVid(fps, filename)
+	model.makeVid(fps, filename)
 
 }
 
