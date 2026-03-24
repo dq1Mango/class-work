@@ -34,7 +34,8 @@ const (
 const (
 	ATTEMPTS = 1
 	SIZE     = 101
-	TICKS    = 1e5
+	TICKS    = 2e4
+	RECORD   = false
 )
 
 // const USE_BOLTZMAN = false
@@ -255,16 +256,16 @@ func gen_yinyang_grid(size int) Grid {
 
 	return yinyang
 }
-
-func genCheckerGrid(size, dimension int) Grid {
+func genCheckerGrid(size, stride int) Grid {
 	checker := gen_grid(size)
 
-	stride := size / dimension
+	// stride := size / dimension
 
-	for x := 0; x < size-stride; x += 2 * stride {
+	for x := 0; x <= size-stride; x += stride {
 		// x := round(x)
-		for y := 0; y < size-stride; y += 2 * stride {
-			fmt.Println("x:", x, "y: ", y)
+		// needlessly complicated one liner
+		for y := (x / stride) % 2 * stride; y <= size-stride; y += 2 * stride {
+			// fmt.Println("x:", x, "y: ", y)
 			// y := round(y)
 			for dx := range stride {
 				for dy := range stride {
@@ -276,6 +277,28 @@ func genCheckerGrid(size, dimension int) Grid {
 	}
 	return checker
 }
+
+// func genCheckerGrid(size, dimension int) Grid {
+// 	checker := gen_grid(size)
+//
+// 	stride := size / dimension
+//
+// 	for x := 0; x < size-stride; x += stride {
+// 		// x := round(x)
+// 		// needlessly complicated one liner
+// 		for y := (x / stride) % 2 * stride; y < size-stride; y += 2 * stride {
+// 			// fmt.Println("x:", x, "y: ", y)
+// 			// y := round(y)
+// 			for dx := range stride {
+// 				for dy := range stride {
+// 					*checker.raw_index(Point{x: x + dx, y: y + dy}) = SiteState(Water)
+// 				}
+// 			}
+// 		}
+//
+// 	}
+// 	return checker
+// }
 
 func init_model(
 	size int,
@@ -572,10 +595,16 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// }
 
 		if m.time%interval == 0 {
-			clone := m.grid.clone()
-			m.grids = append(m.grids, clone)
+
+			if RECORD {
+				clone := m.grid.clone()
+				m.grids = append(m.grids, clone)
+			}
 
 			realEnthalpy := m.TotalEnthalpy()
+			// if realEnthalpy < 800 {
+			// 	fmt.Println(realEnthalpy)
+			// }
 
 			data = append(data, DataPoint{time: m.time, enthalpy: realEnthalpy})
 			// almostEnthalpy := m.ApproxEnthalpy(r)
@@ -613,18 +642,23 @@ func run_simulation() stats.Series {
 
 	series := make(stats.Series, 0, int(num_points))
 
-	startTemp := 0.0001
-	endTemp := 0.01
-	// endTemp := 0.1
-	dataPoints := 100
+	// startTemp := 0.0001
+	// endTemp := 0.01
+	// // endTemp := 0.1
+	// dataPoints := 100
 
-	for temp := startTemp; temp <= endTemp; temp += (endTemp - startTemp) / float64(dataPoints) {
+	// for temp := startTemp; temp <= endTemp; temp += (endTemp - startTemp) / float64(dataPoints) {
+
+	temp := 0.01
+	for checkers := 1; checkers <= 50; checkers++ {
+
+		// for
 		// p := p / num_points
 
 		clear_line()
-		fmt.Print("this much done: ", (temp-startTemp)/(endTemp-startTemp)*100, "%")
+		fmt.Print("this much done: ", checkers, "%")
 
-		model := init_model(SIZE, TICKS, temp, false, 0, num_points, r)
+		model := init_model(SIZE, TICKS, temp, true, checkers, num_points, r)
 
 		data := model.run_trial(r)
 
@@ -632,7 +666,7 @@ func run_simulation() stats.Series {
 
 		_, slope, _ := LinearRegression(logged)
 
-		series = append(series, stats.Coordinate{X: temp, Y: slope})
+		series = append(series, stats.Coordinate{X: float64(checkers), Y: slope})
 	}
 
 	// pretty_picture(model, "testing", 5)
@@ -662,6 +696,7 @@ type DataPoint struct {
 type Data []DataPoint
 
 func (d Data) WriteToCSV(filename string) {
+	fmt.Println("wrtingt to this: ", filename)
 
 	var csv string
 
@@ -676,6 +711,7 @@ func (d Data) WriteToCSV(filename string) {
 }
 
 func WriteToCSV(series stats.Series, filename string) {
+	fmt.Println("wrtingt to this: ", filename)
 
 	var csv string
 
@@ -788,8 +824,8 @@ func main() {
 		panic("no output file name specified")
 	}
 
-	one_trial(*args.output)
-	return
+	// one_trial(*args.output)
+	// return
 
 	// only run one_trial for testing purposes
 
