@@ -35,16 +35,17 @@ const (
 const (
 	ATTEMPTS = 1
 	SIZE     = 101
-	TICKS    = 1e3
+	TICKS    = 2e5
 
-	INITIAL = 10
+	INITIAL = 50
 
-	ALPHA = 0.8
-	BETA  = 0.1
+	BUNNY_REPRO = 0.2
+	CATCH       = 0.8
+	FOX_STARVE  = 0.1
 
 	RECORD   = true
 	FPS      = 15
-	VID_TIME = 10 // in seconds
+	VID_TIME = 20 // in seconds
 )
 
 var StateColor = map[SiteState]color.NRGBA{
@@ -314,24 +315,25 @@ func init_model(
 
 	// wether to use the yinyang pattern or not
 	// (this should probably be configurable from cmdline flags)
-	yinyang := false
 
 	var grid Grid
-	if !yinyang {
-		grid = gen_grid(size)
 
-		cutoff := 0.5
+	grid = gen_grid(size)
 
-		// sets each site to a random state
-		for i := range grid {
-			for j := range grid {
-				if r.Float64() < cutoff {
-					grid[i][j] = Bunny
-				} else {
-					grid[i][j] = Fox
-				}
-			}
+	for range INITIAL {
+		x, y := r.Intn(size), r.Intn(size)
+
+		if grid[x][y] == Empty {
+			grid[x][y] = Bunny
 		}
+	}
+	for range INITIAL {
+		x, y := r.Intn(size), r.Intn(size)
+
+		if grid[x][y] == Empty {
+			grid[x][y] = Fox
+		}
+
 	}
 	// pretty_picture(table, "yinyang", true)
 	// panic("done")
@@ -357,25 +359,78 @@ func (m *Model) randomPoint(r *rand.Rand) Point {
 	return Point{x: r.Intn(m.size) - radius, y: r.Intn(m.size) - radius}
 }
 
-func (m *Model) tick(r *rand.Rand) {
+func randomDirections(r *rand.Rand) []Point {
+	directions := make([]Point, 0, 4)
 
-	var selected Point
-	var state SiteState
-
-	for {
-		selected = m.randomPoint(r)
-		state = *m.index(selected)
-		if state != Empty {
-			break
-		}
+	for _, value := range PERMUTATIONS[r.Int63n(24)] {
+		directions = append(directions, CARDINALS[value])
 	}
 
-	if state == Bunny {
+	return directions
+}
 
-	} else if state == Fox {
+func (m *Model) tick(r *rand.Rand) {
 
-	} else {
-		panic("uknown state")
+	for {
+		var selected Point
+		var state SiteState
+
+		for {
+			selected = m.randomPoint(r)
+			state = *m.index(selected)
+			if state != Empty {
+				break
+			}
+		}
+
+		if state == Bunny {
+			for _, direction := range randomDirections(r) {
+				newPoint := add_points(selected, direction)
+
+				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+					*m.index(newPoint) = SiteState(Bunny)
+					if r.Float64() < BUNNY_REPRO {
+						m.bunnies++
+					} else {
+						*m.index(selected) = Empty
+					}
+					return
+				}
+			}
+
+		} else if state == Fox {
+			if r.Float64() < FOX_STARVE {
+				*m.index(selected) = Empty
+				m.foxes--
+				return
+			}
+
+			for _, direction := range randomDirections(r) {
+				newPoint := add_points(selected, direction)
+
+				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
+					if r.Float64() < CATCH {
+						*m.index(newPoint) = Fox
+						m.foxes++
+						m.bunnies--
+						return
+					}
+
+				}
+			}
+			for _, direction := range randomDirections(r) {
+				newPoint := add_points(selected, direction)
+
+				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+					*m.index(newPoint) = Fox
+					*m.index(selected) = Empty
+					return
+				}
+			}
+
+		} else {
+			panic("uknown state")
+		}
 	}
 }
 
@@ -417,6 +472,12 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// tick the model
 		// m.enthalpicTick(r)
 		m.tick(r)
+
+		if m.bunnies == 0 {
+			panic("bunnies perished")
+		} else if m.foxes == 0 {
+			panic("foxes perished")
+		}
 
 		m.time++
 		// tick(m, r)
@@ -609,7 +670,6 @@ func parse_args() Arguments {
 func main() {
 	// testing()
 	// return
-	return
 
 	var data Data
 
@@ -620,8 +680,8 @@ func main() {
 	}
 
 	// only run one_trial for testing purposes
-	// one_trial(*args.output)
-	// return
+	one_trial(*args.output)
+	return
 
 	if file := *args.file; file != "" {
 		json_data, err := os.ReadFile(file)
@@ -763,9 +823,10 @@ func one_trial(filename string) {
 	// model := init_model(SIZE, TICKS, temp, useTable, 10, 100, r)
 
 	// run a trial
-	data := model.run_trial(r)
+	// data := model.run_trial(r)
+	model.run_trial(r)
 
-	data.WriteToCSV("data/" + filename)
+	// data.WriteToCSV("data/" + filename)
 
 	// for _, point := range data {
 	// 	fmt.Println(point.time)
