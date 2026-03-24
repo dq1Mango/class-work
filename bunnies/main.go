@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"slices"
 	"time"
 
 	"github.com/AlexEidt/Vidio"
@@ -35,6 +36,8 @@ const (
 	ATTEMPTS = 1
 	SIZE     = 101
 	TICKS    = 1e3
+
+	INITIAL = 10
 
 	ALPHA = 0.8
 	BETA  = 0.1
@@ -77,6 +80,85 @@ var CARDINALS = []Point{
 	{x: 1, y: 0},
 	{x: -1, y: 0},
 }
+
+func factorial(n int) int {
+	result := 1
+	for i := 1; i <= n; i++ {
+		result *= i
+	}
+	return result
+}
+
+// func permutate(current [][]int, start, stop int, depth int) {
+//
+// 	// depth := len(taken)
+// 	n := len(current[0])
+// 	if depth == n {
+// 		return
+// 	}
+//
+// 	// if start == stop {
+// 	// 	return
+// 	// }
+//
+// 	stride := (stop - start) / (n - depth)
+//
+// 	availible := make([]int, n - depth)
+// 	for
+//
+// 	for
+//
+// 	for i := range n {
+// 		for j := range stride {
+// 			current[i*stride+j][depth] = i
+//
+// 		}
+// 		permutate(current, i, i+stride, depth+1)
+// 	}
+// }
+
+func heaps(output *[][]int, A []int, k int) {
+	A = slices.Clone(A)
+
+	if k == 1 {
+		*output = append(*output, A)
+		return
+	}
+
+	heaps(output, A, k-1)
+
+	for i := range k - 1 {
+		if k%2 == 0 {
+			A[i], A[k-1] = A[k-1], A[i]
+		} else {
+			A[0], A[k-1] = A[k-1], A[0]
+		}
+		heaps(output, A, k-1)
+	}
+
+}
+func Permutations(n int) [][]int {
+	nPickN := factorial(n)
+	permutations := make([][]int, 0, nPickN)
+
+	// for i := range permutations {
+	// 	permutations[i] = make([]int, 0, n)
+	// }
+
+	initial := make([]int, n)
+	for i := range n {
+		initial[i] = i
+	}
+
+	heaps(&permutations, initial, n)
+
+	// fmt.Println(permutations)
+
+	return permutations
+
+}
+
+var PERMUTATIONS = Permutations(4)
 
 func mid_point() Point {
 	// mid := (size - 1) / 2
@@ -161,8 +243,8 @@ type Model struct {
 	size    int
 	time    int
 	ticks   int
-	bunnies []Point
-	foxes   []Point
+	bunnies int
+	foxes   int
 	frames  int
 }
 
@@ -260,8 +342,8 @@ func init_model(
 		size:    size,
 		time:    1,
 		ticks:   ticks,
-		bunnies: make([]Point, 0),
-		foxes:   make([]Point, 0),
+		bunnies: INITIAL,
+		foxes:   INITIAL,
 		frames:  frames,
 	}
 
@@ -278,8 +360,23 @@ func (m *Model) randomPoint(r *rand.Rand) Point {
 func (m *Model) tick(r *rand.Rand) {
 
 	var selected Point
-	selected = m.randomPoint(r)
+	var state SiteState
 
+	for {
+		selected = m.randomPoint(r)
+		state = *m.index(selected)
+		if state != Empty {
+			break
+		}
+	}
+
+	if state == Bunny {
+
+	} else if state == Fox {
+
+	} else {
+		panic("uknown state")
+	}
 }
 
 // runs one *model* to completion
@@ -312,22 +409,14 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 			// 	fmt.Println(realEnthalpy)
 			// }
 
-			data = append(data, DataPoint{Time: m.time, Bunnies: realEnthalpy})
-			// almostEnthalpy := m.ApproxEnthalpy(r)
-			//
-			// fmt.Println("realEnthalpy: ", realEnthalpy)
-			// fmt.Println("almostEnthalpy: ", almostEnthalpy)
-			// fmt.Printf(
-			// 	"error: %.2f%%\n",
-			// 	math.Abs(float64(almostEnthalpy-realEnthalpy))/float64(almostEnthalpy)*100,
-			// )
+			data = append(data, DataPoint{Time: m.time, Bunnies: m.bunnies, Foxes: m.foxes})
 		}
 		// model.tick(r)
 		// m.logicalTick(r)
 
 		// tick the model
 		// m.enthalpicTick(r)
-		m.boltzmanTick(r)
+		m.tick(r)
 
 		m.time++
 		// tick(m, r)
@@ -520,6 +609,7 @@ func parse_args() Arguments {
 func main() {
 	// testing()
 	// return
+	return
 
 	var data Data
 
