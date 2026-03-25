@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"slices"
+	"strconv"
 	"time"
 
 	"github.com/AlexEidt/Vidio"
@@ -35,39 +36,57 @@ const (
 const (
 	ATTEMPTS = 1
 	SIZE     = 101
-	TICKS    = 2e5
+	TICKS    = 1e3
 
 	INITIAL = 50
 
-	BUNNY_REPRO = 0.2
-	CATCH       = 0.8
+	BUNNY_REPRO = 0.1
+	CATCH       = 0.5
 	FOX_STARVE  = 0.1
 
-	RECORD   = true
-	FPS      = 15
-	VID_TIME = 20 // in seconds
+	RECORD = true
+	TPF    = 1 // ticks per frame
+	FPS    = 30
+	// VID_TIME = 10 // in seconds
 )
 
-var StateColor = map[SiteState]color.NRGBA{
-	Empty: {
-		R: 0,
-		G: 0,
-		B: 0,
+// hey look at this "citation injection":
+// Source - https://stackoverflow.com/a/77740085
+// Posted by zoltron, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-03-25, License - CC BY-SA 4.0
+
+// HexColor converts hex color to color.RGBA with "#FFFFFF" format
+func HexColor(hex string) color.NRGBA {
+	values, _ := strconv.ParseUint(string(hex[1:]), 16, 32)
+	return color.NRGBA{
+		R: uint8(values >> 16),
+		G: uint8((values >> 8) & 0xFF),
+		B: uint8(values & 0xFF),
 		A: 255,
-	},
-	Bunny: {
-		R: 0,
-		G: 0,
-		B: 255,
-		A: 255,
-	},
-	Fox: {
-		R: 255,
-		G: 0,
-		B: 0,
-		A: 255,
-	},
+	}
 }
+
+var StateColor = map[SiteState]color.NRGBA{
+	Empty: HexColor("#a6e3a1"),
+	Bunny: HexColor("#89b4fa"),
+	Fox:   HexColor("#f38ba8"),
+}
+
+// var StateColor = map[SiteState]color.NRGBA{
+// 	Empty: {R: 0, G: 255, B: 0, A: 255},
+// 	Bunny: {
+// 		R: 0,
+// 		G: 0,
+// 		B: 255,
+// 		A: 255,
+// 	},
+// 	Fox: {
+// 		R: 255,
+// 		G: 0,
+// 		B: 0,
+// 		A: 255,
+// 	},
+// }
 
 // representing a cartesian point on the grid
 type Point struct {
@@ -244,8 +263,8 @@ type Model struct {
 	size    int
 	time    int
 	ticks   int
-	bunnies int
-	foxes   int
+	bunnies []Point
+	foxes   []Point
 	frames  int
 }
 
@@ -320,23 +339,11 @@ func init_model(
 
 	grid = gen_grid(size)
 
-	for range INITIAL {
-		x, y := r.Intn(size), r.Intn(size)
-
-		if grid[x][y] == Empty {
-			grid[x][y] = Bunny
-		}
-	}
-	for range INITIAL {
-		x, y := r.Intn(size), r.Intn(size)
-
-		if grid[x][y] == Empty {
-			grid[x][y] = Fox
-		}
-
-	}
 	// pretty_picture(table, "yinyang", true)
 	// panic("done")
+
+	bunnies := make([]Point, 0, INITIAL)
+	foxes := make([]Point, 0, INITIAL)
 
 	model := Model{
 		grid:    grid,
@@ -344,9 +351,29 @@ func init_model(
 		size:    size,
 		time:    1,
 		ticks:   ticks,
-		bunnies: INITIAL,
-		foxes:   INITIAL,
+		bunnies: bunnies,
+		foxes:   foxes,
 		frames:  frames,
+	}
+
+	i := 0
+	for i < INITIAL {
+		point := model.randomPoint(r)
+		if *model.index(point) == Empty {
+			*model.index(point) = Bunny
+			model.bunnies = append(model.bunnies, point)
+			i++
+		}
+	}
+
+	i = 0
+	for i < INITIAL {
+		point := model.randomPoint(r)
+		if *model.index(point) == Empty {
+			*model.index(point) = Fox
+			model.foxes = append(model.foxes, point)
+			i++
+		}
 	}
 
 	return model
@@ -369,67 +396,159 @@ func randomDirections(r *rand.Rand) []Point {
 	return directions
 }
 
+// func (m *Model) lametick(r *rand.Rand) {
+//
+// 	for {
+// 		var selected Point
+// 		var state SiteState
+//
+// 		for {
+// 			selected = m.randomPoint(r)
+// 			state = *m.index(selected)
+// 			if state != Empty {
+// 				break
+// 			}
+// 		}
+//
+// 		if state == Bunny {
+// 			for _, direction := range randomDirections(r) {
+// 				newPoint := add_points(selected, direction)
+//
+// 				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+// 					*m.index(newPoint) = SiteState(Bunny)
+// 					if r.Float64() < BUNNY_REPRO {
+// 						m.bunnies++
+// 					} else {
+// 						*m.index(selected) = Empty
+// 					}
+// 					return
+// 				}
+// 			}
+//
+// 		} else if state == Fox {
+// 			if r.Float64() < FOX_STARVE {
+// 				*m.index(selected) = Empty
+// 				m.foxes--
+// 				return
+// 			}
+//
+// 			for _, direction := range randomDirections(r) {
+// 				newPoint := add_points(selected, direction)
+//
+// 				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
+// 					if r.Float64() < CATCH {
+// 						*m.index(newPoint) = Fox
+// 						m.foxes++
+// 						m.bunnies--
+// 						return
+// 					}
+//
+// 				}
+// 			}
+// 			for _, direction := range randomDirections(r) {
+// 				newPoint := add_points(selected, direction)
+//
+// 				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+// 					*m.index(newPoint) = Fox
+// 					*m.index(selected) = Empty
+// 					return
+// 				}
+// 			}
+//
+// 		} else {
+// 			panic("uknown state")
+// 		}
+// 	}
+// }
+
+func unorderedRemove[T any](arr []T, index int) []T {
+	length := len(arr)
+	i := index
+
+	if i >= 0 && i < length {
+		arr[i], arr[length-1] = arr[length-1], arr[i]
+		return arr[:length-1]
+	} else {
+		panic(fmt.Sprintf("index out of bounds on remove - index: %d, length %d", index, length))
+	}
+}
+
 func (m *Model) tick(r *rand.Rand) {
 
-	for {
-		var selected Point
-		var state SiteState
+	// maybe should just round this ...
+	deadFoxes := int(float64(len(m.foxes)) * FOX_STARVE)
 
-		for {
-			selected = m.randomPoint(r)
-			state = *m.index(selected)
-			if state != Empty {
+	for range deadFoxes {
+		index := r.Intn(len(m.foxes))
+		*m.index(m.foxes[index]) = Empty
+		initialLen := len(m.foxes)
+		m.foxes = unorderedRemove(m.foxes, index)
+		if initialLen == len(m.foxes) {
+			panic("ahhhh")
+		}
+	}
+
+	for i, fox := range m.foxes {
+
+		success := false
+		for _, direction := range randomDirections(r) {
+			newPoint := add_points(fox, direction)
+
+			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
+				if r.Float64() < CATCH {
+					*m.index(newPoint) = Fox
+					m.foxes = append(m.foxes, newPoint)
+
+					for index, bunny := range m.bunnies {
+						if bunny == newPoint {
+							// TODO: should make the map a hash map to advoid this linear search
+							m.bunnies = unorderedRemove(m.bunnies, index)
+							break
+						}
+					}
+
+					success = true
+					break
+				}
+			}
+		}
+		if success {
+			continue
+		}
+
+		for _, direction := range randomDirections(r) {
+			newPoint := add_points(fox, direction)
+
+			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+				*m.index(newPoint) = Fox
+				*m.index(fox) = Empty
+				m.foxes[i] = newPoint
 				break
 			}
 		}
+	}
 
-		if state == Bunny {
-			for _, direction := range randomDirections(r) {
-				newPoint := add_points(selected, direction)
+	for i, bunny := range m.bunnies {
+		for _, direction := range randomDirections(r) {
+			newPoint := add_points(bunny, direction)
 
-				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
-					*m.index(newPoint) = SiteState(Bunny)
-					if r.Float64() < BUNNY_REPRO {
-						m.bunnies++
-					} else {
-						*m.index(selected) = Empty
-					}
-					return
+			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+
+				*m.index(newPoint) = Bunny
+				m.bunnies[i] = newPoint
+
+				if bunny == newPoint {
+					panic("not different")
 				}
-			}
 
-		} else if state == Fox {
-			if r.Float64() < FOX_STARVE {
-				*m.index(selected) = Empty
-				m.foxes--
-				return
-			}
-
-			for _, direction := range randomDirections(r) {
-				newPoint := add_points(selected, direction)
-
-				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
-					if r.Float64() < CATCH {
-						*m.index(newPoint) = Fox
-						m.foxes++
-						m.bunnies--
-						return
-					}
-
+				if r.Float64() < BUNNY_REPRO {
+					m.bunnies = append(m.bunnies, bunny)
+				} else {
+					*m.index(bunny) = Empty
 				}
-			}
-			for _, direction := range randomDirections(r) {
-				newPoint := add_points(selected, direction)
 
-				if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
-					*m.index(newPoint) = Fox
-					*m.index(selected) = Empty
-					return
-				}
+				break
 			}
-
-		} else {
-			panic("uknown state")
 		}
 	}
 }
@@ -446,12 +565,9 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 	// run the model for the specified number of ticks (m.ticks)
 	for m.time < m.ticks {
 
-		// currentProgress := m.time / precision
-		// if currentProgress > progress {
-		// 	progress = currentProgress
-		// 	clear_line()
-		// 	fmt.Printf("This much done: %d", progress)
-		// }
+		currentProgress := float64(m.time) / float64(m.ticks)
+		clear_line()
+		fmt.Printf("This much done: %.1f", currentProgress*100)
 
 		if m.time%interval == 0 {
 
@@ -464,7 +580,10 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 			// 	fmt.Println(realEnthalpy)
 			// }
 
-			data = append(data, DataPoint{Time: m.time, Bunnies: m.bunnies, Foxes: m.foxes})
+			data = append(
+				data,
+				DataPoint{Time: m.time, Bunnies: len(m.bunnies), Foxes: len(m.foxes)},
+			)
 		}
 		// model.tick(r)
 		// m.logicalTick(r)
@@ -473,9 +592,9 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// m.enthalpicTick(r)
 		m.tick(r)
 
-		if m.bunnies == 0 {
+		if len(m.bunnies) == 0 {
 			panic("bunnies perished")
-		} else if m.foxes == 0 {
+		} else if len(m.foxes) == 0 {
 			panic("foxes perished")
 		}
 
@@ -483,6 +602,8 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 		// tick(m, r)
 
 	}
+
+	fmt.Println("\nDone!")
 
 	// fmt.Println("we failed:", m.fails, "times")
 
@@ -529,13 +650,21 @@ func run_simulation() stats.Series {
 
 }
 
+func otherTesting(arr []int) {
+	arr = arr[:len(arr)-1]
+}
+
 func testing() {
+
+	arr := []int{1, 2, 3}
+	otherTesting(arr)
+	fmt.Println(arr)
+	return
 
 	grid := gen_grid(3)
 
 	*grid.index(Point{x: 0, y: 0}) = 1
 	// fmt.Println(grid.index(Point{x: 0, y: 0}) == &grid[1][1])
-	// data = unordered_remove(data, 1)
 
 	clone := grid.clone()
 	*grid.index(Point{x: 0, y: 0}) = 2
@@ -815,8 +944,8 @@ func one_trial(filename string) {
 	// set all the parameters:
 
 	// calculate some values that make a nice video
-	frames := FPS * VID_TIME
-
+	frames := int(TICKS / TPF)
+	// fps := frames / VID_TIME
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// make the model
 	model := init_model(SIZE, TICKS, frames, r)
@@ -824,6 +953,7 @@ func one_trial(filename string) {
 
 	// run a trial
 	// data := model.run_trial(r)
+	fmt.Println("running trial...")
 	model.run_trial(r)
 
 	// data.WriteToCSV("data/" + filename)
@@ -837,7 +967,8 @@ func one_trial(filename string) {
 	// }
 
 	// pretty_picture(model.grid, filename, true)
-	model.makeVid(FPS, filename)
+	// dont add videos to the git tree by default
+	model.makeVid(FPS, "ignore/"+filename)
 
 }
 
@@ -926,6 +1057,7 @@ func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
 func (m *Model) makeVid(fps int, name string) {
 
 	// start := time.Now()
+	fmt.Println("making video...")
 
 	first := pretty_picture(m.grids[0], "", false)
 
@@ -939,7 +1071,23 @@ func (m *Model) makeVid(fps int, name string) {
 
 	// prettyTime := 0.0
 
+	progressLength := 20.0
 	for i := range m.grids {
+
+		progress := float64(i) / float64(len(m.grids))
+		clear_line()
+		fmt.Printf("Progress: %f ", progress*100)
+
+		fmt.Printf("[")
+		lines := int(progressLength * progress)
+		for range lines {
+			fmt.Printf("-")
+		}
+		fmt.Printf(">")
+		for range int(progressLength) - lines - 1 {
+			fmt.Printf(" ")
+		}
+		fmt.Printf("]")
 
 		// prettyStart := time.Now()
 		img := pretty_picture(m.grids[i], name+"-"+fmt.Sprintf("%d", i), false).Pix
