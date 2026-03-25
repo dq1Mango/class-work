@@ -40,9 +40,9 @@ const (
 
 	INITIAL = 50
 
-	BUNNY_REPRO = 0.1
-	CATCH       = 0.5
-	FOX_STARVE  = 0.1
+	BUNNY_BABY = 0.1
+	CATCH      = 0.5
+	FOX_STARVE = 0.1
 
 	RECORD = true
 	TPF    = 1 // ticks per frame
@@ -50,7 +50,8 @@ const (
 	// VID_TIME = 10 // in seconds
 )
 
-// hey look at this "citation injection":
+// hey look at this 'citation injection':
+
 // Source - https://stackoverflow.com/a/77740085
 // Posted by zoltron, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-03-25, License - CC BY-SA 4.0
@@ -66,6 +67,7 @@ func HexColor(hex string) color.NRGBA {
 	}
 }
 
+// catppuccin color mapping
 var StateColor = map[SiteState]color.NRGBA{
 	Empty: HexColor("#a6e3a1"),
 	Bunny: HexColor("#89b4fa"),
@@ -386,6 +388,8 @@ func (m *Model) randomPoint(r *rand.Rand) Point {
 	return Point{x: r.Intn(m.size) - radius, y: r.Intn(m.size) - radius}
 }
 
+// returns the CARDINALS in a random order based on
+// precomputed permunations on n = 4
 func randomDirections(r *rand.Rand) []Point {
 	directions := make([]Point, 0, 4)
 
@@ -461,6 +465,8 @@ func randomDirections(r *rand.Rand) []Point {
 // 	}
 // }
 
+// if the order of elements of a slice does not matter,
+// this is a blazingly fast alternative to append(arr[:i], arr[i+1:])
 func unorderedRemove[T any](arr []T, index int) []T {
 	length := len(arr)
 	i := index
@@ -481,16 +487,12 @@ func (m *Model) tick(r *rand.Rand) {
 	for range deadFoxes {
 		index := r.Intn(len(m.foxes))
 		*m.index(m.foxes[index]) = Empty
-		initialLen := len(m.foxes)
 		m.foxes = unorderedRemove(m.foxes, index)
-		if initialLen == len(m.foxes) {
-			panic("ahhhh")
-		}
 	}
 
 	for i, fox := range m.foxes {
 
-		success := false
+		// success := false
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
 
@@ -503,18 +505,23 @@ func (m *Model) tick(r *rand.Rand) {
 						if bunny == newPoint {
 							// TODO: should make the map a hash map to advoid this linear search
 							m.bunnies = unorderedRemove(m.bunnies, index)
-							break
+
+							// 'goto considered harmful' - Dijkstra 1968
+							goto foxEnd
+							// break
 						}
 					}
 
-					success = true
-					break
+					panic("could not find bunny lol")
+
+					// success = true
+					// break
 				}
 			}
 		}
-		if success {
-			continue
-		}
+		// if success {
+		// 	continue
+		// }
 
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
@@ -526,7 +533,11 @@ func (m *Model) tick(r *rand.Rand) {
 				break
 			}
 		}
+
+	foxEnd:
 	}
+
+	// bunnyTick:
 
 	for i, bunny := range m.bunnies {
 		for _, direction := range randomDirections(r) {
@@ -541,7 +552,7 @@ func (m *Model) tick(r *rand.Rand) {
 					panic("not different")
 				}
 
-				if r.Float64() < BUNNY_REPRO {
+				if r.Float64() < BUNNY_BABY {
 					m.bunnies = append(m.bunnies, bunny)
 				} else {
 					*m.index(bunny) = Empty
@@ -983,8 +994,26 @@ func calc_color(percent float64) color.NRGBA {
 	}
 
 }
+func pretty_picture(grid Grid, name string) {
 
-func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
+	img := grid2png(grid)
+
+	f, err := os.Create(name + ".png")
+	if err != nil {
+		// log.Fatal(err)
+	}
+
+	if err := png.Encode(f, img); err != nil {
+		f.Close()
+		// log.Fatal(err)
+	}
+
+	if err := f.Close(); err != nil {
+		// log.Fatal(err)
+	}
+}
+
+func grid2png(grid Grid) *image.NRGBA {
 
 	size := len(grid)
 	screen_size := 960
@@ -1007,22 +1036,6 @@ func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
 					img.Set(x*scale+j, y*scale+i, color)
 				}
 			}
-		}
-	}
-
-	if save {
-		f, err := os.Create(name + ".png")
-		if err != nil {
-			// log.Fatal(err)
-		}
-
-		if err := png.Encode(f, img); err != nil {
-			f.Close()
-			// log.Fatal(err)
-		}
-
-		if err := f.Close(); err != nil {
-			// log.Fatal(err)
 		}
 	}
 
@@ -1054,12 +1067,82 @@ func pretty_picture(grid Grid, name string, save bool) *image.NRGBA {
 	// exec.Command("chafa", "image.png").Run()
 }
 
+type workOrder struct {
+	Grid  *Grid
+	Index int
+}
+
+type workReceipt struct {
+	Img   []uint8
+	Index int
+}
+
+func pngWorker(orders <-chan workOrder, output chan workReceipt) {
+	for {
+		order, more := <-orders
+		if more {
+			output <- workReceipt{Img: grid2png(*order.Grid).Pix, Index: order.Index}
+		} else {
+			return
+		}
+	}
+}
+
+const WORKERS = 6
+
+func convertGrids(model *Model, output chan []uint8) {
+	// images := make([][]byte, len(model.grids))
+	orders := make(chan workOrder)
+	receipts := make(chan workReceipt)
+
+	for range WORKERS {
+		go pngWorker(orders, receipts)
+	}
+
+	go func() {
+		for i, grid := range model.grids {
+			orders <- workOrder{Index: i, Grid: &grid}
+		}
+
+		close(orders)
+	}()
+
+	buffer := make(map[int][]uint8)
+
+	fmt.Println("converting grids...")
+	next := 0
+
+	for result := range receipts {
+		// fmt.Println(next)
+		buffer[result.Index] = result.Img
+
+		for {
+			img, ok := buffer[next]
+			if !ok {
+				break
+			}
+
+			output <- img
+			delete(buffer, next)
+			next++
+		}
+	}
+
+	// for i, grid := range model.grids {
+	// 	orders <- workOrder{Grid: &grid, Index: i}
+	//
+	// 	progress := float64(i) / float64(len(images))
+	// 	clear_line()
+	// 	fmt.Printf("Progress: %f ", progress*100)
+	// }
+
+}
+
 func (m *Model) makeVid(fps int, name string) {
 
-	// start := time.Now()
-	fmt.Println("making video...")
+	start := time.Now()
 
-	first := pretty_picture(m.grids[0], "", false)
+	first := grid2png(m.grids[0])
 
 	bounds := first.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
@@ -1069,10 +1152,16 @@ func (m *Model) makeVid(fps int, name string) {
 	gif, _ := vidio.NewVideoWriter(name+".mp4", w, h, &options)
 	defer gif.Close()
 
+	imgs := make(chan []uint8)
+	go convertGrids(m, imgs)
+
 	// prettyTime := 0.0
 
+	fmt.Println("making video...")
 	progressLength := 20.0
 	for i := range m.grids {
+		// i := 0
+		// for img := range imgs {
 
 		progress := float64(i) / float64(len(m.grids))
 		clear_line()
@@ -1090,13 +1179,15 @@ func (m *Model) makeVid(fps int, name string) {
 		fmt.Printf("]")
 
 		// prettyStart := time.Now()
-		img := pretty_picture(m.grids[i], name+"-"+fmt.Sprintf("%d", i), false).Pix
+		// img := grid2png(m.grids[i]).Pix
+		img := <-imgs
 		// prettyTime += time.Since(prettyStart).Seconds()
 		gif.Write(img)
+		// i++
 	}
 
-	// elapsedTime := time.Since(start)
-	// fmt.Printf("elapsed time: %.2f\n", elapsedTime.Seconds())
+	elapsedTime := time.Since(start)
+	fmt.Printf("\nelapsed time: %.2fs\n", elapsedTime.Seconds())
 	// fmt.Println(prettyTime)
 }
 
