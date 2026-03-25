@@ -96,6 +96,11 @@ type Point struct {
 	y int
 }
 
+func (p *Point) scale(r int) {
+	p.x *= r
+	p.y *= r
+}
+
 var CARDINALS = []Point{
 	{x: 0, y: -1},
 	{x: 0, y: 1},
@@ -230,6 +235,9 @@ func (g Grid) index(point Point) *SiteState {
 	return &g[real_point.y][real_point.x]
 }
 
+// with periodic bounds all points are valid ig
+// func (g Grid) is_valid_point(point Point) bool { return true }
+
 func (g Grid) is_valid_point(point Point) bool {
 
 	radius := len(g) / 2
@@ -272,6 +280,18 @@ type Model struct {
 
 func (m *Model) index(point Point) *SiteState {
 	return m.grid.index(point)
+}
+
+func (m *Model) modPoint(point *Point) {
+	size := len(m.grid)
+	midPoint := real_mid_point(size)
+
+	realPoint := add_points(midPoint, *point)
+
+	modded := Point{x: remEuclid(realPoint.x, size), y: remEuclid(realPoint.y, size)}
+	midPoint.scale(-1)
+
+	*point = add_points(midPoint, modded)
 }
 
 // generates an empty grid of dimensions *size*
@@ -495,6 +515,7 @@ func (m *Model) tick(r *rand.Rand) {
 		// success := false
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
+			m.modPoint(&newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
 				if r.Float64() < CATCH {
@@ -525,6 +546,7 @@ func (m *Model) tick(r *rand.Rand) {
 
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
+			m.modPoint(&newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
 				*m.index(newPoint) = Fox
@@ -542,6 +564,7 @@ func (m *Model) tick(r *rand.Rand) {
 	for i, bunny := range m.bunnies {
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(bunny, direction)
+			m.modPoint(&newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
 
@@ -661,16 +684,17 @@ func run_simulation() stats.Series {
 
 }
 
-func otherTesting(arr []int) {
-	arr = arr[:len(arr)-1]
+func remEuclid(x, y int) int {
+	for x < 0 {
+		x += y
+	}
+
+	return x % y
 }
 
 func testing() {
 
-	arr := []int{1, 2, 3}
-	otherTesting(arr)
-	fmt.Println(arr)
-	return
+	fmt.Println(remEuclid(4, 5))
 
 	grid := gen_grid(3)
 
@@ -1067,6 +1091,9 @@ func grid2png(grid Grid) *image.NRGBA {
 	// exec.Command("chafa", "image.png").Run()
 }
 
+// yeah this parallel stunt was pretty much totally useless
+// the problem is the slow part is gif.Write(...), which is not parallelizable
+// ...lmao
 type workOrder struct {
 	Grid  *Grid
 	Index int
@@ -1127,15 +1154,6 @@ func convertGrids(model *Model, output chan []uint8) {
 			next++
 		}
 	}
-
-	// for i, grid := range model.grids {
-	// 	orders <- workOrder{Grid: &grid, Index: i}
-	//
-	// 	progress := float64(i) / float64(len(images))
-	// 	clear_line()
-	// 	fmt.Printf("Progress: %f ", progress*100)
-	// }
-
 }
 
 func (m *Model) makeVid(fps int, name string) {
@@ -1179,8 +1197,8 @@ func (m *Model) makeVid(fps int, name string) {
 		fmt.Printf("]")
 
 		// prettyStart := time.Now()
-		// img := grid2png(m.grids[i]).Pix
-		img := <-imgs
+		img := grid2png(m.grids[i]).Pix
+		// img := <-imgs
 		// prettyTime += time.Since(prettyStart).Seconds()
 		gif.Write(img)
 		// i++
