@@ -22,17 +22,7 @@ import (
 	// "slices"
 )
 
-type SiteState int
-
-// possible states of sites
-const (
-	Empty SiteState = iota
-	Bunny
-	Fox
-	// Visited
-	// Immune
-)
-
+// constants that dictate the simulation
 const (
 	ATTEMPTS = 1
 	SIZE     = 101
@@ -50,22 +40,16 @@ const (
 	// VID_TIME = 10 // in seconds
 )
 
-// hey look at this 'citation injection':
+type SiteState int
 
-// Source - https://stackoverflow.com/a/77740085
-// Posted by zoltron, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-03-25, License - CC BY-SA 4.0
-
-// HexColor converts hex color to color.RGBA with "#FFFFFF" format
-func HexColor(hex string) color.NRGBA {
-	values, _ := strconv.ParseUint(string(hex[1:]), 16, 32)
-	return color.NRGBA{
-		R: uint8(values >> 16),
-		G: uint8((values >> 8) & 0xFF),
-		B: uint8(values & 0xFF),
-		A: 255,
-	}
-}
+// possible states of sites
+const (
+	Empty SiteState = iota
+	Bunny
+	Fox
+	// Visited
+	// Immune
+)
 
 // catppuccin color mapping
 var StateColor = map[SiteState]color.NRGBA{
@@ -90,10 +74,44 @@ var StateColor = map[SiteState]color.NRGBA{
 // 	},
 // }
 
+// hey look at this 'citation injection':
+
+// Source - https://stackoverflow.com/a/77740085
+// Posted by zoltron, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-03-25, License - CC BY-SA 4.0
+
+// HexColor converts hex color to color.RGBA with "#FFFFFF" format
+func HexColor(hex string) color.NRGBA {
+	values, _ := strconv.ParseUint(string(hex[1:]), 16, 32)
+	return color.NRGBA{
+		R: uint8(values >> 16),
+		G: uint8((values >> 8) & 0xFF),
+		B: uint8(values & 0xFF),
+		A: 255,
+	}
+}
+
+func round(x float64) int {
+	return int(math.Round(x))
+}
+
+func clear_screen() {
+	print("\u001b[2J")
+}
+
+func clear_line() {
+	print("\u001b[2K")
+	print("\r")
+}
+
 // representing a cartesian point on the grid
 type Point struct {
 	x int
 	y int
+}
+
+func (p *Point) radius() int {
+	return max(abs(p.x), abs(p.y))
 }
 
 func (p *Point) scale(r int) {
@@ -116,34 +134,6 @@ func factorial(n int) int {
 	return result
 }
 
-// func permutate(current [][]int, start, stop int, depth int) {
-//
-// 	// depth := len(taken)
-// 	n := len(current[0])
-// 	if depth == n {
-// 		return
-// 	}
-//
-// 	// if start == stop {
-// 	// 	return
-// 	// }
-//
-// 	stride := (stop - start) / (n - depth)
-//
-// 	availible := make([]int, n - depth)
-// 	for
-//
-// 	for
-//
-// 	for i := range n {
-// 		for j := range stride {
-// 			current[i*stride+j][depth] = i
-//
-// 		}
-// 		permutate(current, i, i+stride, depth+1)
-// 	}
-// }
-
 func heaps(output *[][]int, A []int, k int) {
 	A = slices.Clone(A)
 
@@ -164,6 +154,7 @@ func heaps(output *[][]int, A []int, k int) {
 	}
 
 }
+
 func Permutations(n int) [][]int {
 	nPickN := factorial(n)
 	permutations := make([][]int, 0, nPickN)
@@ -185,8 +176,6 @@ func Permutations(n int) [][]int {
 
 }
 
-var PERMUTATIONS = Permutations(4)
-
 func mid_point() Point {
 	// mid := (size - 1) / 2
 
@@ -204,35 +193,52 @@ func add_points(p1, p2 Point) Point {
 	return Point{x: p1.x + p2.x, y: p1.y + p2.y}
 }
 
-// func (p *Point) add(p2 Point) {
-// 	p.x += p2.x
-// 	p.y += p2.y
-// }
+var PERMUTATIONS = Permutations(4)
 
-// func (p *Point) flip() {
-// 	p.x *= -1
-// 	p.y *= -1
-// }
+// returns the CARDINALS in a random order based on
+// precomputed permunations on n = 4
+func randomDirections(r *rand.Rand) []Point {
+	directions := make([]Point, 0, 4)
+
+	for _, value := range PERMUTATIONS[r.Int63n(24)] {
+		directions = append(directions, CARDINALS[value])
+	}
+
+	return directions
+}
 
 func abs(x int) int {
 	return max(x, x*-1)
 }
 
-func (p *Point) radius() int {
-	return max(abs(p.x), abs(p.y))
-}
-
 // abstraction of a 2d grid such that sites can be acsessd with cartesian coordinates
 type Grid [][]SiteState
+
+// generates an empty grid of dimensions *size*
+func gen_grid(size int) Grid {
+
+	if size%2 == 0 {
+		panic("grid size must be odd you doofus")
+	}
+
+	grid := make(Grid, size)
+
+	for row := range grid {
+		grid[row] = make([]SiteState, size)
+	}
+
+	return grid
+}
 
 func (g Grid) raw_index(point Point) *SiteState {
 	return &g[point.y][point.x]
 }
 
 func (g Grid) index(point Point) *SiteState {
-	real_point := add_points(point, real_mid_point(len(g)))
-
-	return &g[real_point.y][real_point.x]
+	return g.raw_index(point)
+	// real_point := add_points(point, real_mid_point(len(g)))
+	//
+	// return &g[real_point.y][real_point.x]
 }
 
 // with periodic bounds all points are valid ig
@@ -240,13 +246,19 @@ func (g Grid) index(point Point) *SiteState {
 
 func (g Grid) is_valid_point(point Point) bool {
 
-	radius := len(g) / 2
-
-	if point.x >= -radius && point.x <= radius && point.y >= -radius && point.y <= radius {
+	if point.x >= 0 && point.x < len(g) && point.y >= 0 && point.y < len(g) {
 		return true
 	} else {
 		return false
 	}
+
+	// radius := len(g) / 2
+	//
+	// if point.x >= -radius && point.x <= radius && point.y >= -radius && point.y <= radius {
+	// 	return true
+	// } else {
+	// 	return false
+	// }
 }
 
 func (g Grid) clone() Grid {
@@ -278,68 +290,7 @@ type Model struct {
 	frames  int
 }
 
-func (m *Model) index(point Point) *SiteState {
-	return m.grid.index(point)
-}
-
-func (m *Model) modPoint(point *Point) {
-	size := len(m.grid)
-	midPoint := real_mid_point(size)
-
-	realPoint := add_points(midPoint, *point)
-
-	modded := Point{x: remEuclid(realPoint.x, size), y: remEuclid(realPoint.y, size)}
-	midPoint.scale(-1)
-
-	*point = add_points(midPoint, modded)
-}
-
-// generates an empty grid of dimensions *size*
-func gen_grid(size int) Grid {
-
-	if size%2 == 0 {
-		panic("grid size must be odd you doofus")
-	}
-
-	grid := make(Grid, size)
-
-	for row := range grid {
-		grid[row] = make([]SiteState, size)
-	}
-
-	return grid
-}
-
-func round(x float64) int {
-	return int(math.Round(x))
-}
-
-func clear_screen() {
-	print("\u001b[2J")
-}
-
-func clear_line() {
-	print("\u001b[2K")
-	print("\r")
-}
-
-func (g Grid) draw_circle(center Point, radius int, value SiteState) {
-
-	circleEquation := func(x float64) float64 {
-		return math.Sqrt(float64(radius*radius) - x*x)
-	}
-
-	for x := -radius; x <= radius; x++ {
-		height := round(circleEquation(float64(x)))
-
-		for y := -height; y <= height; y++ {
-			point := add_points(Point{x: x, y: y}, center)
-			// fmt.Println(point)
-			*g.index(point) = value
-		}
-	}
-}
-
+// initializizes a model
 func init_model(
 	size int,
 	ticks int,
@@ -402,24 +353,50 @@ func init_model(
 
 }
 
-func (m *Model) randomPoint(r *rand.Rand) Point {
-	radius := m.size / 2
-
-	return Point{x: r.Intn(m.size) - radius, y: r.Intn(m.size) - radius}
+func (m *Model) index(point Point) *SiteState {
+	return m.grid.index(point)
 }
 
-// returns the CARDINALS in a random order based on
-// precomputed permunations on n = 4
-func randomDirections(r *rand.Rand) []Point {
-	directions := make([]Point, 0, 4)
+func (m *Model) modPoint(point Point) Point {
+	return Point{x: remEuclid(point.x, m.size), y: remEuclid(point.y, m.size)}
+	// size := len(m.grid)
+	// midPoint := real_mid_point(size)
+	//
+	// realPoint := add_points(midPoint, *point)
+	//
+	// modded := Point{x: remEuclid(realPoint.x, size), y: remEuclid(realPoint.y, size)}
+	// midPoint.scale(-1)
+	//
+	// *point = add_points(midPoint, modded)
+}
 
-	for _, value := range PERMUTATIONS[r.Int63n(24)] {
-		directions = append(directions, CARDINALS[value])
+// draws a circle ... duh
+func (g Grid) draw_circle(center Point, radius int, value SiteState) {
+
+	circleEquation := func(x float64) float64 {
+		return math.Sqrt(float64(radius*radius) - x*x)
 	}
 
-	return directions
+	for x := -radius; x <= radius; x++ {
+		height := round(circleEquation(float64(x)))
+
+		for y := -height; y <= height; y++ {
+			point := add_points(Point{x: x, y: y}, center)
+			// fmt.Println(point)
+			*g.index(point) = value
+		}
+	}
 }
 
+func (m *Model) randomPoint(r *rand.Rand) Point {
+	return Point{x: r.Intn(m.size), y: r.Intn(m.size)}
+
+	// radius := m.size / 2
+	//
+	// return Point{x: r.Intn(m.size) - radius, y: r.Intn(m.size) - radius}
+}
+
+// i really dont think i need this anymore
 // func (m *Model) lametick(r *rand.Rand) {
 //
 // 	for {
@@ -499,6 +476,7 @@ func unorderedRemove[T any](arr []T, index int) []T {
 	}
 }
 
+// where the secret sauce resides
 func (m *Model) tick(r *rand.Rand) {
 
 	// maybe should just round this ...
@@ -510,12 +488,14 @@ func (m *Model) tick(r *rand.Rand) {
 		m.foxes = unorderedRemove(m.foxes, index)
 	}
 
+	// tick all of the foxes:
+
 	for i, fox := range m.foxes {
 
 		// success := false
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
-			m.modPoint(&newPoint)
+			newPoint = m.modPoint(newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Bunny {
 				if r.Float64() < CATCH {
@@ -546,7 +526,7 @@ func (m *Model) tick(r *rand.Rand) {
 
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(fox, direction)
-			m.modPoint(&newPoint)
+			newPoint = m.modPoint(newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
 				*m.index(newPoint) = Fox
@@ -559,12 +539,12 @@ func (m *Model) tick(r *rand.Rand) {
 	foxEnd:
 	}
 
-	// bunnyTick:
+	// tick all of the bunnies
 
 	for i, bunny := range m.bunnies {
 		for _, direction := range randomDirections(r) {
 			newPoint := add_points(bunny, direction)
-			m.modPoint(&newPoint)
+			newPoint = m.modPoint(newPoint)
 
 			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
 
@@ -645,7 +625,6 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 }
 
-// ignore all these functions that r not rly used
 func run_simulation() stats.Series {
 	num_points := 100
 
@@ -690,21 +669,6 @@ func remEuclid(x, y int) int {
 	}
 
 	return x % y
-}
-
-func testing() {
-
-	fmt.Println(remEuclid(4, 5))
-
-	grid := gen_grid(3)
-
-	*grid.index(Point{x: 0, y: 0}) = 1
-	// fmt.Println(grid.index(Point{x: 0, y: 0}) == &grid[1][1])
-
-	clone := grid.clone()
-	*grid.index(Point{x: 0, y: 0}) = 2
-
-	fmt.Println(clone)
 }
 
 type DataPoint struct {
@@ -829,6 +793,21 @@ func parse_args() Arguments {
 	flag.Parse()
 
 	return args
+}
+
+func testing() {
+
+	fmt.Println(remEuclid(4, 5))
+
+	grid := gen_grid(3)
+
+	*grid.index(Point{x: 0, y: 0}) = 1
+	// fmt.Println(grid.index(Point{x: 0, y: 0}) == &grid[1][1])
+
+	clone := grid.clone()
+	*grid.index(Point{x: 0, y: 0}) = 2
+
+	fmt.Println(clone)
 }
 
 func main() {
@@ -1170,20 +1149,20 @@ func (m *Model) makeVid(fps int, name string) {
 	gif, _ := vidio.NewVideoWriter(name+".mp4", w, h, &options)
 	defer gif.Close()
 
-	imgs := make(chan []uint8)
-	go convertGrids(m, imgs)
+	// imgs := make(chan []uint8)
+	// go convertGrids(m, imgs)
 
 	// prettyTime := 0.0
 
 	fmt.Println("making video...")
-	progressLength := 20.0
+	progressLength := 30.0
 	for i := range m.grids {
 		// i := 0
 		// for img := range imgs {
 
 		progress := float64(i) / float64(len(m.grids))
 		clear_line()
-		fmt.Printf("Progress: %f ", progress*100)
+		fmt.Printf("Progress: %.1f%% ", progress*100)
 
 		fmt.Printf("[")
 		lines := int(progressLength * progress)
