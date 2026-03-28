@@ -1232,22 +1232,26 @@ func makeRaceChart(filename string, data Data) {
 
 	line.SetXAxis(time).AddSeries("Bunnies", bunnys).AddSeries("Foxes", foxes)
 	line.SetSeriesOptions(charts.WithAnimationOpts(opts.Animation{AnimationDelay: 10}))
+	options := line.RenderSnippet().Option
 
-	// f, _ := os.Create()
-	snippet := line.RenderSnippet()
-	var content []byte
-
-	// option := []byte(snippet.Option)
-	content = append(content, []byte(snippet.Element)...)
-	content = append(content, []byte(snippet.Script)...)
-	os.WriteFile(filename+".html", content, 0664)
+	// line.Renderer = newSnippetRenderer(line, line.Validate)
+	// f, _ := os.Create(filename + ".html")
+	// json, _ := json.Marshal(options)
+	os.WriteFile(filename+".json", []byte(options), 0664)
+	// line.Render(f)
+	// snippet := line.RenderSnippet()
+	// var content []byte
+	//
+	// // option := []byte(snippet.Option)
+	// content = append(content, []byte(snippet.Element)...)
+	// content = append(content, []byte(snippet.Script)...)
 
 	// and they say go isnt a scripting language
-	err := exec.Command("xdg-open", filename+".html").Run()
-	if err != nil {
-		fmt.Println("couldnt open chart:", err)
-	}
-	exec.Command("hyprctl", "dispatch", "workspace", "2").Run()
+	// err := exec.Command("xdg-open", filename+".html").Run()
+	// if err != nil {
+	// 	fmt.Println("couldnt open chart:", err)
+	// }
+	// exec.Command("hyprctl", "dispatch", "workspace", "2").Run()
 }
 
 // func make_graph(grid Grid) {

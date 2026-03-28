@@ -12,8 +12,8 @@ type snippetRenderer struct {
 
 // RenderContent implements render.Renderer.
 func (r *snippetRenderer) RenderContent() []byte {
-	return []byte{}
-	// panic("unimplemented")
+	// return []byte{}
+	panic("unimplemented")
 }
 
 // RenderSnippet implements render.Renderer.

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ECharts Loader</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #chart { width: 800px; height: 500px; border: 1px solid #ccc; margin-top: 12px; }
+    #error { color: red; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h2>ECharts Loader</h2>
+  <input type="file" id="file-input" accept=".json" />
+  <div id="error"></div>
+  <div id="chart"></div>
+
+  <script>
+    let chart = echarts.init(document.getElementById('chart'));
+
+    document.getElementById('file-input').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const option = JSON.parse(e.target.result);
+          document.getElementById('error').textContent = '';
+          chart.setOption(option, true);
+        } catch (err) {
+          document.getElementById('error').textContent = 'Invalid JSON: ' + err.message;
+        }
+      };
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+</html>
