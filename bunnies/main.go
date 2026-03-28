@@ -581,7 +581,7 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 		currentProgress := float64(m.time) / float64(m.ticks)
 		clear_line()
-		fmt.Printf("This much done: %.1f", currentProgress*100)
+		fmt.Printf("This much done: %.1f%%", currentProgress*100)
 
 		if m.time%interval == 0 {
 
@@ -692,6 +692,20 @@ func (d Data) WriteToCSV(filename string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (d Data) WriteToJSON(filename string) {
+	file, err := os.Create(filename + ".json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(d)
 }
 
 func WriteToCSV(series stats.Series, filename string) {
@@ -822,10 +836,6 @@ func main() {
 		panic("no output file name specified")
 	}
 
-	// only run one_trial for testing purposes
-	one_trial(*args.output)
-	return
-
 	if file := *args.file; file != "" {
 		json_data, err := os.ReadFile(file)
 		if err != nil {
@@ -838,6 +848,8 @@ func main() {
 
 		// data = run_simulation()
 		// data = one_trial()
+		// only run one_trial for testing purposes
+		data = one_trial(*args.output)
 
 		data.WriteToCSV("data/" + *args.output)
 
@@ -864,11 +876,14 @@ func main() {
 
 	}
 
-	// switch *args.chart {
-	//
-	// default:
-	// 	fmt.Println("uknown chart type: ", *args.chart)
-	// }
+	switch *args.chart {
+
+	case "race":
+		makeRaceChart("charts/"+*args.output, data)
+
+	default:
+		fmt.Println("unknown chart type: ", *args.chart)
+	}
 
 }
 
@@ -954,7 +969,7 @@ func make_3d_chart(data []opts.Chart3DData) {
 // 	return output, nil
 // }
 
-func one_trial(filename string) {
+func one_trial(filename string) Data {
 	// set all the parameters:
 
 	// calculate some values that make a nice video
@@ -968,9 +983,9 @@ func one_trial(filename string) {
 	// run a trial
 	// data := model.run_trial(r)
 	fmt.Println("running trial...")
-	model.run_trial(r)
+	data := model.run_trial(r)
 
-	// data.WriteToCSV("data/" + filename)
+	data.WriteToJSON("data/" + filename)
 
 	// for _, point := range data {
 	// 	fmt.Println(point.time)
@@ -983,6 +998,8 @@ func one_trial(filename string) {
 	// pretty_picture(model.grid, filename, true)
 	// dont add videos to the git tree by default
 	model.makeVid(FPS, "ignore/"+filename)
+
+	return data
 
 }
 
@@ -1189,6 +1206,49 @@ func (m *Model) makeVid(fps int, name string) {
 }
 
 // func (m *Model)
+
+func makeRaceChart(filename string, data Data) {
+	bunnys := make([]opts.LineData, 0, len(data))
+	foxes := make([]opts.LineData, 0, len(data))
+	time := make([]int, 0, len(data))
+
+	for _, point := range data {
+		bunnys = append(bunnys, opts.LineData{Value: point.Bunnies})
+		foxes = append(foxes, opts.LineData{Value: point.Foxes})
+		time = append(time, point.Time)
+	}
+
+	line := charts.NewLine()
+
+	line.SetGlobalOptions(
+		charts.WithInitializationOpts(
+			opts.Initialization{Theme: "dark", Width: "1400px", Height: "700px"},
+		),
+		charts.WithTitleOpts(opts.Title{
+			Title: "Population vs. Time",
+		}))
+
+	// chart.SetGlobalOptions(charts.WithColorsOpts({opts.RGBColor(255, 255, 255)}))
+
+	line.SetXAxis(time).AddSeries("Bunnies", bunnys).AddSeries("Foxes", foxes)
+	line.SetSeriesOptions(charts.WithAnimationOpts(opts.Animation{AnimationDelay: 10}))
+
+	// f, _ := os.Create()
+	snippet := line.RenderSnippet()
+	var content []byte
+
+	// option := []byte(snippet.Option)
+	content = append(content, []byte(snippet.Element)...)
+	content = append(content, []byte(snippet.Script)...)
+	os.WriteFile(filename+".html", content, 0664)
+
+	// and they say go isnt a scripting language
+	err := exec.Command("xdg-open", filename+".html").Run()
+	if err != nil {
+		fmt.Println("couldnt open chart:", err)
+	}
+	exec.Command("hyprctl", "dispatch", "workspace", "2").Run()
+}
 
 // func make_graph(grid Grid) {
 // 	chart := charts.NewHeatMap()
