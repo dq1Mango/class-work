@@ -27,6 +27,7 @@
       reader.onload = function (e) {
         try {
           const option = JSON.parse(e.target.result);
+    option.animationEasing = (t) => 0.5;
           document.getElementById('error').textContent = '';
           chart.setOption(option, true);
         } catch (err) {

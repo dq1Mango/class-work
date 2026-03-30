@@ -28,7 +28,8 @@ const (
 	SIZE     = 101
 	TICKS    = 1e3
 
-	INITIAL = 50
+	INITIAL_BUNNY = 2
+	INITIAL_FOX   = 50
 
 	BUNNY_BABY = 0.1
 	CATCH      = 0.5
@@ -315,8 +316,8 @@ func init_model(
 	// pretty_picture(table, "yinyang", true)
 	// panic("done")
 
-	bunnies := make([]Point, 0, INITIAL)
-	foxes := make([]Point, 0, INITIAL)
+	bunnies := make([]Point, 0, INITIAL_BUNNY)
+	foxes := make([]Point, 0, INITIAL_FOX)
 
 	model := Model{
 		grid:    grid,
@@ -330,7 +331,7 @@ func init_model(
 	}
 
 	i := 0
-	for i < INITIAL {
+	for i < INITIAL_BUNNY {
 		point := model.randomPoint(r)
 		if *model.index(point) == Empty {
 			*model.index(point) = Bunny
@@ -340,7 +341,7 @@ func init_model(
 	}
 
 	i = 0
-	for i < INITIAL {
+	for i < INITIAL_FOX {
 		point := model.randomPoint(r)
 		if *model.index(point) == Empty {
 			*model.index(point) = Fox
