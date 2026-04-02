@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"image/png"
 	"math"
+	// "math/cmplx"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -19,6 +20,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/montanaflynn/stats"
+	"github.com/scientificgo/fft"
 	// "slices"
 )
 
@@ -709,6 +711,18 @@ func (d Data) WriteToJSON(filename string) {
 	encoder.Encode(d)
 }
 
+func (d Data) Fft() ([]complex128, []complex128) {
+	bunnies := make([]complex128, len(d))
+	foxes := make([]complex128, len(d))
+
+	for i, point := range d {
+		bunnies[i] = complex(float64(point.Bunnies), 0)
+		foxes[i] = complex(float64(point.Foxes), 0)
+	}
+
+	return fft.Fft(bunnies, false), fft.Fft(foxes, false)
+}
+
 func WriteToCSV(series stats.Series, filename string) {
 	fmt.Println("wrtingt to this: ", filename)
 
@@ -854,6 +868,7 @@ func main() {
 
 		data.WriteToCSV("data/" + *args.output)
 
+		makeFFTChart(*args.output, data)
 		// for _, d := range data {
 		// 	fmt.Println(d.X)
 		// }
@@ -998,7 +1013,7 @@ func one_trial(filename string) Data {
 
 	// pretty_picture(model.grid, filename, true)
 	// dont add videos to the git tree by default
-	model.makeVid(FPS, "ignore/"+filename)
+	// model.makeVid(FPS, "ignore/"+filename)
 
 	return data
 
@@ -1207,6 +1222,47 @@ func (m *Model) makeVid(fps int, name string) {
 }
 
 // func (m *Model)
+
+func makeFFTChart(filename string, data Data) {
+
+	lineData := make([]opts.LineData, 0, 10)
+	time := make([]opts.LineData, len(data)/2)
+	fftBunny, _ := data.Fft()
+
+	for i, point := range fftBunny[1 : len(fftBunny)/2] {
+		value := 0.0
+		if real(point) > 0 {
+			value = real(point)
+		}
+		lineData = append(lineData, opts.LineData{Value: value})
+
+		time[i] = opts.LineData{Value: i}
+	}
+
+	line := charts.NewLine()
+
+	line.SetGlobalOptions(
+		charts.WithInitializationOpts(
+			opts.Initialization{Theme: "dark", Width: "1400px", Height: "700px"},
+		),
+		charts.WithTitleOpts(opts.Title{
+			Title: "Population vs. Time",
+		}))
+
+	// chart.SetGlobalOptions(charts.WithColorsOpts({opts.RGBColor(255, 255, 255)}))
+
+	line.SetXAxis(time).AddSeries("Bunnies", lineData)
+	line.SetSeriesOptions(charts.WithAnimationOpts(opts.Animation{AnimationDelay: 10}))
+	// options := line.RenderSnippet().Option
+
+	// line.Renderer = newSnippetRenderer(line, line.Validate)
+	f, _ := os.Create(filename + ".html")
+	// json, _ := json.Marshal(options)
+
+	line.Render(f)
+	// os.WriteFile(filename+".json", []byte(options), 0664)
+
+}
 
 func makeRaceChart(filename string, data Data) {
 	bunnys := make([]opts.LineData, 0, len(data))
