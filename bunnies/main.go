@@ -868,7 +868,6 @@ func main() {
 
 		data.WriteToCSV("data/" + *args.output)
 
-		makeFFTChart(*args.output, data)
 		// for _, d := range data {
 		// 	fmt.Println(d.X)
 		// }
@@ -896,6 +895,9 @@ func main() {
 
 	case "race":
 		makeRaceChart("charts/"+*args.output, data)
+
+	case "fft":
+		makeFFTChart("charts/"+*args.output, data)
 
 	default:
 		fmt.Println("unknown chart type: ", *args.chart)
@@ -1225,18 +1227,32 @@ func (m *Model) makeVid(fps int, name string) {
 
 func makeFFTChart(filename string, data Data) {
 
-	lineData := make([]opts.LineData, 0, 10)
-	time := make([]opts.LineData, len(data)/2)
-	fftBunny, _ := data.Fft()
+	n := len(data) / 2
+	numPoints := n / 10
+	bunnyData := make([]opts.LineData, 0, numPoints)
+	foxData := make([]opts.LineData, 0, numPoints)
 
-	for i, point := range fftBunny[1 : len(fftBunny)/2] {
+	time := make([]opts.LineData, 0, n/10)
+	fftBunny, fftFox := data.Fft()
+
+	for i := 2; i < numPoints; i++ {
+
+		bunny := fftBunny[i]
+		fox := fftFox[i]
+
 		value := 0.0
-		if real(point) > 0 {
-			value = real(point)
+		if real(bunny) > 0 {
+			value = real(bunny)
 		}
-		lineData = append(lineData, opts.LineData{Value: value})
+		bunnyData = append(bunnyData, opts.LineData{Value: value})
 
-		time[i] = opts.LineData{Value: i}
+		value = 0.0
+		if real(fox) > 0 {
+			value = real(fox)
+		}
+		foxData = append(foxData, opts.LineData{Value: value})
+
+		time = append(time, opts.LineData{Value: float64(i) / float64(n)})
 	}
 
 	line := charts.NewLine()
@@ -1251,7 +1267,7 @@ func makeFFTChart(filename string, data Data) {
 
 	// chart.SetGlobalOptions(charts.WithColorsOpts({opts.RGBColor(255, 255, 255)}))
 
-	line.SetXAxis(time).AddSeries("Bunnies", lineData)
+	line.SetXAxis(time).AddSeries("Bunnies", bunnyData).AddSeries("Foxes", foxData)
 	line.SetSeriesOptions(charts.WithAnimationOpts(opts.Animation{AnimationDelay: 10}))
 	// options := line.RenderSnippet().Option
 
