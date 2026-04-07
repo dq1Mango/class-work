@@ -1,0 +1,5996 @@
+[
+  {
+    "time": 1,
+    "Bunnies": 50,
+    "Foxes": 50,
+    "grass": 0
+  },
+  {
+    "time": 2,
+    "Bunnies": 48,
+    "Foxes": 47,
+    "grass": 5022
+  },
+  {
+    "time": 3,
+    "Bunnies": 49,
+    "Foxes": 44,
+    "grass": 7557
+  },
+  {
+    "time": 4,
+    "Bunnies": 51,
+    "Foxes": 40,
+    "grass": 8837
+  },
+  {
+    "time": 5,
+    "Bunnies": 57,
+    "Foxes": 36,
+    "grass": 9497
+  },
+  {
+    "time": 6,
+    "Bunnies": 66,
+    "Foxes": 33,
+    "grass": 9819
+  },
+  {
+    "time": 7,
+    "Bunnies": 75,
+    "Foxes": 30,
+    "grass": 9978
+  },
+  {
+    "time": 8,
+    "Bunnies": 81,
+    "Foxes": 27,
+    "grass": 10061
+  },
+  {
+    "time": 9,
+    "Bunnies": 87,
+    "Foxes": 25,
+    "grass": 10099
+  },
+  {
+    "time": 10,
+    "Bunnies": 97,
+    "Foxes": 23,
+    "grass": 10101
+  },
+  {
+    "time": 11,
+    "Bunnies": 107,
+    "Foxes": 21,
+    "grass": 10103
+  },
+  {
+    "time": 12,
+    "Bunnies": 120,
+    "Foxes": 19,
+    "grass": 10097
+  },
+  {
+    "time": 13,
+    "Bunnies": 130,
+    "Foxes": 18,
+    "grass": 10085
+  },
+  {
+    "time": 14,
+    "Bunnies": 141,
+    "Foxes": 17,
+    "grass": 10088
+  },
+  {
+    "time": 15,
+    "Bunnies": 154,
+    "Foxes": 16,
+    "grass": 10086
+  },
+  {
+    "time": 16,
+    "Bunnies": 170,
+    "Foxes": 17,
+    "grass": 10057
+  },
+  {
+    "time": 17,
+    "Bunnies": 192,
+    "Foxes": 16,
+    "grass": 10045
+  },
+  {
+    "time": 18,
+    "Bunnies": 209,
+    "Foxes": 16,
+    "grass": 10024
+  },
+  {
+    "time": 19,
+    "Bunnies": 226,
+    "Foxes": 16,
+    "grass": 10034
+  },
+  {
+    "time": 20,
+    "Bunnies": 244,
+    "Foxes": 15,
+    "grass": 10005
+  },
+  {
+    "time": 21,
+    "Bunnies": 272,
+    "Foxes": 14,
+    "grass": 9984
+  },
+  {
+    "time": 22,
+    "Bunnies": 301,
+    "Foxes": 14,
+    "grass": 9965
+  },
+  {
+    "time": 23,
+    "Bunnies": 335,
+    "Foxes": 14,
+    "grass": 9943
+  },
+  {
+    "time": 24,
+    "Bunnies": 374,
+    "Foxes": 13,
+    "grass": 9902
+  },
+  {
+    "time": 25,
+    "Bunnies": 409,
+    "Foxes": 14,
+    "grass": 9862
+  },
+  {
+    "time": 26,
+    "Bunnies": 448,
+    "Foxes": 15,
+    "grass": 9855
+  },
+  {
+    "time": 27,
+    "Bunnies": 486,
+    "Foxes": 16,
+    "grass": 9826
+  },
+  {
+    "time": 28,
+    "Bunnies": 530,
+    "Foxes": 15,
+    "grass": 9765
+  },
+  {
+    "time": 29,
+    "Bunnies": 577,
+    "Foxes": 15,
+    "grass": 9720
+  },
+  {
+    "time": 30,
+    "Bunnies": 644,
+    "Foxes": 16,
+    "grass": 9710
+  },
+  {
+    "time": 31,
+    "Bunnies": 700,
+    "Foxes": 17,
+    "grass": 9645
+  },
+  {
+    "time": 32,
+    "Bunnies": 777,
+    "Foxes": 17,
+    "grass": 9578
+  },
+  {
+    "time": 33,
+    "Bunnies": 849,
+    "Foxes": 19,
+    "grass": 9511
+  },
+  {
+    "time": 34,
+    "Bunnies": 927,
+    "Foxes": 21,
+    "grass": 9440
+  },
+  {
+    "time": 35,
+    "Bunnies": 1008,
+    "Foxes": 21,
+    "grass": 9337
+  },
+  {
+    "time": 36,
+    "Bunnies": 1102,
+    "Foxes": 24,
+    "grass": 9257
+  },
+  {
+    "time": 37,
+    "Bunnies": 1199,
+    "Foxes": 27,
+    "grass": 9184
+  },
+  {
+    "time": 38,
+    "Bunnies": 1307,
+    "Foxes": 27,
+    "grass": 9126
+  },
+  {
+    "time": 39,
+    "Bunnies": 1436,
+    "Foxes": 26,
+    "grass": 9044
+  },
+  {
+    "time": 40,
+    "Bunnies": 1573,
+    "Foxes": 27,
+    "grass": 8960
+  },
+  {
+    "time": 41,
+    "Bunnies": 1701,
+    "Foxes": 28,
+    "grass": 8857
+  },
+  {
+    "time": 42,
+    "Bunnies": 1843,
+    "Foxes": 34,
+    "grass": 8751
+  },
+  {
+    "time": 43,
+    "Bunnies": 2006,
+    "Foxes": 33,
+    "grass": 8622
+  },
+  {
+    "time": 44,
+    "Bunnies": 2165,
+    "Foxes": 37,
+    "grass": 8539
+  },
+  {
+    "time": 45,
+    "Bunnies": 2368,
+    "Foxes": 36,
+    "grass": 8390
+  },
+  {
+    "time": 46,
+    "Bunnies": 2563,
+    "Foxes": 39,
+    "grass": 8256
+  },
+  {
+    "time": 47,
+    "Bunnies": 2770,
+    "Foxes": 41,
+    "grass": 8115
+  },
+  {
+    "time": 48,
+    "Bunnies": 2980,
+    "Foxes": 45,
+    "grass": 8011
+  },
+  {
+    "time": 49,
+    "Bunnies": 3191,
+    "Foxes": 53,
+    "grass": 7908
+  },
+  {
+    "time": 50,
+    "Bunnies": 3441,
+    "Foxes": 59,
+    "grass": 7838
+  },
+  {
+    "time": 51,
+    "Bunnies": 3690,
+    "Foxes": 66,
+    "grass": 7781
+  },
+  {
+    "time": 52,
+    "Bunnies": 3923,
+    "Foxes": 77,
+    "grass": 7636
+  },
+  {
+    "time": 53,
+    "Bunnies": 4199,
+    "Foxes": 98,
+    "grass": 7449
+  },
+  {
+    "time": 54,
+    "Bunnies": 4488,
+    "Foxes": 112,
+    "grass": 7433
+  },
+  {
+    "time": 55,
+    "Bunnies": 4758,
+    "Foxes": 122,
+    "grass": 7339
+  },
+  {
+    "time": 56,
+    "Bunnies": 5026,
+    "Foxes": 138,
+    "grass": 7249
+  },
+  {
+    "time": 57,
+    "Bunnies": 5316,
+    "Foxes": 148,
+    "grass": 7170
+  },
+  {
+    "time": 58,
+    "Bunnies": 5565,
+    "Foxes": 169,
+    "grass": 7129
+  },
+  {
+    "time": 59,
+    "Bunnies": 5839,
+    "Foxes": 191,
+    "grass": 7040
+  },
+  {
+    "time": 60,
+    "Bunnies": 6123,
+    "Foxes": 215,
+    "grass": 7023
+  },
+  {
+    "time": 61,
+    "Bunnies": 6419,
+    "Foxes": 246,
+    "grass": 7074
+  },
+  {
+    "time": 62,
+    "Bunnies": 6640,
+    "Foxes": 280,
+    "grass": 7207
+  },
+  {
+    "time": 63,
+    "Bunnies": 6854,
+    "Foxes": 323,
+    "grass": 7115
+  },
+  {
+    "time": 64,
+    "Bunnies": 7029,
+    "Foxes": 372,
+    "grass": 7209
+  },
+  {
+    "time": 65,
+    "Bunnies": 7209,
+    "Foxes": 424,
+    "grass": 7375
+  },
+  {
+    "time": 66,
+    "Bunnies": 7363,
+    "Foxes": 480,
+    "grass": 7460
+  },
+  {
+    "time": 67,
+    "Bunnies": 7506,
+    "Foxes": 536,
+    "grass": 7578
+  },
+  {
+    "time": 68,
+    "Bunnies": 7610,
+    "Foxes": 601,
+    "grass": 7743
+  },
+  {
+    "time": 69,
+    "Bunnies": 7686,
+    "Foxes": 681,
+    "grass": 7812
+  },
+  {
+    "time": 70,
+    "Bunnies": 7740,
+    "Foxes": 758,
+    "grass": 8010
+  },
+  {
+    "time": 71,
+    "Bunnies": 7751,
+    "Foxes": 850,
+    "grass": 8229
+  },
+  {
+    "time": 72,
+    "Bunnies": 7772,
+    "Foxes": 910,
+    "grass": 8394
+  },
+  {
+    "time": 73,
+    "Bunnies": 7747,
+    "Foxes": 981,
+    "grass": 8599
+  },
+  {
+    "time": 74,
+    "Bunnies": 7709,
+    "Foxes": 1058,
+    "grass": 8730
+  },
+  {
+    "time": 75,
+    "Bunnies": 7660,
+    "Foxes": 1126,
+    "grass": 8873
+  },
+  {
+    "time": 76,
+    "Bunnies": 7588,
+    "Foxes": 1180,
+    "grass": 9057
+  },
+  {
+    "time": 77,
+    "Bunnies": 7479,
+    "Foxes": 1260,
+    "grass": 9150
+  },
+  {
+    "time": 78,
+    "Bunnies": 7372,
+    "Foxes": 1316,
+    "grass": 9269
+  },
+  {
+    "time": 79,
+    "Bunnies": 7244,
+    "Foxes": 1382,
+    "grass": 9369
+  },
+  {
+    "time": 80,
+    "Bunnies": 7106,
+    "Foxes": 1439,
+    "grass": 9454
+  },
+  {
+    "time": 81,
+    "Bunnies": 6962,
+    "Foxes": 1502,
+    "grass": 9474
+  },
+  {
+    "time": 82,
+    "Bunnies": 6799,
+    "Foxes": 1568,
+    "grass": 9580
+  },
+  {
+    "time": 83,
+    "Bunnies": 6644,
+    "Foxes": 1613,
+    "grass": 9627
+  },
+  {
+    "time": 84,
+    "Bunnies": 6467,
+    "Foxes": 1676,
+    "grass": 9700
+  },
+  {
+    "time": 85,
+    "Bunnies": 6278,
+    "Foxes": 1735,
+    "grass": 9745
+  },
+  {
+    "time": 86,
+    "Bunnies": 6109,
+    "Foxes": 1771,
+    "grass": 9756
+  },
+  {
+    "time": 87,
+    "Bunnies": 5927,
+    "Foxes": 1811,
+    "grass": 9792
+  },
+  {
+    "time": 88,
+    "Bunnies": 5735,
+    "Foxes": 1855,
+    "grass": 9779
+  },
+  {
+    "time": 89,
+    "Bunnies": 5559,
+    "Foxes": 1893,
+    "grass": 9809
+  },
+  {
+    "time": 90,
+    "Bunnies": 5382,
+    "Foxes": 1923,
+    "grass": 9797
+  },
+  {
+    "time": 91,
+    "Bunnies": 5196,
+    "Foxes": 1958,
+    "grass": 9779
+  },
+  {
+    "time": 92,
+    "Bunnies": 4985,
+    "Foxes": 2007,
+    "grass": 9807
+  },
+  {
+    "time": 93,
+    "Bunnies": 4790,
+    "Foxes": 2031,
+    "grass": 9836
+  },
+  {
+    "time": 94,
+    "Bunnies": 4590,
+    "Foxes": 2062,
+    "grass": 9838
+  },
+  {
+    "time": 95,
+    "Bunnies": 4405,
+    "Foxes": 2073,
+    "grass": 9827
+  },
+  {
+    "time": 96,
+    "Bunnies": 4213,
+    "Foxes": 2090,
+    "grass": 9820
+  },
+  {
+    "time": 97,
+    "Bunnies": 4019,
+    "Foxes": 2109,
+    "grass": 9869
+  },
+  {
+    "time": 98,
+    "Bunnies": 3839,
+    "Foxes": 2117,
+    "grass": 9888
+  },
+  {
+    "time": 99,
+    "Bunnies": 3642,
+    "Foxes": 2133,
+    "grass": 9870
+  },
+  {
+    "time": 100,
+    "Bunnies": 3448,
+    "Foxes": 2137,
+    "grass": 9898
+  },
+  {
+    "time": 101,
+    "Bunnies": 3248,
+    "Foxes": 2157,
+    "grass": 9910
+  },
+  {
+    "time": 102,
+    "Bunnies": 3079,
+    "Foxes": 2146,
+    "grass": 9910
+  },
+  {
+    "time": 103,
+    "Bunnies": 2907,
+    "Foxes": 2139,
+    "grass": 9926
+  },
+  {
+    "time": 104,
+    "Bunnies": 2709,
+    "Foxes": 2151,
+    "grass": 9927
+  },
+  {
+    "time": 105,
+    "Bunnies": 2532,
+    "Foxes": 2142,
+    "grass": 9929
+  },
+  {
+    "time": 106,
+    "Bunnies": 2348,
+    "Foxes": 2138,
+    "grass": 9958
+  },
+  {
+    "time": 107,
+    "Bunnies": 2174,
+    "Foxes": 2123,
+    "grass": 9949
+  },
+  {
+    "time": 108,
+    "Bunnies": 2005,
+    "Foxes": 2110,
+    "grass": 9965
+  },
+  {
+    "time": 109,
+    "Bunnies": 1844,
+    "Foxes": 2085,
+    "grass": 9979
+  },
+  {
+    "time": 110,
+    "Bunnies": 1668,
+    "Foxes": 2071,
+    "grass": 9971
+  },
+  {
+    "time": 111,
+    "Bunnies": 1532,
+    "Foxes": 2026,
+    "grass": 9944
+  },
+  {
+    "time": 112,
+    "Bunnies": 1400,
+    "Foxes": 1986,
+    "grass": 9941
+  },
+  {
+    "time": 113,
+    "Bunnies": 1281,
+    "Foxes": 1931,
+    "grass": 9948
+  },
+  {
+    "time": 114,
+    "Bunnies": 1137,
+    "Foxes": 1903,
+    "grass": 9972
+  },
+  {
+    "time": 115,
+    "Bunnies": 1015,
+    "Foxes": 1861,
+    "grass": 9976
+  },
+  {
+    "time": 116,
+    "Bunnies": 886,
+    "Foxes": 1819,
+    "grass": 9974
+  },
+  {
+    "time": 117,
+    "Bunnies": 759,
+    "Foxes": 1782,
+    "grass": 10009
+  },
+  {
+    "time": 118,
+    "Bunnies": 648,
+    "Foxes": 1728,
+    "grass": 10022
+  },
+  {
+    "time": 119,
+    "Bunnies": 551,
+    "Foxes": 1661,
+    "grass": 10026
+  },
+  {
+    "time": 120,
+    "Bunnies": 464,
+    "Foxes": 1599,
+    "grass": 10043
+  },
+  {
+    "time": 121,
+    "Bunnies": 379,
+    "Foxes": 1539,
+    "grass": 10066
+  },
+  {
+    "time": 122,
+    "Bunnies": 299,
+    "Foxes": 1480,
+    "grass": 10082
+  },
+  {
+    "time": 123,
+    "Bunnies": 226,
+    "Foxes": 1413,
+    "grass": 10093
+  },
+  {
+    "time": 124,
+    "Bunnies": 187,
+    "Foxes": 1325,
+    "grass": 10102
+  },
+  {
+    "time": 125,
+    "Bunnies": 142,
+    "Foxes": 1242,
+    "grass": 10109
+  },
+  {
+    "time": 126,
+    "Bunnies": 103,
+    "Foxes": 1163,
+    "grass": 10126
+  },
+  {
+    "time": 127,
+    "Bunnies": 70,
+    "Foxes": 1085,
+    "grass": 10141
+  },
+  {
+    "time": 128,
+    "Bunnies": 53,
+    "Foxes": 997,
+    "grass": 10150
+  },
+  {
+    "time": 129,
+    "Bunnies": 38,
+    "Foxes": 915,
+    "grass": 10154
+  },
+  {
+    "time": 130,
+    "Bunnies": 29,
+    "Foxes": 835,
+    "grass": 10167
+  },
+  {
+    "time": 131,
+    "Bunnies": 25,
+    "Foxes": 759,
+    "grass": 10181
+  },
+  {
+    "time": 132,
+    "Bunnies": 23,
+    "Foxes": 687,
+    "grass": 10185
+  },
+  {
+    "time": 133,
+    "Bunnies": 22,
+    "Foxes": 621,
+    "grass": 10182
+  },
+  {
+    "time": 134,
+    "Bunnies": 21,
+    "Foxes": 561,
+    "grass": 10179
+  },
+  {
+    "time": 135,
+    "Bunnies": 24,
+    "Foxes": 507,
+    "grass": 10181
+  },
+  {
+    "time": 136,
+    "Bunnies": 25,
+    "Foxes": 457,
+    "grass": 10181
+  },
+  {
+    "time": 137,
+    "Bunnies": 24,
+    "Foxes": 413,
+    "grass": 10176
+  },
+  {
+    "time": 138,
+    "Bunnies": 30,
+    "Foxes": 372,
+    "grass": 10176
+  },
+  {
+    "time": 139,
+    "Bunnies": 30,
+    "Foxes": 335,
+    "grass": 10169
+  },
+  {
+    "time": 140,
+    "Bunnies": 31,
+    "Foxes": 303,
+    "grass": 10172
+  },
+  {
+    "time": 141,
+    "Bunnies": 31,
+    "Foxes": 274,
+    "grass": 10166
+  },
+  {
+    "time": 142,
+    "Bunnies": 33,
+    "Foxes": 247,
+    "grass": 10169
+  },
+  {
+    "time": 143,
+    "Bunnies": 36,
+    "Foxes": 224,
+    "grass": 10171
+  },
+  {
+    "time": 144,
+    "Bunnies": 41,
+    "Foxes": 202,
+    "grass": 10168
+  },
+  {
+    "time": 145,
+    "Bunnies": 44,
+    "Foxes": 182,
+    "grass": 10167
+  },
+  {
+    "time": 146,
+    "Bunnies": 45,
+    "Foxes": 164,
+    "grass": 10167
+  },
+  {
+    "time": 147,
+    "Bunnies": 48,
+    "Foxes": 148,
+    "grass": 10154
+  },
+  {
+    "time": 148,
+    "Bunnies": 51,
+    "Foxes": 135,
+    "grass": 10153
+  },
+  {
+    "time": 149,
+    "Bunnies": 56,
+    "Foxes": 122,
+    "grass": 10145
+  },
+  {
+    "time": 150,
+    "Bunnies": 60,
+    "Foxes": 110,
+    "grass": 10151
+  },
+  {
+    "time": 151,
+    "Bunnies": 63,
+    "Foxes": 99,
+    "grass": 10145
+  },
+  {
+    "time": 152,
+    "Bunnies": 69,
+    "Foxes": 91,
+    "grass": 10143
+  },
+  {
+    "time": 153,
+    "Bunnies": 76,
+    "Foxes": 82,
+    "grass": 10134
+  },
+  {
+    "time": 154,
+    "Bunnies": 81,
+    "Foxes": 74,
+    "grass": 10125
+  },
+  {
+    "time": 155,
+    "Bunnies": 89,
+    "Foxes": 68,
+    "grass": 10122
+  },
+  {
+    "time": 156,
+    "Bunnies": 100,
+    "Foxes": 62,
+    "grass": 10128
+  },
+  {
+    "time": 157,
+    "Bunnies": 113,
+    "Foxes": 57,
+    "grass": 10117
+  },
+  {
+    "time": 158,
+    "Bunnies": 123,
+    "Foxes": 54,
+    "grass": 10097
+  },
+  {
+    "time": 159,
+    "Bunnies": 131,
+    "Foxes": 49,
+    "grass": 10098
+  },
+  {
+    "time": 160,
+    "Bunnies": 144,
+    "Foxes": 45,
+    "grass": 10082
+  },
+  {
+    "time": 161,
+    "Bunnies": 159,
+    "Foxes": 41,
+    "grass": 10073
+  },
+  {
+    "time": 162,
+    "Bunnies": 177,
+    "Foxes": 37,
+    "grass": 10053
+  },
+  {
+    "time": 163,
+    "Bunnies": 189,
+    "Foxes": 36,
+    "grass": 10037
+  },
+  {
+    "time": 164,
+    "Bunnies": 208,
+    "Foxes": 34,
+    "grass": 10029
+  },
+  {
+    "time": 165,
+    "Bunnies": 228,
+    "Foxes": 34,
+    "grass": 10023
+  },
+  {
+    "time": 166,
+    "Bunnies": 253,
+    "Foxes": 33,
+    "grass": 10004
+  },
+  {
+    "time": 167,
+    "Bunnies": 271,
+    "Foxes": 32,
+    "grass": 9983
+  },
+  {
+    "time": 168,
+    "Bunnies": 286,
+    "Foxes": 31,
+    "grass": 9967
+  },
+  {
+    "time": 169,
+    "Bunnies": 312,
+    "Foxes": 30,
+    "grass": 9959
+  },
+  {
+    "time": 170,
+    "Bunnies": 346,
+    "Foxes": 29,
+    "grass": 9937
+  },
+  {
+    "time": 171,
+    "Bunnies": 383,
+    "Foxes": 28,
+    "grass": 9901
+  },
+  {
+    "time": 172,
+    "Bunnies": 413,
+    "Foxes": 28,
+    "grass": 9887
+  },
+  {
+    "time": 173,
+    "Bunnies": 451,
+    "Foxes": 30,
+    "grass": 9868
+  },
+  {
+    "time": 174,
+    "Bunnies": 487,
+    "Foxes": 33,
+    "grass": 9833
+  },
+  {
+    "time": 175,
+    "Bunnies": 523,
+    "Foxes": 31,
+    "grass": 9786
+  },
+  {
+    "time": 176,
+    "Bunnies": 567,
+    "Foxes": 33,
+    "grass": 9788
+  },
+  {
+    "time": 177,
+    "Bunnies": 610,
+    "Foxes": 32,
+    "grass": 9762
+  },
+  {
+    "time": 178,
+    "Bunnies": 654,
+    "Foxes": 35,
+    "grass": 9771
+  },
+  {
+    "time": 179,
+    "Bunnies": 697,
+    "Foxes": 39,
+    "grass": 9669
+  },
+  {
+    "time": 180,
+    "Bunnies": 740,
+    "Foxes": 44,
+    "grass": 9637
+  },
+  {
+    "time": 181,
+    "Bunnies": 795,
+    "Foxes": 49,
+    "grass": 9678
+  },
+  {
+    "time": 182,
+    "Bunnies": 842,
+    "Foxes": 56,
+    "grass": 9642
+  },
+  {
+    "time": 183,
+    "Bunnies": 909,
+    "Foxes": 58,
+    "grass": 9643
+  },
+  {
+    "time": 184,
+    "Bunnies": 971,
+    "Foxes": 62,
+    "grass": 9594
+  },
+  {
+    "time": 185,
+    "Bunnies": 1026,
+    "Foxes": 66,
+    "grass": 9559
+  },
+  {
+    "time": 186,
+    "Bunnies": 1087,
+    "Foxes": 73,
+    "grass": 9538
+  },
+  {
+    "time": 187,
+    "Bunnies": 1144,
+    "Foxes": 76,
+    "grass": 9498
+  },
+  {
+    "time": 188,
+    "Bunnies": 1212,
+    "Foxes": 80,
+    "grass": 9453
+  },
+  {
+    "time": 189,
+    "Bunnies": 1281,
+    "Foxes": 84,
+    "grass": 9371
+  },
+  {
+    "time": 190,
+    "Bunnies": 1366,
+    "Foxes": 90,
+    "grass": 9417
+  },
+  {
+    "time": 191,
+    "Bunnies": 1439,
+    "Foxes": 102,
+    "grass": 9375
+  },
+  {
+    "time": 192,
+    "Bunnies": 1512,
+    "Foxes": 109,
+    "grass": 9310
+  },
+  {
+    "time": 193,
+    "Bunnies": 1590,
+    "Foxes": 120,
+    "grass": 9266
+  },
+  {
+    "time": 194,
+    "Bunnies": 1659,
+    "Foxes": 131,
+    "grass": 9227
+  },
+  {
+    "time": 195,
+    "Bunnies": 1745,
+    "Foxes": 144,
+    "grass": 9177
+  },
+  {
+    "time": 196,
+    "Bunnies": 1839,
+    "Foxes": 148,
+    "grass": 9198
+  },
+  {
+    "time": 197,
+    "Bunnies": 1915,
+    "Foxes": 157,
+    "grass": 9173
+  },
+  {
+    "time": 198,
+    "Bunnies": 2000,
+    "Foxes": 172,
+    "grass": 9101
+  },
+  {
+    "time": 199,
+    "Bunnies": 2098,
+    "Foxes": 176,
+    "grass": 9060
+  },
+  {
+    "time": 200,
+    "Bunnies": 2163,
+    "Foxes": 186,
+    "grass": 9042
+  },
+  {
+    "time": 201,
+    "Bunnies": 2240,
+    "Foxes": 196,
+    "grass": 8969
+  },
+  {
+    "time": 202,
+    "Bunnies": 2330,
+    "Foxes": 206,
+    "grass": 8968
+  },
+  {
+    "time": 203,
+    "Bunnies": 2425,
+    "Foxes": 223,
+    "grass": 8971
+  },
+  {
+    "time": 204,
+    "Bunnies": 2505,
+    "Foxes": 234,
+    "grass": 8939
+  },
+  {
+    "time": 205,
+    "Bunnies": 2601,
+    "Foxes": 246,
+    "grass": 8913
+  },
+  {
+    "time": 206,
+    "Bunnies": 2680,
+    "Foxes": 263,
+    "grass": 8904
+  },
+  {
+    "time": 207,
+    "Bunnies": 2759,
+    "Foxes": 276,
+    "grass": 8857
+  },
+  {
+    "time": 208,
+    "Bunnies": 2853,
+    "Foxes": 282,
+    "grass": 8830
+  },
+  {
+    "time": 209,
+    "Bunnies": 2956,
+    "Foxes": 292,
+    "grass": 8869
+  },
+  {
+    "time": 210,
+    "Bunnies": 3036,
+    "Foxes": 298,
+    "grass": 8898
+  },
+  {
+    "time": 211,
+    "Bunnies": 3142,
+    "Foxes": 311,
+    "grass": 8869
+  },
+  {
+    "time": 212,
+    "Bunnies": 3228,
+    "Foxes": 328,
+    "grass": 8777
+  },
+  {
+    "time": 213,
+    "Bunnies": 3333,
+    "Foxes": 336,
+    "grass": 8788
+  },
+  {
+    "time": 214,
+    "Bunnies": 3458,
+    "Foxes": 341,
+    "grass": 8766
+  },
+  {
+    "time": 215,
+    "Bunnies": 3552,
+    "Foxes": 351,
+    "grass": 8818
+  },
+  {
+    "time": 216,
+    "Bunnies": 3646,
+    "Foxes": 364,
+    "grass": 8712
+  },
+  {
+    "time": 217,
+    "Bunnies": 3739,
+    "Foxes": 380,
+    "grass": 8705
+  },
+  {
+    "time": 218,
+    "Bunnies": 3838,
+    "Foxes": 396,
+    "grass": 8683
+  },
+  {
+    "time": 219,
+    "Bunnies": 3918,
+    "Foxes": 434,
+    "grass": 8733
+  },
+  {
+    "time": 220,
+    "Bunnies": 4016,
+    "Foxes": 465,
+    "grass": 8678
+  },
+  {
+    "time": 221,
+    "Bunnies": 4097,
+    "Foxes": 487,
+    "grass": 8672
+  },
+  {
+    "time": 222,
+    "Bunnies": 4167,
+    "Foxes": 507,
+    "grass": 8740
+  },
+  {
+    "time": 223,
+    "Bunnies": 4240,
+    "Foxes": 526,
+    "grass": 8707
+  },
+  {
+    "time": 224,
+    "Bunnies": 4306,
+    "Foxes": 548,
+    "grass": 8668
+  },
+  {
+    "time": 225,
+    "Bunnies": 4375,
+    "Foxes": 575,
+    "grass": 8686
+  },
+  {
+    "time": 226,
+    "Bunnies": 4456,
+    "Foxes": 596,
+    "grass": 8734
+  },
+  {
+    "time": 227,
+    "Bunnies": 4534,
+    "Foxes": 617,
+    "grass": 8745
+  },
+  {
+    "time": 228,
+    "Bunnies": 4585,
+    "Foxes": 638,
+    "grass": 8776
+  },
+  {
+    "time": 229,
+    "Bunnies": 4641,
+    "Foxes": 659,
+    "grass": 8748
+  },
+  {
+    "time": 230,
+    "Bunnies": 4694,
+    "Foxes": 687,
+    "grass": 8737
+  },
+  {
+    "time": 231,
+    "Bunnies": 4732,
+    "Foxes": 704,
+    "grass": 8728
+  },
+  {
+    "time": 232,
+    "Bunnies": 4780,
+    "Foxes": 726,
+    "grass": 8701
+  },
+  {
+    "time": 233,
+    "Bunnies": 4822,
+    "Foxes": 753,
+    "grass": 8734
+  },
+  {
+    "time": 234,
+    "Bunnies": 4870,
+    "Foxes": 780,
+    "grass": 8711
+  },
+  {
+    "time": 235,
+    "Bunnies": 4897,
+    "Foxes": 809,
+    "grass": 8723
+  },
+  {
+    "time": 236,
+    "Bunnies": 4940,
+    "Foxes": 834,
+    "grass": 8709
+  },
+  {
+    "time": 237,
+    "Bunnies": 4977,
+    "Foxes": 859,
+    "grass": 8727
+  },
+  {
+    "time": 238,
+    "Bunnies": 5035,
+    "Foxes": 863,
+    "grass": 8804
+  },
+  {
+    "time": 239,
+    "Bunnies": 5067,
+    "Foxes": 880,
+    "grass": 8843
+  },
+  {
+    "time": 240,
+    "Bunnies": 5096,
+    "Foxes": 893,
+    "grass": 8816
+  },
+  {
+    "time": 241,
+    "Bunnies": 5138,
+    "Foxes": 913,
+    "grass": 8806
+  },
+  {
+    "time": 242,
+    "Bunnies": 5163,
+    "Foxes": 937,
+    "grass": 8812
+  },
+  {
+    "time": 243,
+    "Bunnies": 5176,
+    "Foxes": 955,
+    "grass": 8810
+  },
+  {
+    "time": 244,
+    "Bunnies": 5194,
+    "Foxes": 973,
+    "grass": 8848
+  },
+  {
+    "time": 245,
+    "Bunnies": 5201,
+    "Foxes": 1000,
+    "grass": 8885
+  },
+  {
+    "time": 246,
+    "Bunnies": 5223,
+    "Foxes": 1017,
+    "grass": 8869
+  },
+  {
+    "time": 247,
+    "Bunnies": 5212,
+    "Foxes": 1046,
+    "grass": 8903
+  },
+  {
+    "time": 248,
+    "Bunnies": 5194,
+    "Foxes": 1061,
+    "grass": 8966
+  },
+  {
+    "time": 249,
+    "Bunnies": 5165,
+    "Foxes": 1090,
+    "grass": 9030
+  },
+  {
+    "time": 250,
+    "Bunnies": 5159,
+    "Foxes": 1112,
+    "grass": 9085
+  },
+  {
+    "time": 251,
+    "Bunnies": 5109,
+    "Foxes": 1146,
+    "grass": 9113
+  },
+  {
+    "time": 252,
+    "Bunnies": 5068,
+    "Foxes": 1169,
+    "grass": 9146
+  },
+  {
+    "time": 253,
+    "Bunnies": 5042,
+    "Foxes": 1180,
+    "grass": 9181
+  },
+  {
+    "time": 254,
+    "Bunnies": 4978,
+    "Foxes": 1213,
+    "grass": 9192
+  },
+  {
+    "time": 255,
+    "Bunnies": 4923,
+    "Foxes": 1240,
+    "grass": 9235
+  },
+  {
+    "time": 256,
+    "Bunnies": 4856,
+    "Foxes": 1262,
+    "grass": 9287
+  },
+  {
+    "time": 257,
+    "Bunnies": 4766,
+    "Foxes": 1292,
+    "grass": 9300
+  },
+  {
+    "time": 258,
+    "Bunnies": 4707,
+    "Foxes": 1309,
+    "grass": 9317
+  },
+  {
+    "time": 259,
+    "Bunnies": 4651,
+    "Foxes": 1315,
+    "grass": 9329
+  },
+  {
+    "time": 260,
+    "Bunnies": 4576,
+    "Foxes": 1335,
+    "grass": 9290
+  },
+  {
+    "time": 261,
+    "Bunnies": 4504,
+    "Foxes": 1358,
+    "grass": 9320
+  },
+  {
+    "time": 262,
+    "Bunnies": 4412,
+    "Foxes": 1385,
+    "grass": 9337
+  },
+  {
+    "time": 263,
+    "Bunnies": 4336,
+    "Foxes": 1408,
+    "grass": 9436
+  },
+  {
+    "time": 264,
+    "Bunnies": 4270,
+    "Foxes": 1422,
+    "grass": 9466
+  },
+  {
+    "time": 265,
+    "Bunnies": 4157,
+    "Foxes": 1460,
+    "grass": 9424
+  },
+  {
+    "time": 266,
+    "Bunnies": 4060,
+    "Foxes": 1480,
+    "grass": 9516
+  },
+  {
+    "time": 267,
+    "Bunnies": 3950,
+    "Foxes": 1512,
+    "grass": 9508
+  },
+  {
+    "time": 268,
+    "Bunnies": 3843,
+    "Foxes": 1540,
+    "grass": 9591
+  },
+  {
+    "time": 269,
+    "Bunnies": 3713,
+    "Foxes": 1559,
+    "grass": 9647
+  },
+  {
+    "time": 270,
+    "Bunnies": 3588,
+    "Foxes": 1575,
+    "grass": 9689
+  },
+  {
+    "time": 271,
+    "Bunnies": 3465,
+    "Foxes": 1584,
+    "grass": 9702
+  },
+  {
+    "time": 272,
+    "Bunnies": 3334,
+    "Foxes": 1595,
+    "grass": 9737
+  },
+  {
+    "time": 273,
+    "Bunnies": 3189,
+    "Foxes": 1625,
+    "grass": 9763
+  },
+  {
+    "time": 274,
+    "Bunnies": 3050,
+    "Foxes": 1642,
+    "grass": 9779
+  },
+  {
+    "time": 275,
+    "Bunnies": 2940,
+    "Foxes": 1635,
+    "grass": 9768
+  },
+  {
+    "time": 276,
+    "Bunnies": 2823,
+    "Foxes": 1632,
+    "grass": 9766
+  },
+  {
+    "time": 277,
+    "Bunnies": 2690,
+    "Foxes": 1639,
+    "grass": 9778
+  },
+  {
+    "time": 278,
+    "Bunnies": 2578,
+    "Foxes": 1633,
+    "grass": 9787
+  },
+  {
+    "time": 279,
+    "Bunnies": 2478,
+    "Foxes": 1615,
+    "grass": 9811
+  },
+  {
+    "time": 280,
+    "Bunnies": 2359,
+    "Foxes": 1619,
+    "grass": 9800
+  },
+  {
+    "time": 281,
+    "Bunnies": 2249,
+    "Foxes": 1611,
+    "grass": 9803
+  },
+  {
+    "time": 282,
+    "Bunnies": 2145,
+    "Foxes": 1595,
+    "grass": 9819
+  },
+  {
+    "time": 283,
+    "Bunnies": 2046,
+    "Foxes": 1575,
+    "grass": 9833
+  },
+  {
+    "time": 284,
+    "Bunnies": 1933,
+    "Foxes": 1570,
+    "grass": 9822
+  },
+  {
+    "time": 285,
+    "Bunnies": 1825,
+    "Foxes": 1553,
+    "grass": 9822
+  },
+  {
+    "time": 286,
+    "Bunnies": 1739,
+    "Foxes": 1531,
+    "grass": 9817
+  },
+  {
+    "time": 287,
+    "Bunnies": 1637,
+    "Foxes": 1519,
+    "grass": 9804
+  },
+  {
+    "time": 288,
+    "Bunnies": 1546,
+    "Foxes": 1509,
+    "grass": 9821
+  },
+  {
+    "time": 289,
+    "Bunnies": 1451,
+    "Foxes": 1488,
+    "grass": 9822
+  },
+  {
+    "time": 290,
+    "Bunnies": 1368,
+    "Foxes": 1457,
+    "grass": 9808
+  },
+  {
+    "time": 291,
+    "Bunnies": 1305,
+    "Foxes": 1422,
+    "grass": 9814
+  },
+  {
+    "time": 292,
+    "Bunnies": 1237,
+    "Foxes": 1390,
+    "grass": 9786
+  },
+  {
+    "time": 293,
+    "Bunnies": 1166,
+    "Foxes": 1366,
+    "grass": 9796
+  },
+  {
+    "time": 294,
+    "Bunnies": 1107,
+    "Foxes": 1326,
+    "grass": 9799
+  },
+  {
+    "time": 295,
+    "Bunnies": 1038,
+    "Foxes": 1302,
+    "grass": 9811
+  },
+  {
+    "time": 296,
+    "Bunnies": 982,
+    "Foxes": 1257,
+    "grass": 9809
+  },
+  {
+    "time": 297,
+    "Bunnies": 937,
+    "Foxes": 1212,
+    "grass": 9812
+  },
+  {
+    "time": 298,
+    "Bunnies": 896,
+    "Foxes": 1167,
+    "grass": 9844
+  },
+  {
+    "time": 299,
+    "Bunnies": 878,
+    "Foxes": 1114,
+    "grass": 9851
+  },
+  {
+    "time": 300,
+    "Bunnies": 854,
+    "Foxes": 1066,
+    "grass": 9797
+  },
+  {
+    "time": 301,
+    "Bunnies": 825,
+    "Foxes": 1026,
+    "grass": 9810
+  },
+  {
+    "time": 302,
+    "Bunnies": 816,
+    "Foxes": 992,
+    "grass": 9783
+  },
+  {
+    "time": 303,
+    "Bunnies": 796,
+    "Foxes": 951,
+    "grass": 9746
+  },
+  {
+    "time": 304,
+    "Bunnies": 785,
+    "Foxes": 918,
+    "grass": 9748
+  },
+  {
+    "time": 305,
+    "Bunnies": 783,
+    "Foxes": 883,
+    "grass": 9751
+  },
+  {
+    "time": 306,
+    "Bunnies": 773,
+    "Foxes": 854,
+    "grass": 9711
+  },
+  {
+    "time": 307,
+    "Bunnies": 749,
+    "Foxes": 834,
+    "grass": 9722
+  },
+  {
+    "time": 308,
+    "Bunnies": 748,
+    "Foxes": 808,
+    "grass": 9734
+  },
+  {
+    "time": 309,
+    "Bunnies": 735,
+    "Foxes": 782,
+    "grass": 9714
+  },
+  {
+    "time": 310,
+    "Bunnies": 725,
+    "Foxes": 760,
+    "grass": 9697
+  },
+  {
+    "time": 311,
+    "Bunnies": 714,
+    "Foxes": 738,
+    "grass": 9685
+  },
+  {
+    "time": 312,
+    "Bunnies": 711,
+    "Foxes": 710,
+    "grass": 9708
+  },
+  {
+    "time": 313,
+    "Bunnies": 723,
+    "Foxes": 682,
+    "grass": 9717
+  },
+  {
+    "time": 314,
+    "Bunnies": 747,
+    "Foxes": 644,
+    "grass": 9711
+  },
+  {
+    "time": 315,
+    "Bunnies": 758,
+    "Foxes": 623,
+    "grass": 9690
+  },
+  {
+    "time": 316,
+    "Bunnies": 781,
+    "Foxes": 599,
+    "grass": 9684
+  },
+  {
+    "time": 317,
+    "Bunnies": 801,
+    "Foxes": 582,
+    "grass": 9671
+  },
+  {
+    "time": 318,
+    "Bunnies": 802,
+    "Foxes": 576,
+    "grass": 9661
+  },
+  {
+    "time": 319,
+    "Bunnies": 813,
+    "Foxes": 565,
+    "grass": 9634
+  },
+  {
+    "time": 320,
+    "Bunnies": 828,
+    "Foxes": 551,
+    "grass": 9608
+  },
+  {
+    "time": 321,
+    "Bunnies": 843,
+    "Foxes": 542,
+    "grass": 9585
+  },
+  {
+    "time": 322,
+    "Bunnies": 849,
+    "Foxes": 529,
+    "grass": 9601
+  },
+  {
+    "time": 323,
+    "Bunnies": 862,
+    "Foxes": 523,
+    "grass": 9572
+  },
+  {
+    "time": 324,
+    "Bunnies": 867,
+    "Foxes": 517,
+    "grass": 9614
+  },
+  {
+    "time": 325,
+    "Bunnies": 853,
+    "Foxes": 532,
+    "grass": 9603
+  },
+  {
+    "time": 326,
+    "Bunnies": 863,
+    "Foxes": 531,
+    "grass": 9580
+  },
+  {
+    "time": 327,
+    "Bunnies": 875,
+    "Foxes": 530,
+    "grass": 9552
+  },
+  {
+    "time": 328,
+    "Bunnies": 870,
+    "Foxes": 538,
+    "grass": 9580
+  },
+  {
+    "time": 329,
+    "Bunnies": 863,
+    "Foxes": 539,
+    "grass": 9543
+  },
+  {
+    "time": 330,
+    "Bunnies": 877,
+    "Foxes": 533,
+    "grass": 9538
+  },
+  {
+    "time": 331,
+    "Bunnies": 897,
+    "Foxes": 531,
+    "grass": 9557
+  },
+  {
+    "time": 332,
+    "Bunnies": 919,
+    "Foxes": 529,
+    "grass": 9538
+  },
+  {
+    "time": 333,
+    "Bunnies": 940,
+    "Foxes": 525,
+    "grass": 9553
+  },
+  {
+    "time": 334,
+    "Bunnies": 948,
+    "Foxes": 527,
+    "grass": 9568
+  },
+  {
+    "time": 335,
+    "Bunnies": 959,
+    "Foxes": 521,
+    "grass": 9578
+  },
+  {
+    "time": 336,
+    "Bunnies": 962,
+    "Foxes": 525,
+    "grass": 9540
+  },
+  {
+    "time": 337,
+    "Bunnies": 981,
+    "Foxes": 526,
+    "grass": 9552
+  },
+  {
+    "time": 338,
+    "Bunnies": 991,
+    "Foxes": 523,
+    "grass": 9538
+  },
+  {
+    "time": 339,
+    "Bunnies": 1009,
+    "Foxes": 522,
+    "grass": 9501
+  },
+  {
+    "time": 340,
+    "Bunnies": 1028,
+    "Foxes": 519,
+    "grass": 9508
+  },
+  {
+    "time": 341,
+    "Bunnies": 1067,
+    "Foxes": 510,
+    "grass": 9467
+  },
+  {
+    "time": 342,
+    "Bunnies": 1101,
+    "Foxes": 515,
+    "grass": 9444
+  },
+  {
+    "time": 343,
+    "Bunnies": 1124,
+    "Foxes": 520,
+    "grass": 9381
+  },
+  {
+    "time": 344,
+    "Bunnies": 1158,
+    "Foxes": 522,
+    "grass": 9380
+  },
+  {
+    "time": 345,
+    "Bunnies": 1177,
+    "Foxes": 531,
+    "grass": 9371
+  },
+  {
+    "time": 346,
+    "Bunnies": 1203,
+    "Foxes": 538,
+    "grass": 9346
+  },
+  {
+    "time": 347,
+    "Bunnies": 1247,
+    "Foxes": 544,
+    "grass": 9362
+  },
+  {
+    "time": 348,
+    "Bunnies": 1281,
+    "Foxes": 555,
+    "grass": 9349
+  },
+  {
+    "time": 349,
+    "Bunnies": 1309,
+    "Foxes": 579,
+    "grass": 9356
+  },
+  {
+    "time": 350,
+    "Bunnies": 1311,
+    "Foxes": 598,
+    "grass": 9293
+  },
+  {
+    "time": 351,
+    "Bunnies": 1319,
+    "Foxes": 614,
+    "grass": 9320
+  },
+  {
+    "time": 352,
+    "Bunnies": 1340,
+    "Foxes": 626,
+    "grass": 9278
+  },
+  {
+    "time": 353,
+    "Bunnies": 1361,
+    "Foxes": 641,
+    "grass": 9289
+  },
+  {
+    "time": 354,
+    "Bunnies": 1379,
+    "Foxes": 648,
+    "grass": 9275
+  },
+  {
+    "time": 355,
+    "Bunnies": 1418,
+    "Foxes": 650,
+    "grass": 9256
+  },
+  {
+    "time": 356,
+    "Bunnies": 1434,
+    "Foxes": 657,
+    "grass": 9193
+  },
+  {
+    "time": 357,
+    "Bunnies": 1447,
+    "Foxes": 683,
+    "grass": 9181
+  },
+  {
+    "time": 358,
+    "Bunnies": 1490,
+    "Foxes": 694,
+    "grass": 9143
+  },
+  {
+    "time": 359,
+    "Bunnies": 1507,
+    "Foxes": 713,
+    "grass": 9099
+  },
+  {
+    "time": 360,
+    "Bunnies": 1511,
+    "Foxes": 740,
+    "grass": 9117
+  },
+  {
+    "time": 361,
+    "Bunnies": 1540,
+    "Foxes": 754,
+    "grass": 9109
+  },
+  {
+    "time": 362,
+    "Bunnies": 1567,
+    "Foxes": 767,
+    "grass": 9093
+  },
+  {
+    "time": 363,
+    "Bunnies": 1570,
+    "Foxes": 797,
+    "grass": 9083
+  },
+  {
+    "time": 364,
+    "Bunnies": 1593,
+    "Foxes": 809,
+    "grass": 9090
+  },
+  {
+    "time": 365,
+    "Bunnies": 1608,
+    "Foxes": 825,
+    "grass": 9034
+  },
+  {
+    "time": 366,
+    "Bunnies": 1612,
+    "Foxes": 841,
+    "grass": 9033
+  },
+  {
+    "time": 367,
+    "Bunnies": 1639,
+    "Foxes": 853,
+    "grass": 9021
+  },
+  {
+    "time": 368,
+    "Bunnies": 1652,
+    "Foxes": 866,
+    "grass": 8984
+  },
+  {
+    "time": 369,
+    "Bunnies": 1653,
+    "Foxes": 889,
+    "grass": 8962
+  },
+  {
+    "time": 370,
+    "Bunnies": 1714,
+    "Foxes": 886,
+    "grass": 8959
+  },
+  {
+    "time": 371,
+    "Bunnies": 1743,
+    "Foxes": 900,
+    "grass": 8938
+  },
+  {
+    "time": 372,
+    "Bunnies": 1785,
+    "Foxes": 902,
+    "grass": 8960
+  },
+  {
+    "time": 373,
+    "Bunnies": 1813,
+    "Foxes": 918,
+    "grass": 8927
+  },
+  {
+    "time": 374,
+    "Bunnies": 1804,
+    "Foxes": 949,
+    "grass": 8918
+  },
+  {
+    "time": 375,
+    "Bunnies": 1823,
+    "Foxes": 976,
+    "grass": 8942
+  },
+  {
+    "time": 376,
+    "Bunnies": 1832,
+    "Foxes": 986,
+    "grass": 8921
+  },
+  {
+    "time": 377,
+    "Bunnies": 1836,
+    "Foxes": 1011,
+    "grass": 8940
+  },
+  {
+    "time": 378,
+    "Bunnies": 1849,
+    "Foxes": 1021,
+    "grass": 8940
+  },
+  {
+    "time": 379,
+    "Bunnies": 1868,
+    "Foxes": 1054,
+    "grass": 8910
+  },
+  {
+    "time": 380,
+    "Bunnies": 1865,
+    "Foxes": 1072,
+    "grass": 8896
+  },
+  {
+    "time": 381,
+    "Bunnies": 1865,
+    "Foxes": 1092,
+    "grass": 8949
+  },
+  {
+    "time": 382,
+    "Bunnies": 1878,
+    "Foxes": 1109,
+    "grass": 8892
+  },
+  {
+    "time": 383,
+    "Bunnies": 1897,
+    "Foxes": 1121,
+    "grass": 8922
+  },
+  {
+    "time": 384,
+    "Bunnies": 1896,
+    "Foxes": 1142,
+    "grass": 8902
+  },
+  {
+    "time": 385,
+    "Bunnies": 1892,
+    "Foxes": 1172,
+    "grass": 8879
+  },
+  {
+    "time": 386,
+    "Bunnies": 1874,
+    "Foxes": 1215,
+    "grass": 8841
+  },
+  {
+    "time": 387,
+    "Bunnies": 1862,
+    "Foxes": 1246,
+    "grass": 8901
+  },
+  {
+    "time": 388,
+    "Bunnies": 1823,
+    "Foxes": 1282,
+    "grass": 8935
+  },
+  {
+    "time": 389,
+    "Bunnies": 1798,
+    "Foxes": 1306,
+    "grass": 8929
+  },
+  {
+    "time": 390,
+    "Bunnies": 1751,
+    "Foxes": 1351,
+    "grass": 8965
+  },
+  {
+    "time": 391,
+    "Bunnies": 1697,
+    "Foxes": 1384,
+    "grass": 8997
+  },
+  {
+    "time": 392,
+    "Bunnies": 1638,
+    "Foxes": 1405,
+    "grass": 9059
+  },
+  {
+    "time": 393,
+    "Bunnies": 1576,
+    "Foxes": 1433,
+    "grass": 9103
+  },
+  {
+    "time": 394,
+    "Bunnies": 1540,
+    "Foxes": 1440,
+    "grass": 9151
+  },
+  {
+    "time": 395,
+    "Bunnies": 1516,
+    "Foxes": 1428,
+    "grass": 9140
+  },
+  {
+    "time": 396,
+    "Bunnies": 1459,
+    "Foxes": 1439,
+    "grass": 9187
+  },
+  {
+    "time": 397,
+    "Bunnies": 1414,
+    "Foxes": 1431,
+    "grass": 9244
+  },
+  {
+    "time": 398,
+    "Bunnies": 1355,
+    "Foxes": 1436,
+    "grass": 9282
+  },
+  {
+    "time": 399,
+    "Bunnies": 1299,
+    "Foxes": 1436,
+    "grass": 9332
+  },
+  {
+    "time": 400,
+    "Bunnies": 1243,
+    "Foxes": 1436,
+    "grass": 9358
+  },
+  {
+    "time": 401,
+    "Bunnies": 1212,
+    "Foxes": 1416,
+    "grass": 9374
+  },
+  {
+    "time": 402,
+    "Bunnies": 1167,
+    "Foxes": 1402,
+    "grass": 9447
+  },
+  {
+    "time": 403,
+    "Bunnies": 1104,
+    "Foxes": 1393,
+    "grass": 9462
+  },
+  {
+    "time": 404,
+    "Bunnies": 1064,
+    "Foxes": 1372,
+    "grass": 9490
+  },
+  {
+    "time": 405,
+    "Bunnies": 1018,
+    "Foxes": 1346,
+    "grass": 9553
+  },
+  {
+    "time": 406,
+    "Bunnies": 986,
+    "Foxes": 1316,
+    "grass": 9518
+  },
+  {
+    "time": 407,
+    "Bunnies": 936,
+    "Foxes": 1297,
+    "grass": 9533
+  },
+  {
+    "time": 408,
+    "Bunnies": 884,
+    "Foxes": 1267,
+    "grass": 9572
+  },
+  {
+    "time": 409,
+    "Bunnies": 853,
+    "Foxes": 1243,
+    "grass": 9609
+  },
+  {
+    "time": 410,
+    "Bunnies": 834,
+    "Foxes": 1193,
+    "grass": 9613
+  },
+  {
+    "time": 411,
+    "Bunnies": 818,
+    "Foxes": 1141,
+    "grass": 9640
+  },
+  {
+    "time": 412,
+    "Bunnies": 785,
+    "Foxes": 1103,
+    "grass": 9648
+  },
+  {
+    "time": 413,
+    "Bunnies": 773,
+    "Foxes": 1060,
+    "grass": 9666
+  },
+  {
+    "time": 414,
+    "Bunnies": 760,
+    "Foxes": 1021,
+    "grass": 9701
+  },
+  {
+    "time": 415,
+    "Bunnies": 751,
+    "Foxes": 981,
+    "grass": 9712
+  },
+  {
+    "time": 416,
+    "Bunnies": 731,
+    "Foxes": 945,
+    "grass": 9714
+  },
+  {
+    "time": 417,
+    "Bunnies": 726,
+    "Foxes": 911,
+    "grass": 9721
+  },
+  {
+    "time": 418,
+    "Bunnies": 708,
+    "Foxes": 877,
+    "grass": 9730
+  },
+  {
+    "time": 419,
+    "Bunnies": 689,
+    "Foxes": 853,
+    "grass": 9742
+  },
+  {
+    "time": 420,
+    "Bunnies": 683,
+    "Foxes": 826,
+    "grass": 9730
+  },
+  {
+    "time": 421,
+    "Bunnies": 650,
+    "Foxes": 817,
+    "grass": 9708
+  },
+  {
+    "time": 422,
+    "Bunnies": 634,
+    "Foxes": 800,
+    "grass": 9774
+  },
+  {
+    "time": 423,
+    "Bunnies": 615,
+    "Foxes": 782,
+    "grass": 9767
+  },
+  {
+    "time": 424,
+    "Bunnies": 593,
+    "Foxes": 759,
+    "grass": 9766
+  },
+  {
+    "time": 425,
+    "Bunnies": 566,
+    "Foxes": 745,
+    "grass": 9798
+  },
+  {
+    "time": 426,
+    "Bunnies": 563,
+    "Foxes": 725,
+    "grass": 9762
+  },
+  {
+    "time": 427,
+    "Bunnies": 538,
+    "Foxes": 715,
+    "grass": 9768
+  },
+  {
+    "time": 428,
+    "Bunnies": 517,
+    "Foxes": 703,
+    "grass": 9796
+  },
+  {
+    "time": 429,
+    "Bunnies": 503,
+    "Foxes": 687,
+    "grass": 9814
+  },
+  {
+    "time": 430,
+    "Bunnies": 509,
+    "Foxes": 658,
+    "grass": 9788
+  },
+  {
+    "time": 431,
+    "Bunnies": 522,
+    "Foxes": 636,
+    "grass": 9784
+  },
+  {
+    "time": 432,
+    "Bunnies": 526,
+    "Foxes": 607,
+    "grass": 9773
+  },
+  {
+    "time": 433,
+    "Bunnies": 536,
+    "Foxes": 588,
+    "grass": 9751
+  },
+  {
+    "time": 434,
+    "Bunnies": 554,
+    "Foxes": 556,
+    "grass": 9772
+  },
+  {
+    "time": 435,
+    "Bunnies": 577,
+    "Foxes": 528,
+    "grass": 9749
+  },
+  {
+    "time": 436,
+    "Bunnies": 616,
+    "Foxes": 504,
+    "grass": 9683
+  },
+  {
+    "time": 437,
+    "Bunnies": 639,
+    "Foxes": 489,
+    "grass": 9695
+  },
+  {
+    "time": 438,
+    "Bunnies": 680,
+    "Foxes": 470,
+    "grass": 9663
+  },
+  {
+    "time": 439,
+    "Bunnies": 710,
+    "Foxes": 449,
+    "grass": 9662
+  },
+  {
+    "time": 440,
+    "Bunnies": 740,
+    "Foxes": 438,
+    "grass": 9617
+  },
+  {
+    "time": 441,
+    "Bunnies": 774,
+    "Foxes": 429,
+    "grass": 9564
+  },
+  {
+    "time": 442,
+    "Bunnies": 809,
+    "Foxes": 420,
+    "grass": 9540
+  },
+  {
+    "time": 443,
+    "Bunnies": 848,
+    "Foxes": 407,
+    "grass": 9510
+  },
+  {
+    "time": 444,
+    "Bunnies": 891,
+    "Foxes": 398,
+    "grass": 9480
+  },
+  {
+    "time": 445,
+    "Bunnies": 943,
+    "Foxes": 386,
+    "grass": 9470
+  },
+  {
+    "time": 446,
+    "Bunnies": 979,
+    "Foxes": 385,
+    "grass": 9441
+  },
+  {
+    "time": 447,
+    "Bunnies": 1013,
+    "Foxes": 390,
+    "grass": 9396
+  },
+  {
+    "time": 448,
+    "Bunnies": 1052,
+    "Foxes": 392,
+    "grass": 9336
+  },
+  {
+    "time": 449,
+    "Bunnies": 1092,
+    "Foxes": 401,
+    "grass": 9295
+  },
+  {
+    "time": 450,
+    "Bunnies": 1129,
+    "Foxes": 402,
+    "grass": 9281
+  },
+  {
+    "time": 451,
+    "Bunnies": 1178,
+    "Foxes": 415,
+    "grass": 9262
+  },
+  {
+    "time": 452,
+    "Bunnies": 1209,
+    "Foxes": 439,
+    "grass": 9238
+  },
+  {
+    "time": 453,
+    "Bunnies": 1240,
+    "Foxes": 455,
+    "grass": 9222
+  },
+  {
+    "time": 454,
+    "Bunnies": 1290,
+    "Foxes": 469,
+    "grass": 9207
+  },
+  {
+    "time": 455,
+    "Bunnies": 1353,
+    "Foxes": 471,
+    "grass": 9152
+  },
+  {
+    "time": 456,
+    "Bunnies": 1415,
+    "Foxes": 481,
+    "grass": 9160
+  },
+  {
+    "time": 457,
+    "Bunnies": 1470,
+    "Foxes": 485,
+    "grass": 9090
+  },
+  {
+    "time": 458,
+    "Bunnies": 1541,
+    "Foxes": 493,
+    "grass": 9022
+  },
+  {
+    "time": 459,
+    "Bunnies": 1604,
+    "Foxes": 506,
+    "grass": 9000
+  },
+  {
+    "time": 460,
+    "Bunnies": 1690,
+    "Foxes": 521,
+    "grass": 8910
+  },
+  {
+    "time": 461,
+    "Bunnies": 1752,
+    "Foxes": 545,
+    "grass": 8921
+  },
+  {
+    "time": 462,
+    "Bunnies": 1832,
+    "Foxes": 563,
+    "grass": 8840
+  },
+  {
+    "time": 463,
+    "Bunnies": 1939,
+    "Foxes": 574,
+    "grass": 8799
+  },
+  {
+    "time": 464,
+    "Bunnies": 1992,
+    "Foxes": 611,
+    "grass": 8826
+  },
+  {
+    "time": 465,
+    "Bunnies": 2052,
+    "Foxes": 635,
+    "grass": 8725
+  },
+  {
+    "time": 466,
+    "Bunnies": 2136,
+    "Foxes": 654,
+    "grass": 8713
+  },
+  {
+    "time": 467,
+    "Bunnies": 2190,
+    "Foxes": 681,
+    "grass": 8642
+  },
+  {
+    "time": 468,
+    "Bunnies": 2253,
+    "Foxes": 706,
+    "grass": 8667
+  },
+  {
+    "time": 469,
+    "Bunnies": 2302,
+    "Foxes": 746,
+    "grass": 8622
+  },
+  {
+    "time": 470,
+    "Bunnies": 2345,
+    "Foxes": 793,
+    "grass": 8626
+  },
+  {
+    "time": 471,
+    "Bunnies": 2361,
+    "Foxes": 852,
+    "grass": 8616
+  },
+  {
+    "time": 472,
+    "Bunnies": 2377,
+    "Foxes": 914,
+    "grass": 8581
+  },
+  {
+    "time": 473,
+    "Bunnies": 2390,
+    "Foxes": 971,
+    "grass": 8619
+  },
+  {
+    "time": 474,
+    "Bunnies": 2375,
+    "Foxes": 1031,
+    "grass": 8601
+  },
+  {
+    "time": 475,
+    "Bunnies": 2377,
+    "Foxes": 1082,
+    "grass": 8668
+  },
+  {
+    "time": 476,
+    "Bunnies": 2365,
+    "Foxes": 1134,
+    "grass": 8681
+  },
+  {
+    "time": 477,
+    "Bunnies": 2358,
+    "Foxes": 1193,
+    "grass": 8686
+  },
+  {
+    "time": 478,
+    "Bunnies": 2332,
+    "Foxes": 1239,
+    "grass": 8719
+  },
+  {
+    "time": 479,
+    "Bunnies": 2296,
+    "Foxes": 1289,
+    "grass": 8759
+  },
+  {
+    "time": 480,
+    "Bunnies": 2232,
+    "Foxes": 1348,
+    "grass": 8790
+  },
+  {
+    "time": 481,
+    "Bunnies": 2183,
+    "Foxes": 1394,
+    "grass": 8884
+  },
+  {
+    "time": 482,
+    "Bunnies": 2137,
+    "Foxes": 1437,
+    "grass": 8954
+  },
+  {
+    "time": 483,
+    "Bunnies": 2064,
+    "Foxes": 1466,
+    "grass": 8933
+  },
+  {
+    "time": 484,
+    "Bunnies": 2021,
+    "Foxes": 1488,
+    "grass": 8952
+  },
+  {
+    "time": 485,
+    "Bunnies": 1979,
+    "Foxes": 1504,
+    "grass": 8939
+  },
+  {
+    "time": 486,
+    "Bunnies": 1907,
+    "Foxes": 1524,
+    "grass": 9021
+  },
+  {
+    "time": 487,
+    "Bunnies": 1836,
+    "Foxes": 1549,
+    "grass": 9102
+  },
+  {
+    "time": 488,
+    "Bunnies": 1804,
+    "Foxes": 1545,
+    "grass": 9089
+  },
+  {
+    "time": 489,
+    "Bunnies": 1765,
+    "Foxes": 1546,
+    "grass": 9125
+  },
+  {
+    "time": 490,
+    "Bunnies": 1701,
+    "Foxes": 1559,
+    "grass": 9167
+  },
+  {
+    "time": 491,
+    "Bunnies": 1658,
+    "Foxes": 1550,
+    "grass": 9202
+  },
+  {
+    "time": 492,
+    "Bunnies": 1603,
+    "Foxes": 1547,
+    "grass": 9216
+  },
+  {
+    "time": 493,
+    "Bunnies": 1556,
+    "Foxes": 1525,
+    "grass": 9210
+  },
+  {
+    "time": 494,
+    "Bunnies": 1523,
+    "Foxes": 1508,
+    "grass": 9219
+  },
+  {
+    "time": 495,
+    "Bunnies": 1494,
+    "Foxes": 1495,
+    "grass": 9186
+  },
+  {
+    "time": 496,
+    "Bunnies": 1433,
+    "Foxes": 1487,
+    "grass": 9239
+  },
+  {
+    "time": 497,
+    "Bunnies": 1377,
+    "Foxes": 1474,
+    "grass": 9249
+  },
+  {
+    "time": 498,
+    "Bunnies": 1380,
+    "Foxes": 1435,
+    "grass": 9270
+  },
+  {
+    "time": 499,
+    "Bunnies": 1337,
+    "Foxes": 1413,
+    "grass": 9283
+  },
+  {
+    "time": 500,
+    "Bunnies": 1316,
+    "Foxes": 1381,
+    "grass": 9285
+  },
+  {
+    "time": 501,
+    "Bunnies": 1290,
+    "Foxes": 1353,
+    "grass": 9297
+  },
+  {
+    "time": 502,
+    "Bunnies": 1260,
+    "Foxes": 1317,
+    "grass": 9333
+  },
+  {
+    "time": 503,
+    "Bunnies": 1234,
+    "Foxes": 1299,
+    "grass": 9339
+  },
+  {
+    "time": 504,
+    "Bunnies": 1186,
+    "Foxes": 1283,
+    "grass": 9381
+  },
+  {
+    "time": 505,
+    "Bunnies": 1169,
+    "Foxes": 1256,
+    "grass": 9385
+  },
+  {
+    "time": 506,
+    "Bunnies": 1151,
+    "Foxes": 1225,
+    "grass": 9387
+  },
+  {
+    "time": 507,
+    "Bunnies": 1138,
+    "Foxes": 1189,
+    "grass": 9438
+  },
+  {
+    "time": 508,
+    "Bunnies": 1130,
+    "Foxes": 1165,
+    "grass": 9442
+  },
+  {
+    "time": 509,
+    "Bunnies": 1111,
+    "Foxes": 1134,
+    "grass": 9445
+  },
+  {
+    "time": 510,
+    "Bunnies": 1086,
+    "Foxes": 1108,
+    "grass": 9445
+  },
+  {
+    "time": 511,
+    "Bunnies": 1068,
+    "Foxes": 1086,
+    "grass": 9480
+  },
+  {
+    "time": 512,
+    "Bunnies": 1063,
+    "Foxes": 1059,
+    "grass": 9500
+  },
+  {
+    "time": 513,
+    "Bunnies": 1044,
+    "Foxes": 1031,
+    "grass": 9491
+  },
+  {
+    "time": 514,
+    "Bunnies": 1010,
+    "Foxes": 1026,
+    "grass": 9546
+  },
+  {
+    "time": 515,
+    "Bunnies": 982,
+    "Foxes": 1013,
+    "grass": 9534
+  },
+  {
+    "time": 516,
+    "Bunnies": 960,
+    "Foxes": 1004,
+    "grass": 9534
+  },
+  {
+    "time": 517,
+    "Bunnies": 928,
+    "Foxes": 993,
+    "grass": 9587
+  },
+  {
+    "time": 518,
+    "Bunnies": 906,
+    "Foxes": 972,
+    "grass": 9572
+  },
+  {
+    "time": 519,
+    "Bunnies": 896,
+    "Foxes": 954,
+    "grass": 9567
+  },
+  {
+    "time": 520,
+    "Bunnies": 870,
+    "Foxes": 941,
+    "grass": 9593
+  },
+  {
+    "time": 521,
+    "Bunnies": 854,
+    "Foxes": 925,
+    "grass": 9589
+  },
+  {
+    "time": 522,
+    "Bunnies": 823,
+    "Foxes": 912,
+    "grass": 9614
+  },
+  {
+    "time": 523,
+    "Bunnies": 790,
+    "Foxes": 908,
+    "grass": 9649
+  },
+  {
+    "time": 524,
+    "Bunnies": 766,
+    "Foxes": 895,
+    "grass": 9651
+  },
+  {
+    "time": 525,
+    "Bunnies": 757,
+    "Foxes": 879,
+    "grass": 9681
+  },
+  {
+    "time": 526,
+    "Bunnies": 747,
+    "Foxes": 866,
+    "grass": 9693
+  },
+  {
+    "time": 527,
+    "Bunnies": 712,
+    "Foxes": 853,
+    "grass": 9691
+  },
+  {
+    "time": 528,
+    "Bunnies": 699,
+    "Foxes": 826,
+    "grass": 9662
+  },
+  {
+    "time": 529,
+    "Bunnies": 667,
+    "Foxes": 821,
+    "grass": 9681
+  },
+  {
+    "time": 530,
+    "Bunnies": 646,
+    "Foxes": 806,
+    "grass": 9649
+  },
+  {
+    "time": 531,
+    "Bunnies": 623,
+    "Foxes": 796,
+    "grass": 9671
+  },
+  {
+    "time": 532,
+    "Bunnies": 623,
+    "Foxes": 771,
+    "grass": 9677
+  },
+  {
+    "time": 533,
+    "Bunnies": 636,
+    "Foxes": 742,
+    "grass": 9657
+  },
+  {
+    "time": 534,
+    "Bunnies": 626,
+    "Foxes": 722,
+    "grass": 9650
+  },
+  {
+    "time": 535,
+    "Bunnies": 638,
+    "Foxes": 698,
+    "grass": 9614
+  },
+  {
+    "time": 536,
+    "Bunnies": 657,
+    "Foxes": 661,
+    "grass": 9595
+  },
+  {
+    "time": 537,
+    "Bunnies": 680,
+    "Foxes": 627,
+    "grass": 9617
+  },
+  {
+    "time": 538,
+    "Bunnies": 714,
+    "Foxes": 591,
+    "grass": 9603
+  },
+  {
+    "time": 539,
+    "Bunnies": 746,
+    "Foxes": 561,
+    "grass": 9578
+  },
+  {
+    "time": 540,
+    "Bunnies": 770,
+    "Foxes": 542,
+    "grass": 9555
+  },
+  {
+    "time": 541,
+    "Bunnies": 793,
+    "Foxes": 522,
+    "grass": 9527
+  },
+  {
+    "time": 542,
+    "Bunnies": 819,
+    "Foxes": 510,
+    "grass": 9508
+  },
+  {
+    "time": 543,
+    "Bunnies": 864,
+    "Foxes": 493,
+    "grass": 9464
+  },
+  {
+    "time": 544,
+    "Bunnies": 893,
+    "Foxes": 487,
+    "grass": 9479
+  },
+  {
+    "time": 545,
+    "Bunnies": 933,
+    "Foxes": 476,
+    "grass": 9438
+  },
+  {
+    "time": 546,
+    "Bunnies": 975,
+    "Foxes": 464,
+    "grass": 9414
+  },
+  {
+    "time": 547,
+    "Bunnies": 1031,
+    "Foxes": 451,
+    "grass": 9393
+  },
+  {
+    "time": 548,
+    "Bunnies": 1063,
+    "Foxes": 456,
+    "grass": 9383
+  },
+  {
+    "time": 549,
+    "Bunnies": 1106,
+    "Foxes": 452,
+    "grass": 9310
+  },
+  {
+    "time": 550,
+    "Bunnies": 1159,
+    "Foxes": 454,
+    "grass": 9290
+  },
+  {
+    "time": 551,
+    "Bunnies": 1179,
+    "Foxes": 458,
+    "grass": 9321
+  },
+  {
+    "time": 552,
+    "Bunnies": 1234,
+    "Foxes": 463,
+    "grass": 9287
+  },
+  {
+    "time": 553,
+    "Bunnies": 1286,
+    "Foxes": 468,
+    "grass": 9203
+  },
+  {
+    "time": 554,
+    "Bunnies": 1325,
+    "Foxes": 477,
+    "grass": 9206
+  },
+  {
+    "time": 555,
+    "Bunnies": 1369,
+    "Foxes": 494,
+    "grass": 9122
+  },
+  {
+    "time": 556,
+    "Bunnies": 1411,
+    "Foxes": 510,
+    "grass": 9107
+  },
+  {
+    "time": 557,
+    "Bunnies": 1448,
+    "Foxes": 519,
+    "grass": 9063
+  },
+  {
+    "time": 558,
+    "Bunnies": 1486,
+    "Foxes": 523,
+    "grass": 9071
+  },
+  {
+    "time": 559,
+    "Bunnies": 1518,
+    "Foxes": 550,
+    "grass": 9053
+  },
+  {
+    "time": 560,
+    "Bunnies": 1595,
+    "Foxes": 557,
+    "grass": 9023
+  },
+  {
+    "time": 561,
+    "Bunnies": 1646,
+    "Foxes": 577,
+    "grass": 9044
+  },
+  {
+    "time": 562,
+    "Bunnies": 1697,
+    "Foxes": 602,
+    "grass": 9035
+  },
+  {
+    "time": 563,
+    "Bunnies": 1728,
+    "Foxes": 633,
+    "grass": 8970
+  },
+  {
+    "time": 564,
+    "Bunnies": 1754,
+    "Foxes": 675,
+    "grass": 8986
+  },
+  {
+    "time": 565,
+    "Bunnies": 1767,
+    "Foxes": 720,
+    "grass": 9009
+  },
+  {
+    "time": 566,
+    "Bunnies": 1766,
+    "Foxes": 760,
+    "grass": 8937
+  },
+  {
+    "time": 567,
+    "Bunnies": 1776,
+    "Foxes": 800,
+    "grass": 8967
+  },
+  {
+    "time": 568,
+    "Bunnies": 1771,
+    "Foxes": 840,
+    "grass": 8981
+  },
+  {
+    "time": 569,
+    "Bunnies": 1771,
+    "Foxes": 872,
+    "grass": 8937
+  },
+  {
+    "time": 570,
+    "Bunnies": 1778,
+    "Foxes": 908,
+    "grass": 8993
+  },
+  {
+    "time": 571,
+    "Bunnies": 1782,
+    "Foxes": 941,
+    "grass": 9015
+  },
+  {
+    "time": 572,
+    "Bunnies": 1776,
+    "Foxes": 975,
+    "grass": 8986
+  },
+  {
+    "time": 573,
+    "Bunnies": 1774,
+    "Foxes": 1005,
+    "grass": 8973
+  },
+  {
+    "time": 574,
+    "Bunnies": 1765,
+    "Foxes": 1037,
+    "grass": 9047
+  },
+  {
+    "time": 575,
+    "Bunnies": 1742,
+    "Foxes": 1065,
+    "grass": 9040
+  },
+  {
+    "time": 576,
+    "Bunnies": 1727,
+    "Foxes": 1080,
+    "grass": 9068
+  },
+  {
+    "time": 577,
+    "Bunnies": 1738,
+    "Foxes": 1099,
+    "grass": 9037
+  },
+  {
+    "time": 578,
+    "Bunnies": 1752,
+    "Foxes": 1116,
+    "grass": 8991
+  },
+  {
+    "time": 579,
+    "Bunnies": 1733,
+    "Foxes": 1133,
+    "grass": 9073
+  },
+  {
+    "time": 580,
+    "Bunnies": 1718,
+    "Foxes": 1145,
+    "grass": 9078
+  },
+  {
+    "time": 581,
+    "Bunnies": 1700,
+    "Foxes": 1157,
+    "grass": 9032
+  },
+  {
+    "time": 582,
+    "Bunnies": 1710,
+    "Foxes": 1157,
+    "grass": 9036
+  },
+  {
+    "time": 583,
+    "Bunnies": 1715,
+    "Foxes": 1156,
+    "grass": 9057
+  },
+  {
+    "time": 584,
+    "Bunnies": 1722,
+    "Foxes": 1146,
+    "grass": 9044
+  },
+  {
+    "time": 585,
+    "Bunnies": 1732,
+    "Foxes": 1149,
+    "grass": 9022
+  },
+  {
+    "time": 586,
+    "Bunnies": 1747,
+    "Foxes": 1142,
+    "grass": 9034
+  },
+  {
+    "time": 587,
+    "Bunnies": 1765,
+    "Foxes": 1129,
+    "grass": 9074
+  },
+  {
+    "time": 588,
+    "Bunnies": 1777,
+    "Foxes": 1118,
+    "grass": 9028
+  },
+  {
+    "time": 589,
+    "Bunnies": 1788,
+    "Foxes": 1110,
+    "grass": 9049
+  },
+  {
+    "time": 590,
+    "Bunnies": 1802,
+    "Foxes": 1107,
+    "grass": 8979
+  },
+  {
+    "time": 591,
+    "Bunnies": 1835,
+    "Foxes": 1094,
+    "grass": 8958
+  },
+  {
+    "time": 592,
+    "Bunnies": 1833,
+    "Foxes": 1097,
+    "grass": 8953
+  },
+  {
+    "time": 593,
+    "Bunnies": 1837,
+    "Foxes": 1087,
+    "grass": 8970
+  },
+  {
+    "time": 594,
+    "Bunnies": 1841,
+    "Foxes": 1093,
+    "grass": 8993
+  },
+  {
+    "time": 595,
+    "Bunnies": 1860,
+    "Foxes": 1095,
+    "grass": 8944
+  },
+  {
+    "time": 596,
+    "Bunnies": 1844,
+    "Foxes": 1114,
+    "grass": 8927
+  },
+  {
+    "time": 597,
+    "Bunnies": 1854,
+    "Foxes": 1122,
+    "grass": 8986
+  },
+  {
+    "time": 598,
+    "Bunnies": 1868,
+    "Foxes": 1134,
+    "grass": 8987
+  },
+  {
+    "time": 599,
+    "Bunnies": 1840,
+    "Foxes": 1159,
+    "grass": 9038
+  },
+  {
+    "time": 600,
+    "Bunnies": 1812,
+    "Foxes": 1175,
+    "grass": 9038
+  },
+  {
+    "time": 601,
+    "Bunnies": 1792,
+    "Foxes": 1178,
+    "grass": 9099
+  },
+  {
+    "time": 602,
+    "Bunnies": 1781,
+    "Foxes": 1172,
+    "grass": 9141
+  },
+  {
+    "time": 603,
+    "Bunnies": 1769,
+    "Foxes": 1176,
+    "grass": 9131
+  },
+  {
+    "time": 604,
+    "Bunnies": 1727,
+    "Foxes": 1193,
+    "grass": 9169
+  },
+  {
+    "time": 605,
+    "Bunnies": 1695,
+    "Foxes": 1205,
+    "grass": 9153
+  },
+  {
+    "time": 606,
+    "Bunnies": 1695,
+    "Foxes": 1206,
+    "grass": 9148
+  },
+  {
+    "time": 607,
+    "Bunnies": 1651,
+    "Foxes": 1218,
+    "grass": 9180
+  },
+  {
+    "time": 608,
+    "Bunnies": 1602,
+    "Foxes": 1240,
+    "grass": 9207
+  },
+  {
+    "time": 609,
+    "Bunnies": 1580,
+    "Foxes": 1242,
+    "grass": 9231
+  },
+  {
+    "time": 610,
+    "Bunnies": 1541,
+    "Foxes": 1259,
+    "grass": 9220
+  },
+  {
+    "time": 611,
+    "Bunnies": 1496,
+    "Foxes": 1263,
+    "grass": 9273
+  },
+  {
+    "time": 612,
+    "Bunnies": 1448,
+    "Foxes": 1263,
+    "grass": 9282
+  },
+  {
+    "time": 613,
+    "Bunnies": 1418,
+    "Foxes": 1261,
+    "grass": 9305
+  },
+  {
+    "time": 614,
+    "Bunnies": 1370,
+    "Foxes": 1272,
+    "grass": 9284
+  },
+  {
+    "time": 615,
+    "Bunnies": 1313,
+    "Foxes": 1281,
+    "grass": 9314
+  },
+  {
+    "time": 616,
+    "Bunnies": 1264,
+    "Foxes": 1292,
+    "grass": 9335
+  },
+  {
+    "time": 617,
+    "Bunnies": 1217,
+    "Foxes": 1294,
+    "grass": 9360
+  },
+  {
+    "time": 618,
+    "Bunnies": 1170,
+    "Foxes": 1276,
+    "grass": 9398
+  },
+  {
+    "time": 619,
+    "Bunnies": 1121,
+    "Foxes": 1265,
+    "grass": 9467
+  },
+  {
+    "time": 620,
+    "Bunnies": 1095,
+    "Foxes": 1246,
+    "grass": 9521
+  },
+  {
+    "time": 621,
+    "Bunnies": 1055,
+    "Foxes": 1221,
+    "grass": 9507
+  },
+  {
+    "time": 622,
+    "Bunnies": 1015,
+    "Foxes": 1205,
+    "grass": 9488
+  },
+  {
+    "time": 623,
+    "Bunnies": 969,
+    "Foxes": 1193,
+    "grass": 9562
+  },
+  {
+    "time": 624,
+    "Bunnies": 948,
+    "Foxes": 1170,
+    "grass": 9598
+  },
+  {
+    "time": 625,
+    "Bunnies": 920,
+    "Foxes": 1145,
+    "grass": 9566
+  },
+  {
+    "time": 626,
+    "Bunnies": 863,
+    "Foxes": 1140,
+    "grass": 9581
+  },
+  {
+    "time": 627,
+    "Bunnies": 819,
+    "Foxes": 1124,
+    "grass": 9635
+  },
+  {
+    "time": 628,
+    "Bunnies": 776,
+    "Foxes": 1110,
+    "grass": 9646
+  },
+  {
+    "time": 629,
+    "Bunnies": 741,
+    "Foxes": 1084,
+    "grass": 9671
+  },
+  {
+    "time": 630,
+    "Bunnies": 711,
+    "Foxes": 1054,
+    "grass": 9692
+  },
+  {
+    "time": 631,
+    "Bunnies": 681,
+    "Foxes": 1026,
+    "grass": 9700
+  },
+  {
+    "time": 632,
+    "Bunnies": 653,
+    "Foxes": 1003,
+    "grass": 9731
+  },
+  {
+    "time": 633,
+    "Bunnies": 630,
+    "Foxes": 975,
+    "grass": 9776
+  },
+  {
+    "time": 634,
+    "Bunnies": 627,
+    "Foxes": 939,
+    "grass": 9755
+  },
+  {
+    "time": 635,
+    "Bunnies": 616,
+    "Foxes": 908,
+    "grass": 9761
+  },
+  {
+    "time": 636,
+    "Bunnies": 594,
+    "Foxes": 887,
+    "grass": 9721
+  },
+  {
+    "time": 637,
+    "Bunnies": 604,
+    "Foxes": 843,
+    "grass": 9687
+  },
+  {
+    "time": 638,
+    "Bunnies": 609,
+    "Foxes": 803,
+    "grass": 9713
+  },
+  {
+    "time": 639,
+    "Bunnies": 630,
+    "Foxes": 756,
+    "grass": 9706
+  },
+  {
+    "time": 640,
+    "Bunnies": 644,
+    "Foxes": 720,
+    "grass": 9702
+  },
+  {
+    "time": 641,
+    "Bunnies": 656,
+    "Foxes": 685,
+    "grass": 9687
+  },
+  {
+    "time": 642,
+    "Bunnies": 694,
+    "Foxes": 646,
+    "grass": 9668
+  },
+  {
+    "time": 643,
+    "Bunnies": 729,
+    "Foxes": 614,
+    "grass": 9623
+  },
+  {
+    "time": 644,
+    "Bunnies": 764,
+    "Foxes": 587,
+    "grass": 9617
+  },
+  {
+    "time": 645,
+    "Bunnies": 795,
+    "Foxes": 561,
+    "grass": 9564
+  },
+  {
+    "time": 646,
+    "Bunnies": 843,
+    "Foxes": 529,
+    "grass": 9523
+  },
+  {
+    "time": 647,
+    "Bunnies": 879,
+    "Foxes": 518,
+    "grass": 9506
+  },
+  {
+    "time": 648,
+    "Bunnies": 916,
+    "Foxes": 491,
+    "grass": 9454
+  },
+  {
+    "time": 649,
+    "Bunnies": 957,
+    "Foxes": 466,
+    "grass": 9482
+  },
+  {
+    "time": 650,
+    "Bunnies": 1008,
+    "Foxes": 455,
+    "grass": 9473
+  },
+  {
+    "time": 651,
+    "Bunnies": 1049,
+    "Foxes": 448,
+    "grass": 9410
+  },
+  {
+    "time": 652,
+    "Bunnies": 1080,
+    "Foxes": 441,
+    "grass": 9314
+  },
+  {
+    "time": 653,
+    "Bunnies": 1162,
+    "Foxes": 429,
+    "grass": 9314
+  },
+  {
+    "time": 654,
+    "Bunnies": 1212,
+    "Foxes": 428,
+    "grass": 9305
+  },
+  {
+    "time": 655,
+    "Bunnies": 1253,
+    "Foxes": 435,
+    "grass": 9270
+  },
+  {
+    "time": 656,
+    "Bunnies": 1290,
+    "Foxes": 438,
+    "grass": 9230
+  },
+  {
+    "time": 657,
+    "Bunnies": 1329,
+    "Foxes": 442,
+    "grass": 9172
+  },
+  {
+    "time": 658,
+    "Bunnies": 1391,
+    "Foxes": 438,
+    "grass": 9183
+  },
+  {
+    "time": 659,
+    "Bunnies": 1447,
+    "Foxes": 439,
+    "grass": 9154
+  },
+  {
+    "time": 660,
+    "Bunnies": 1507,
+    "Foxes": 447,
+    "grass": 9144
+  },
+  {
+    "time": 661,
+    "Bunnies": 1552,
+    "Foxes": 467,
+    "grass": 9146
+  },
+  {
+    "time": 662,
+    "Bunnies": 1609,
+    "Foxes": 479,
+    "grass": 9083
+  },
+  {
+    "time": 663,
+    "Bunnies": 1664,
+    "Foxes": 496,
+    "grass": 9096
+  },
+  {
+    "time": 664,
+    "Bunnies": 1698,
+    "Foxes": 522,
+    "grass": 9066
+  },
+  {
+    "time": 665,
+    "Bunnies": 1732,
+    "Foxes": 541,
+    "grass": 9111
+  },
+  {
+    "time": 666,
+    "Bunnies": 1761,
+    "Foxes": 575,
+    "grass": 9027
+  },
+  {
+    "time": 667,
+    "Bunnies": 1794,
+    "Foxes": 599,
+    "grass": 9016
+  },
+  {
+    "time": 668,
+    "Bunnies": 1826,
+    "Foxes": 622,
+    "grass": 9030
+  },
+  {
+    "time": 669,
+    "Bunnies": 1862,
+    "Foxes": 648,
+    "grass": 9035
+  },
+  {
+    "time": 670,
+    "Bunnies": 1891,
+    "Foxes": 675,
+    "grass": 9021
+  },
+  {
+    "time": 671,
+    "Bunnies": 1902,
+    "Foxes": 712,
+    "grass": 9001
+  },
+  {
+    "time": 672,
+    "Bunnies": 1917,
+    "Foxes": 742,
+    "grass": 8969
+  },
+  {
+    "time": 673,
+    "Bunnies": 1929,
+    "Foxes": 775,
+    "grass": 8959
+  },
+  {
+    "time": 674,
+    "Bunnies": 1933,
+    "Foxes": 808,
+    "grass": 8970
+  },
+  {
+    "time": 675,
+    "Bunnies": 1950,
+    "Foxes": 836,
+    "grass": 8978
+  },
+  {
+    "time": 676,
+    "Bunnies": 1954,
+    "Foxes": 869,
+    "grass": 8999
+  },
+  {
+    "time": 677,
+    "Bunnies": 1948,
+    "Foxes": 904,
+    "grass": 9028
+  },
+  {
+    "time": 678,
+    "Bunnies": 1944,
+    "Foxes": 948,
+    "grass": 8981
+  },
+  {
+    "time": 679,
+    "Bunnies": 1960,
+    "Foxes": 977,
+    "grass": 8980
+  },
+  {
+    "time": 680,
+    "Bunnies": 1941,
+    "Foxes": 1011,
+    "grass": 8953
+  },
+  {
+    "time": 681,
+    "Bunnies": 1939,
+    "Foxes": 1034,
+    "grass": 9000
+  },
+  {
+    "time": 682,
+    "Bunnies": 1930,
+    "Foxes": 1053,
+    "grass": 8983
+  },
+  {
+    "time": 683,
+    "Bunnies": 1928,
+    "Foxes": 1059,
+    "grass": 9016
+  },
+  {
+    "time": 684,
+    "Bunnies": 1902,
+    "Foxes": 1101,
+    "grass": 9021
+  },
+  {
+    "time": 685,
+    "Bunnies": 1866,
+    "Foxes": 1139,
+    "grass": 9044
+  },
+  {
+    "time": 686,
+    "Bunnies": 1868,
+    "Foxes": 1156,
+    "grass": 9076
+  },
+  {
+    "time": 687,
+    "Bunnies": 1848,
+    "Foxes": 1174,
+    "grass": 9026
+  },
+  {
+    "time": 688,
+    "Bunnies": 1822,
+    "Foxes": 1194,
+    "grass": 8980
+  },
+  {
+    "time": 689,
+    "Bunnies": 1776,
+    "Foxes": 1227,
+    "grass": 9020
+  },
+  {
+    "time": 690,
+    "Bunnies": 1756,
+    "Foxes": 1255,
+    "grass": 9092
+  },
+  {
+    "time": 691,
+    "Bunnies": 1746,
+    "Foxes": 1265,
+    "grass": 9113
+  },
+  {
+    "time": 692,
+    "Bunnies": 1710,
+    "Foxes": 1285,
+    "grass": 9079
+  },
+  {
+    "time": 693,
+    "Bunnies": 1671,
+    "Foxes": 1287,
+    "grass": 9129
+  },
+  {
+    "time": 694,
+    "Bunnies": 1654,
+    "Foxes": 1267,
+    "grass": 9074
+  },
+  {
+    "time": 695,
+    "Bunnies": 1637,
+    "Foxes": 1274,
+    "grass": 9102
+  },
+  {
+    "time": 696,
+    "Bunnies": 1626,
+    "Foxes": 1273,
+    "grass": 9123
+  },
+  {
+    "time": 697,
+    "Bunnies": 1583,
+    "Foxes": 1273,
+    "grass": 9112
+  },
+  {
+    "time": 698,
+    "Bunnies": 1584,
+    "Foxes": 1246,
+    "grass": 9143
+  },
+  {
+    "time": 699,
+    "Bunnies": 1594,
+    "Foxes": 1226,
+    "grass": 9167
+  },
+  {
+    "time": 700,
+    "Bunnies": 1600,
+    "Foxes": 1197,
+    "grass": 9110
+  },
+  {
+    "time": 701,
+    "Bunnies": 1598,
+    "Foxes": 1194,
+    "grass": 9088
+  },
+  {
+    "time": 702,
+    "Bunnies": 1597,
+    "Foxes": 1182,
+    "grass": 9113
+  },
+  {
+    "time": 703,
+    "Bunnies": 1580,
+    "Foxes": 1170,
+    "grass": 9099
+  },
+  {
+    "time": 704,
+    "Bunnies": 1599,
+    "Foxes": 1152,
+    "grass": 9078
+  },
+  {
+    "time": 705,
+    "Bunnies": 1600,
+    "Foxes": 1151,
+    "grass": 9054
+  },
+  {
+    "time": 706,
+    "Bunnies": 1619,
+    "Foxes": 1133,
+    "grass": 9069
+  },
+  {
+    "time": 707,
+    "Bunnies": 1636,
+    "Foxes": 1116,
+    "grass": 9103
+  },
+  {
+    "time": 708,
+    "Bunnies": 1636,
+    "Foxes": 1104,
+    "grass": 9097
+  },
+  {
+    "time": 709,
+    "Bunnies": 1647,
+    "Foxes": 1083,
+    "grass": 9045
+  },
+  {
+    "time": 710,
+    "Bunnies": 1662,
+    "Foxes": 1070,
+    "grass": 9076
+  },
+  {
+    "time": 711,
+    "Bunnies": 1656,
+    "Foxes": 1072,
+    "grass": 9069
+  },
+  {
+    "time": 712,
+    "Bunnies": 1677,
+    "Foxes": 1063,
+    "grass": 9087
+  },
+  {
+    "time": 713,
+    "Bunnies": 1676,
+    "Foxes": 1073,
+    "grass": 9095
+  },
+  {
+    "time": 714,
+    "Bunnies": 1669,
+    "Foxes": 1086,
+    "grass": 9101
+  },
+  {
+    "time": 715,
+    "Bunnies": 1664,
+    "Foxes": 1083,
+    "grass": 9162
+  },
+  {
+    "time": 716,
+    "Bunnies": 1680,
+    "Foxes": 1089,
+    "grass": 9131
+  },
+  {
+    "time": 717,
+    "Bunnies": 1664,
+    "Foxes": 1087,
+    "grass": 9109
+  },
+  {
+    "time": 718,
+    "Bunnies": 1663,
+    "Foxes": 1113,
+    "grass": 9136
+  },
+  {
+    "time": 719,
+    "Bunnies": 1641,
+    "Foxes": 1130,
+    "grass": 9150
+  },
+  {
+    "time": 720,
+    "Bunnies": 1580,
+    "Foxes": 1167,
+    "grass": 9193
+  },
+  {
+    "time": 721,
+    "Bunnies": 1551,
+    "Foxes": 1188,
+    "grass": 9171
+  },
+  {
+    "time": 722,
+    "Bunnies": 1489,
+    "Foxes": 1217,
+    "grass": 9195
+  },
+  {
+    "time": 723,
+    "Bunnies": 1441,
+    "Foxes": 1242,
+    "grass": 9201
+  },
+  {
+    "time": 724,
+    "Bunnies": 1369,
+    "Foxes": 1271,
+    "grass": 9260
+  },
+  {
+    "time": 725,
+    "Bunnies": 1325,
+    "Foxes": 1282,
+    "grass": 9226
+  },
+  {
+    "time": 726,
+    "Bunnies": 1290,
+    "Foxes": 1281,
+    "grass": 9267
+  },
+  {
+    "time": 727,
+    "Bunnies": 1225,
+    "Foxes": 1300,
+    "grass": 9324
+  },
+  {
+    "time": 728,
+    "Bunnies": 1185,
+    "Foxes": 1286,
+    "grass": 9348
+  },
+  {
+    "time": 729,
+    "Bunnies": 1135,
+    "Foxes": 1279,
+    "grass": 9413
+  },
+  {
+    "time": 730,
+    "Bunnies": 1078,
+    "Foxes": 1281,
+    "grass": 9426
+  },
+  {
+    "time": 731,
+    "Bunnies": 1043,
+    "Foxes": 1260,
+    "grass": 9438
+  },
+  {
+    "time": 732,
+    "Bunnies": 1001,
+    "Foxes": 1257,
+    "grass": 9444
+  },
+  {
+    "time": 733,
+    "Bunnies": 968,
+    "Foxes": 1238,
+    "grass": 9491
+  },
+  {
+    "time": 734,
+    "Bunnies": 920,
+    "Foxes": 1222,
+    "grass": 9508
+  },
+  {
+    "time": 735,
+    "Bunnies": 864,
+    "Foxes": 1210,
+    "grass": 9545
+  },
+  {
+    "time": 736,
+    "Bunnies": 823,
+    "Foxes": 1186,
+    "grass": 9515
+  },
+  {
+    "time": 737,
+    "Bunnies": 791,
+    "Foxes": 1162,
+    "grass": 9571
+  },
+  {
+    "time": 738,
+    "Bunnies": 745,
+    "Foxes": 1144,
+    "grass": 9599
+  },
+  {
+    "time": 739,
+    "Bunnies": 737,
+    "Foxes": 1105,
+    "grass": 9611
+  },
+  {
+    "time": 740,
+    "Bunnies": 712,
+    "Foxes": 1068,
+    "grass": 9612
+  },
+  {
+    "time": 741,
+    "Bunnies": 707,
+    "Foxes": 1029,
+    "grass": 9642
+  },
+  {
+    "time": 742,
+    "Bunnies": 703,
+    "Foxes": 986,
+    "grass": 9608
+  },
+  {
+    "time": 743,
+    "Bunnies": 714,
+    "Foxes": 941,
+    "grass": 9646
+  },
+  {
+    "time": 744,
+    "Bunnies": 732,
+    "Foxes": 899,
+    "grass": 9628
+  },
+  {
+    "time": 745,
+    "Bunnies": 743,
+    "Foxes": 866,
+    "grass": 9618
+  },
+  {
+    "time": 746,
+    "Bunnies": 761,
+    "Foxes": 834,
+    "grass": 9608
+  },
+  {
+    "time": 747,
+    "Bunnies": 765,
+    "Foxes": 802,
+    "grass": 9588
+  },
+  {
+    "time": 748,
+    "Bunnies": 808,
+    "Foxes": 759,
+    "grass": 9549
+  },
+  {
+    "time": 749,
+    "Bunnies": 821,
+    "Foxes": 736,
+    "grass": 9519
+  },
+  {
+    "time": 750,
+    "Bunnies": 851,
+    "Foxes": 713,
+    "grass": 9509
+  },
+  {
+    "time": 751,
+    "Bunnies": 879,
+    "Foxes": 691,
+    "grass": 9507
+  },
+  {
+    "time": 752,
+    "Bunnies": 906,
+    "Foxes": 679,
+    "grass": 9505
+  },
+  {
+    "time": 753,
+    "Bunnies": 927,
+    "Foxes": 667,
+    "grass": 9479
+  },
+  {
+    "time": 754,
+    "Bunnies": 948,
+    "Foxes": 660,
+    "grass": 9460
+  },
+  {
+    "time": 755,
+    "Bunnies": 952,
+    "Foxes": 653,
+    "grass": 9459
+  },
+  {
+    "time": 756,
+    "Bunnies": 973,
+    "Foxes": 632,
+    "grass": 9424
+  },
+  {
+    "time": 757,
+    "Bunnies": 1005,
+    "Foxes": 626,
+    "grass": 9401
+  },
+  {
+    "time": 758,
+    "Bunnies": 1034,
+    "Foxes": 620,
+    "grass": 9368
+  },
+  {
+    "time": 759,
+    "Bunnies": 1083,
+    "Foxes": 609,
+    "grass": 9368
+  },
+  {
+    "time": 760,
+    "Bunnies": 1133,
+    "Foxes": 600,
+    "grass": 9347
+  },
+  {
+    "time": 761,
+    "Bunnies": 1170,
+    "Foxes": 597,
+    "grass": 9314
+  },
+  {
+    "time": 762,
+    "Bunnies": 1219,
+    "Foxes": 596,
+    "grass": 9277
+  },
+  {
+    "time": 763,
+    "Bunnies": 1260,
+    "Foxes": 598,
+    "grass": 9275
+  },
+  {
+    "time": 764,
+    "Bunnies": 1305,
+    "Foxes": 597,
+    "grass": 9274
+  },
+  {
+    "time": 765,
+    "Bunnies": 1327,
+    "Foxes": 614,
+    "grass": 9236
+  },
+  {
+    "time": 766,
+    "Bunnies": 1356,
+    "Foxes": 631,
+    "grass": 9178
+  },
+  {
+    "time": 767,
+    "Bunnies": 1391,
+    "Foxes": 639,
+    "grass": 9162
+  },
+  {
+    "time": 768,
+    "Bunnies": 1414,
+    "Foxes": 658,
+    "grass": 9127
+  },
+  {
+    "time": 769,
+    "Bunnies": 1443,
+    "Foxes": 670,
+    "grass": 9109
+  },
+  {
+    "time": 770,
+    "Bunnies": 1495,
+    "Foxes": 679,
+    "grass": 9111
+  },
+  {
+    "time": 771,
+    "Bunnies": 1534,
+    "Foxes": 694,
+    "grass": 9082
+  },
+  {
+    "time": 772,
+    "Bunnies": 1535,
+    "Foxes": 722,
+    "grass": 9100
+  },
+  {
+    "time": 773,
+    "Bunnies": 1566,
+    "Foxes": 740,
+    "grass": 9050
+  },
+  {
+    "time": 774,
+    "Bunnies": 1590,
+    "Foxes": 759,
+    "grass": 9022
+  },
+  {
+    "time": 775,
+    "Bunnies": 1615,
+    "Foxes": 771,
+    "grass": 9057
+  },
+  {
+    "time": 776,
+    "Bunnies": 1617,
+    "Foxes": 804,
+    "grass": 9055
+  },
+  {
+    "time": 777,
+    "Bunnies": 1657,
+    "Foxes": 819,
+    "grass": 9023
+  },
+  {
+    "time": 778,
+    "Bunnies": 1678,
+    "Foxes": 844,
+    "grass": 9060
+  },
+  {
+    "time": 779,
+    "Bunnies": 1706,
+    "Foxes": 872,
+    "grass": 9023
+  },
+  {
+    "time": 780,
+    "Bunnies": 1705,
+    "Foxes": 903,
+    "grass": 9033
+  },
+  {
+    "time": 781,
+    "Bunnies": 1708,
+    "Foxes": 938,
+    "grass": 9057
+  },
+  {
+    "time": 782,
+    "Bunnies": 1696,
+    "Foxes": 980,
+    "grass": 8998
+  },
+  {
+    "time": 783,
+    "Bunnies": 1705,
+    "Foxes": 1000,
+    "grass": 8950
+  },
+  {
+    "time": 784,
+    "Bunnies": 1678,
+    "Foxes": 1043,
+    "grass": 8994
+  },
+  {
+    "time": 785,
+    "Bunnies": 1692,
+    "Foxes": 1063,
+    "grass": 9024
+  },
+  {
+    "time": 786,
+    "Bunnies": 1694,
+    "Foxes": 1078,
+    "grass": 8982
+  },
+  {
+    "time": 787,
+    "Bunnies": 1681,
+    "Foxes": 1108,
+    "grass": 9004
+  },
+  {
+    "time": 788,
+    "Bunnies": 1657,
+    "Foxes": 1141,
+    "grass": 8996
+  },
+  {
+    "time": 789,
+    "Bunnies": 1654,
+    "Foxes": 1167,
+    "grass": 9027
+  },
+  {
+    "time": 790,
+    "Bunnies": 1619,
+    "Foxes": 1195,
+    "grass": 9031
+  },
+  {
+    "time": 791,
+    "Bunnies": 1617,
+    "Foxes": 1198,
+    "grass": 9000
+  },
+  {
+    "time": 792,
+    "Bunnies": 1633,
+    "Foxes": 1194,
+    "grass": 8999
+  },
+  {
+    "time": 793,
+    "Bunnies": 1637,
+    "Foxes": 1192,
+    "grass": 9028
+  },
+  {
+    "time": 794,
+    "Bunnies": 1621,
+    "Foxes": 1203,
+    "grass": 9028
+  },
+  {
+    "time": 795,
+    "Bunnies": 1607,
+    "Foxes": 1202,
+    "grass": 9023
+  },
+  {
+    "time": 796,
+    "Bunnies": 1623,
+    "Foxes": 1186,
+    "grass": 9027
+  },
+  {
+    "time": 797,
+    "Bunnies": 1650,
+    "Foxes": 1180,
+    "grass": 9025
+  },
+  {
+    "time": 798,
+    "Bunnies": 1676,
+    "Foxes": 1157,
+    "grass": 8984
+  },
+  {
+    "time": 799,
+    "Bunnies": 1699,
+    "Foxes": 1146,
+    "grass": 8919
+  },
+  {
+    "time": 800,
+    "Bunnies": 1722,
+    "Foxes": 1142,
+    "grass": 8873
+  },
+  {
+    "time": 801,
+    "Bunnies": 1742,
+    "Foxes": 1130,
+    "grass": 8930
+  },
+  {
+    "time": 802,
+    "Bunnies": 1740,
+    "Foxes": 1146,
+    "grass": 8863
+  },
+  {
+    "time": 803,
+    "Bunnies": 1773,
+    "Foxes": 1132,
+    "grass": 8891
+  },
+  {
+    "time": 804,
+    "Bunnies": 1764,
+    "Foxes": 1150,
+    "grass": 8965
+  },
+  {
+    "time": 805,
+    "Bunnies": 1748,
+    "Foxes": 1162,
+    "grass": 8976
+  },
+  {
+    "time": 806,
+    "Bunnies": 1737,
+    "Foxes": 1181,
+    "grass": 8910
+  },
+  {
+    "time": 807,
+    "Bunnies": 1726,
+    "Foxes": 1197,
+    "grass": 8950
+  },
+  {
+    "time": 808,
+    "Bunnies": 1721,
+    "Foxes": 1209,
+    "grass": 8990
+  },
+  {
+    "time": 809,
+    "Bunnies": 1687,
+    "Foxes": 1247,
+    "grass": 8958
+  },
+  {
+    "time": 810,
+    "Bunnies": 1646,
+    "Foxes": 1279,
+    "grass": 9011
+  },
+  {
+    "time": 811,
+    "Bunnies": 1623,
+    "Foxes": 1298,
+    "grass": 9095
+  },
+  {
+    "time": 812,
+    "Bunnies": 1563,
+    "Foxes": 1330,
+    "grass": 9105
+  },
+  {
+    "time": 813,
+    "Bunnies": 1521,
+    "Foxes": 1351,
+    "grass": 9140
+  },
+  {
+    "time": 814,
+    "Bunnies": 1481,
+    "Foxes": 1359,
+    "grass": 9183
+  },
+  {
+    "time": 815,
+    "Bunnies": 1427,
+    "Foxes": 1370,
+    "grass": 9162
+  },
+  {
+    "time": 816,
+    "Bunnies": 1361,
+    "Foxes": 1378,
+    "grass": 9186
+  },
+  {
+    "time": 817,
+    "Bunnies": 1295,
+    "Foxes": 1406,
+    "grass": 9277
+  },
+  {
+    "time": 818,
+    "Bunnies": 1236,
+    "Foxes": 1427,
+    "grass": 9263
+  },
+  {
+    "time": 819,
+    "Bunnies": 1152,
+    "Foxes": 1440,
+    "grass": 9329
+  },
+  {
+    "time": 820,
+    "Bunnies": 1055,
+    "Foxes": 1463,
+    "grass": 9382
+  },
+  {
+    "time": 821,
+    "Bunnies": 952,
+    "Foxes": 1482,
+    "grass": 9469
+  },
+  {
+    "time": 822,
+    "Bunnies": 875,
+    "Foxes": 1469,
+    "grass": 9483
+  },
+  {
+    "time": 823,
+    "Bunnies": 804,
+    "Foxes": 1453,
+    "grass": 9555
+  },
+  {
+    "time": 824,
+    "Bunnies": 743,
+    "Foxes": 1435,
+    "grass": 9604
+  },
+  {
+    "time": 825,
+    "Bunnies": 701,
+    "Foxes": 1382,
+    "grass": 9653
+  },
+  {
+    "time": 826,
+    "Bunnies": 664,
+    "Foxes": 1341,
+    "grass": 9653
+  },
+  {
+    "time": 827,
+    "Bunnies": 623,
+    "Foxes": 1295,
+    "grass": 9663
+  },
+  {
+    "time": 828,
+    "Bunnies": 580,
+    "Foxes": 1263,
+    "grass": 9709
+  },
+  {
+    "time": 829,
+    "Bunnies": 529,
+    "Foxes": 1229,
+    "grass": 9754
+  },
+  {
+    "time": 830,
+    "Bunnies": 506,
+    "Foxes": 1171,
+    "grass": 9776
+  },
+  {
+    "time": 831,
+    "Bunnies": 488,
+    "Foxes": 1118,
+    "grass": 9789
+  },
+  {
+    "time": 832,
+    "Bunnies": 465,
+    "Foxes": 1062,
+    "grass": 9785
+  },
+  {
+    "time": 833,
+    "Bunnies": 475,
+    "Foxes": 992,
+    "grass": 9812
+  },
+  {
+    "time": 834,
+    "Bunnies": 463,
+    "Foxes": 938,
+    "grass": 9774
+  },
+  {
+    "time": 835,
+    "Bunnies": 446,
+    "Foxes": 899,
+    "grass": 9796
+  },
+  {
+    "time": 836,
+    "Bunnies": 458,
+    "Foxes": 844,
+    "grass": 9813
+  },
+  {
+    "time": 837,
+    "Bunnies": 463,
+    "Foxes": 790,
+    "grass": 9796
+  },
+  {
+    "time": 838,
+    "Bunnies": 471,
+    "Foxes": 739,
+    "grass": 9791
+  },
+  {
+    "time": 839,
+    "Bunnies": 484,
+    "Foxes": 703,
+    "grass": 9783
+  },
+  {
+    "time": 840,
+    "Bunnies": 496,
+    "Foxes": 664,
+    "grass": 9768
+  },
+  {
+    "time": 841,
+    "Bunnies": 511,
+    "Foxes": 634,
+    "grass": 9761
+  },
+  {
+    "time": 842,
+    "Bunnies": 504,
+    "Foxes": 612,
+    "grass": 9744
+  },
+  {
+    "time": 843,
+    "Bunnies": 520,
+    "Foxes": 576,
+    "grass": 9737
+  },
+  {
+    "time": 844,
+    "Bunnies": 540,
+    "Foxes": 547,
+    "grass": 9721
+  },
+  {
+    "time": 845,
+    "Bunnies": 585,
+    "Foxes": 516,
+    "grass": 9737
+  },
+  {
+    "time": 846,
+    "Bunnies": 622,
+    "Foxes": 488,
+    "grass": 9687
+  },
+  {
+    "time": 847,
+    "Bunnies": 671,
+    "Foxes": 465,
+    "grass": 9668
+  },
+  {
+    "time": 848,
+    "Bunnies": 704,
+    "Foxes": 446,
+    "grass": 9622
+  },
+  {
+    "time": 849,
+    "Bunnies": 745,
+    "Foxes": 427,
+    "grass": 9594
+  },
+  {
+    "time": 850,
+    "Bunnies": 786,
+    "Foxes": 413,
+    "grass": 9520
+  },
+  {
+    "time": 851,
+    "Bunnies": 833,
+    "Foxes": 402,
+    "grass": 9515
+  },
+  {
+    "time": 852,
+    "Bunnies": 881,
+    "Foxes": 387,
+    "grass": 9478
+  },
+  {
+    "time": 853,
+    "Bunnies": 943,
+    "Foxes": 376,
+    "grass": 9431
+  },
+  {
+    "time": 854,
+    "Bunnies": 1002,
+    "Foxes": 373,
+    "grass": 9384
+  },
+  {
+    "time": 855,
+    "Bunnies": 1053,
+    "Foxes": 369,
+    "grass": 9341
+  },
+  {
+    "time": 856,
+    "Bunnies": 1113,
+    "Foxes": 364,
+    "grass": 9313
+  },
+  {
+    "time": 857,
+    "Bunnies": 1178,
+    "Foxes": 360,
+    "grass": 9268
+  },
+  {
+    "time": 858,
+    "Bunnies": 1244,
+    "Foxes": 362,
+    "grass": 9186
+  },
+  {
+    "time": 859,
+    "Bunnies": 1311,
+    "Foxes": 366,
+    "grass": 9158
+  },
+  {
+    "time": 860,
+    "Bunnies": 1376,
+    "Foxes": 376,
+    "grass": 9117
+  },
+  {
+    "time": 861,
+    "Bunnies": 1450,
+    "Foxes": 392,
+    "grass": 9117
+  },
+  {
+    "time": 862,
+    "Bunnies": 1526,
+    "Foxes": 403,
+    "grass": 9025
+  },
+  {
+    "time": 863,
+    "Bunnies": 1594,
+    "Foxes": 420,
+    "grass": 8962
+  },
+  {
+    "time": 864,
+    "Bunnies": 1666,
+    "Foxes": 446,
+    "grass": 8937
+  },
+  {
+    "time": 865,
+    "Bunnies": 1748,
+    "Foxes": 461,
+    "grass": 8872
+  },
+  {
+    "time": 866,
+    "Bunnies": 1819,
+    "Foxes": 481,
+    "grass": 8862
+  },
+  {
+    "time": 867,
+    "Bunnies": 1872,
+    "Foxes": 519,
+    "grass": 8901
+  },
+  {
+    "time": 868,
+    "Bunnies": 1901,
+    "Foxes": 572,
+    "grass": 8871
+  },
+  {
+    "time": 869,
+    "Bunnies": 1938,
+    "Foxes": 612,
+    "grass": 8793
+  },
+  {
+    "time": 870,
+    "Bunnies": 1956,
+    "Foxes": 650,
+    "grass": 8820
+  },
+  {
+    "time": 871,
+    "Bunnies": 2012,
+    "Foxes": 685,
+    "grass": 8833
+  },
+  {
+    "time": 872,
+    "Bunnies": 2041,
+    "Foxes": 716,
+    "grass": 8889
+  },
+  {
+    "time": 873,
+    "Bunnies": 2054,
+    "Foxes": 770,
+    "grass": 8838
+  },
+  {
+    "time": 874,
+    "Bunnies": 2085,
+    "Foxes": 821,
+    "grass": 8827
+  },
+  {
+    "time": 875,
+    "Bunnies": 2097,
+    "Foxes": 870,
+    "grass": 8830
+  },
+  {
+    "time": 876,
+    "Bunnies": 2117,
+    "Foxes": 917,
+    "grass": 8857
+  },
+  {
+    "time": 877,
+    "Bunnies": 2117,
+    "Foxes": 958,
+    "grass": 8839
+  },
+  {
+    "time": 878,
+    "Bunnies": 2129,
+    "Foxes": 1004,
+    "grass": 8858
+  },
+  {
+    "time": 879,
+    "Bunnies": 2096,
+    "Foxes": 1085,
+    "grass": 8829
+  },
+  {
+    "time": 880,
+    "Bunnies": 2057,
+    "Foxes": 1136,
+    "grass": 8801
+  },
+  {
+    "time": 881,
+    "Bunnies": 2013,
+    "Foxes": 1193,
+    "grass": 8863
+  },
+  {
+    "time": 882,
+    "Bunnies": 1974,
+    "Foxes": 1239,
+    "grass": 8888
+  },
+  {
+    "time": 883,
+    "Bunnies": 1953,
+    "Foxes": 1269,
+    "grass": 8892
+  },
+  {
+    "time": 884,
+    "Bunnies": 1918,
+    "Foxes": 1299,
+    "grass": 8938
+  },
+  {
+    "time": 885,
+    "Bunnies": 1907,
+    "Foxes": 1312,
+    "grass": 8892
+  },
+  {
+    "time": 886,
+    "Bunnies": 1868,
+    "Foxes": 1347,
+    "grass": 8949
+  },
+  {
+    "time": 887,
+    "Bunnies": 1852,
+    "Foxes": 1358,
+    "grass": 8970
+  },
+  {
+    "time": 888,
+    "Bunnies": 1804,
+    "Foxes": 1390,
+    "grass": 8963
+  },
+  {
+    "time": 889,
+    "Bunnies": 1761,
+    "Foxes": 1418,
+    "grass": 8960
+  },
+  {
+    "time": 890,
+    "Bunnies": 1728,
+    "Foxes": 1435,
+    "grass": 8992
+  },
+  {
+    "time": 891,
+    "Bunnies": 1689,
+    "Foxes": 1451,
+    "grass": 9001
+  },
+  {
+    "time": 892,
+    "Bunnies": 1656,
+    "Foxes": 1445,
+    "grass": 9028
+  },
+  {
+    "time": 893,
+    "Bunnies": 1610,
+    "Foxes": 1453,
+    "grass": 9061
+  },
+  {
+    "time": 894,
+    "Bunnies": 1566,
+    "Foxes": 1453,
+    "grass": 9124
+  },
+  {
+    "time": 895,
+    "Bunnies": 1549,
+    "Foxes": 1437,
+    "grass": 9141
+  },
+  {
+    "time": 896,
+    "Bunnies": 1513,
+    "Foxes": 1427,
+    "grass": 9099
+  },
+  {
+    "time": 897,
+    "Bunnies": 1469,
+    "Foxes": 1415,
+    "grass": 9115
+  },
+  {
+    "time": 898,
+    "Bunnies": 1447,
+    "Foxes": 1409,
+    "grass": 9130
+  },
+  {
+    "time": 899,
+    "Bunnies": 1422,
+    "Foxes": 1398,
+    "grass": 9192
+  },
+  {
+    "time": 900,
+    "Bunnies": 1414,
+    "Foxes": 1372,
+    "grass": 9148
+  },
+  {
+    "time": 901,
+    "Bunnies": 1393,
+    "Foxes": 1358,
+    "grass": 9138
+  },
+  {
+    "time": 902,
+    "Bunnies": 1395,
+    "Foxes": 1338,
+    "grass": 9159
+  },
+  {
+    "time": 903,
+    "Bunnies": 1359,
+    "Foxes": 1339,
+    "grass": 9203
+  },
+  {
+    "time": 904,
+    "Bunnies": 1341,
+    "Foxes": 1334,
+    "grass": 9240
+  },
+  {
+    "time": 905,
+    "Bunnies": 1298,
+    "Foxes": 1343,
+    "grass": 9270
+  },
+  {
+    "time": 906,
+    "Bunnies": 1258,
+    "Foxes": 1341,
+    "grass": 9251
+  },
+  {
+    "time": 907,
+    "Bunnies": 1210,
+    "Foxes": 1343,
+    "grass": 9300
+  },
+  {
+    "time": 908,
+    "Bunnies": 1163,
+    "Foxes": 1341,
+    "grass": 9314
+  },
+  {
+    "time": 909,
+    "Bunnies": 1107,
+    "Foxes": 1343,
+    "grass": 9302
+  },
+  {
+    "time": 910,
+    "Bunnies": 1068,
+    "Foxes": 1341,
+    "grass": 9356
+  },
+  {
+    "time": 911,
+    "Bunnies": 1022,
+    "Foxes": 1332,
+    "grass": 9389
+  },
+  {
+    "time": 912,
+    "Bunnies": 983,
+    "Foxes": 1314,
+    "grass": 9436
+  },
+  {
+    "time": 913,
+    "Bunnies": 948,
+    "Foxes": 1286,
+    "grass": 9497
+  },
+  {
+    "time": 914,
+    "Bunnies": 902,
+    "Foxes": 1256,
+    "grass": 9518
+  },
+  {
+    "time": 915,
+    "Bunnies": 879,
+    "Foxes": 1206,
+    "grass": 9523
+  },
+  {
+    "time": 916,
+    "Bunnies": 837,
+    "Foxes": 1180,
+    "grass": 9527
+  },
+  {
+    "time": 917,
+    "Bunnies": 816,
+    "Foxes": 1142,
+    "grass": 9612
+  },
+  {
+    "time": 918,
+    "Bunnies": 810,
+    "Foxes": 1095,
+    "grass": 9608
+  },
+  {
+    "time": 919,
+    "Bunnies": 799,
+    "Foxes": 1052,
+    "grass": 9640
+  },
+  {
+    "time": 920,
+    "Bunnies": 796,
+    "Foxes": 1012,
+    "grass": 9626
+  },
+  {
+    "time": 921,
+    "Bunnies": 798,
+    "Foxes": 973,
+    "grass": 9637
+  },
+  {
+    "time": 922,
+    "Bunnies": 781,
+    "Foxes": 956,
+    "grass": 9636
+  },
+  {
+    "time": 923,
+    "Bunnies": 758,
+    "Foxes": 934,
+    "grass": 9656
+  },
+  {
+    "time": 924,
+    "Bunnies": 736,
+    "Foxes": 910,
+    "grass": 9694
+  },
+  {
+    "time": 925,
+    "Bunnies": 730,
+    "Foxes": 890,
+    "grass": 9702
+  },
+  {
+    "time": 926,
+    "Bunnies": 698,
+    "Foxes": 886,
+    "grass": 9697
+  },
+  {
+    "time": 927,
+    "Bunnies": 676,
+    "Foxes": 878,
+    "grass": 9692
+  },
+  {
+    "time": 928,
+    "Bunnies": 650,
+    "Foxes": 861,
+    "grass": 9676
+  },
+  {
+    "time": 929,
+    "Bunnies": 656,
+    "Foxes": 825,
+    "grass": 9681
+  },
+  {
+    "time": 930,
+    "Bunnies": 657,
+    "Foxes": 795,
+    "grass": 9684
+  },
+  {
+    "time": 931,
+    "Bunnies": 649,
+    "Foxes": 772,
+    "grass": 9678
+  },
+  {
+    "time": 932,
+    "Bunnies": 641,
+    "Foxes": 744,
+    "grass": 9703
+  },
+  {
+    "time": 933,
+    "Bunnies": 631,
+    "Foxes": 726,
+    "grass": 9696
+  },
+  {
+    "time": 934,
+    "Bunnies": 647,
+    "Foxes": 701,
+    "grass": 9704
+  },
+  {
+    "time": 935,
+    "Bunnies": 641,
+    "Foxes": 690,
+    "grass": 9693
+  },
+  {
+    "time": 936,
+    "Bunnies": 656,
+    "Foxes": 666,
+    "grass": 9647
+  },
+  {
+    "time": 937,
+    "Bunnies": 668,
+    "Foxes": 647,
+    "grass": 9655
+  },
+  {
+    "time": 938,
+    "Bunnies": 695,
+    "Foxes": 627,
+    "grass": 9639
+  },
+  {
+    "time": 939,
+    "Bunnies": 716,
+    "Foxes": 605,
+    "grass": 9607
+  },
+  {
+    "time": 940,
+    "Bunnies": 751,
+    "Foxes": 572,
+    "grass": 9579
+  },
+  {
+    "time": 941,
+    "Bunnies": 784,
+    "Foxes": 546,
+    "grass": 9555
+  },
+  {
+    "time": 942,
+    "Bunnies": 834,
+    "Foxes": 516,
+    "grass": 9551
+  },
+  {
+    "time": 943,
+    "Bunnies": 857,
+    "Foxes": 504,
+    "grass": 9480
+  },
+  {
+    "time": 944,
+    "Bunnies": 911,
+    "Foxes": 492,
+    "grass": 9498
+  },
+  {
+    "time": 945,
+    "Bunnies": 953,
+    "Foxes": 476,
+    "grass": 9457
+  },
+  {
+    "time": 946,
+    "Bunnies": 1012,
+    "Foxes": 462,
+    "grass": 9407
+  },
+  {
+    "time": 947,
+    "Bunnies": 1062,
+    "Foxes": 458,
+    "grass": 9400
+  },
+  {
+    "time": 948,
+    "Bunnies": 1116,
+    "Foxes": 446,
+    "grass": 9332
+  },
+  {
+    "time": 949,
+    "Bunnies": 1163,
+    "Foxes": 444,
+    "grass": 9334
+  },
+  {
+    "time": 950,
+    "Bunnies": 1221,
+    "Foxes": 442,
+    "grass": 9280
+  },
+  {
+    "time": 951,
+    "Bunnies": 1285,
+    "Foxes": 439,
+    "grass": 9259
+  },
+  {
+    "time": 952,
+    "Bunnies": 1338,
+    "Foxes": 443,
+    "grass": 9206
+  },
+  {
+    "time": 953,
+    "Bunnies": 1373,
+    "Foxes": 456,
+    "grass": 9178
+  },
+  {
+    "time": 954,
+    "Bunnies": 1417,
+    "Foxes": 474,
+    "grass": 9162
+  },
+  {
+    "time": 955,
+    "Bunnies": 1468,
+    "Foxes": 482,
+    "grass": 9118
+  },
+  {
+    "time": 956,
+    "Bunnies": 1518,
+    "Foxes": 497,
+    "grass": 9128
+  },
+  {
+    "time": 957,
+    "Bunnies": 1559,
+    "Foxes": 524,
+    "grass": 9071
+  },
+  {
+    "time": 958,
+    "Bunnies": 1617,
+    "Foxes": 542,
+    "grass": 8996
+  },
+  {
+    "time": 959,
+    "Bunnies": 1661,
+    "Foxes": 567,
+    "grass": 8971
+  },
+  {
+    "time": 960,
+    "Bunnies": 1732,
+    "Foxes": 573,
+    "grass": 8973
+  },
+  {
+    "time": 961,
+    "Bunnies": 1777,
+    "Foxes": 602,
+    "grass": 8940
+  },
+  {
+    "time": 962,
+    "Bunnies": 1797,
+    "Foxes": 635,
+    "grass": 8940
+  },
+  {
+    "time": 963,
+    "Bunnies": 1812,
+    "Foxes": 678,
+    "grass": 8924
+  },
+  {
+    "time": 964,
+    "Bunnies": 1823,
+    "Foxes": 724,
+    "grass": 8866
+  },
+  {
+    "time": 965,
+    "Bunnies": 1880,
+    "Foxes": 746,
+    "grass": 8872
+  },
+  {
+    "time": 966,
+    "Bunnies": 1921,
+    "Foxes": 786,
+    "grass": 8900
+  },
+  {
+    "time": 967,
+    "Bunnies": 1929,
+    "Foxes": 834,
+    "grass": 8877
+  },
+  {
+    "time": 968,
+    "Bunnies": 1948,
+    "Foxes": 867,
+    "grass": 8829
+  },
+  {
+    "time": 969,
+    "Bunnies": 1958,
+    "Foxes": 904,
+    "grass": 8812
+  },
+  {
+    "time": 970,
+    "Bunnies": 1997,
+    "Foxes": 910,
+    "grass": 8795
+  },
+  {
+    "time": 971,
+    "Bunnies": 1985,
+    "Foxes": 963,
+    "grass": 8785
+  },
+  {
+    "time": 972,
+    "Bunnies": 1974,
+    "Foxes": 1015,
+    "grass": 8728
+  },
+  {
+    "time": 973,
+    "Bunnies": 1969,
+    "Foxes": 1060,
+    "grass": 8783
+  },
+  {
+    "time": 974,
+    "Bunnies": 1983,
+    "Foxes": 1090,
+    "grass": 8823
+  },
+  {
+    "time": 975,
+    "Bunnies": 1989,
+    "Foxes": 1121,
+    "grass": 8852
+  },
+  {
+    "time": 976,
+    "Bunnies": 1981,
+    "Foxes": 1152,
+    "grass": 8798
+  },
+  {
+    "time": 977,
+    "Bunnies": 1968,
+    "Foxes": 1177,
+    "grass": 8833
+  },
+  {
+    "time": 978,
+    "Bunnies": 1970,
+    "Foxes": 1198,
+    "grass": 8831
+  },
+  {
+    "time": 979,
+    "Bunnies": 1962,
+    "Foxes": 1234,
+    "grass": 8814
+  },
+  {
+    "time": 980,
+    "Bunnies": 1988,
+    "Foxes": 1244,
+    "grass": 8879
+  },
+  {
+    "time": 981,
+    "Bunnies": 1980,
+    "Foxes": 1258,
+    "grass": 8875
+  },
+  {
+    "time": 982,
+    "Bunnies": 1976,
+    "Foxes": 1269,
+    "grass": 8835
+  },
+  {
+    "time": 983,
+    "Bunnies": 1960,
+    "Foxes": 1283,
+    "grass": 8899
+  },
+  {
+    "time": 984,
+    "Bunnies": 1928,
+    "Foxes": 1302,
+    "grass": 8914
+  },
+  {
+    "time": 985,
+    "Bunnies": 1893,
+    "Foxes": 1318,
+    "grass": 8921
+  },
+  {
+    "time": 986,
+    "Bunnies": 1871,
+    "Foxes": 1332,
+    "grass": 8977
+  },
+  {
+    "time": 987,
+    "Bunnies": 1846,
+    "Foxes": 1342,
+    "grass": 9008
+  },
+  {
+    "time": 988,
+    "Bunnies": 1822,
+    "Foxes": 1358,
+    "grass": 9049
+  },
+  {
+    "time": 989,
+    "Bunnies": 1793,
+    "Foxes": 1366,
+    "grass": 9110
+  },
+  {
+    "time": 990,
+    "Bunnies": 1737,
+    "Foxes": 1385,
+    "grass": 9142
+  },
+  {
+    "time": 991,
+    "Bunnies": 1661,
+    "Foxes": 1408,
+    "grass": 9129
+  },
+  {
+    "time": 992,
+    "Bunnies": 1616,
+    "Foxes": 1422,
+    "grass": 9171
+  },
+  {
+    "time": 993,
+    "Bunnies": 1535,
+    "Foxes": 1439,
+    "grass": 9231
+  },
+  {
+    "time": 994,
+    "Bunnies": 1512,
+    "Foxes": 1438,
+    "grass": 9248
+  },
+  {
+    "time": 995,
+    "Bunnies": 1448,
+    "Foxes": 1443,
+    "grass": 9294
+  },
+  {
+    "time": 996,
+    "Bunnies": 1394,
+    "Foxes": 1445,
+    "grass": 9238
+  },
+  {
+    "time": 997,
+    "Bunnies": 1325,
+    "Foxes": 1460,
+    "grass": 9249
+  },
+  {
+    "time": 998,
+    "Bunnies": 1268,
+    "Foxes": 1451,
+    "grass": 9334
+  },
+  {
+    "time": 999,
+    "Bunnies": 1224,
+    "Foxes": 1428,
+    "grass": 9382
+  }
+]

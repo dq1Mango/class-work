@@ -30,16 +30,20 @@ const (
 	SIZE     = 101
 	TICKS    = 1e3
 
-	INITIAL_BUNNY = 2
+	INITIAL_BUNNY = 50
 	INITIAL_FOX   = 50
 
 	BUNNY_BABY = 0.1
 	CATCH      = 0.5
 	FOX_STARVE = 0.1
 
+	GRASS_GROW = 0.5
+
 	RECORD = true
 	TPF    = 1 // ticks per frame
 	FPS    = 30
+
+	GRASS = true
 	// VID_TIME = 10 // in seconds
 )
 
@@ -50,6 +54,7 @@ const (
 	Empty SiteState = iota
 	Bunny
 	Fox
+	Grass
 	// Visited
 	// Immune
 )
@@ -284,12 +289,14 @@ func (g Grid) clone() Grid {
 // as well as the grids themselves
 type Model struct {
 	grid    Grid
+	grass   Grid
 	grids   []Grid
 	size    int
 	time    int
 	ticks   int
 	bunnies []Point
 	foxes   []Point
+	grasses int
 	frames  int
 }
 
@@ -314,6 +321,7 @@ func init_model(
 	var grid Grid
 
 	grid = gen_grid(size)
+	grass := gen_grid(size)
 
 	// pretty_picture(table, "yinyang", true)
 	// panic("done")
@@ -323,6 +331,7 @@ func init_model(
 
 	model := Model{
 		grid:    grid,
+		grass:   grass,
 		grids:   []Grid{grid.clone()},
 		size:    size,
 		time:    1,
@@ -358,6 +367,10 @@ func init_model(
 
 func (m *Model) index(point Point) *SiteState {
 	return m.grid.index(point)
+}
+
+func (m *Model) grassDex(point Point) *SiteState {
+	return m.grass.index(point)
 }
 
 func (m *Model) modPoint(point Point) Point {
@@ -549,7 +562,11 @@ func (m *Model) tick(r *rand.Rand) {
 			newPoint := add_points(bunny, direction)
 			newPoint = m.modPoint(newPoint)
 
-			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty &&
+				*m.grassDex(newPoint) == Grass {
+
+				*m.grassDex(newPoint) = Empty
+				m.grasses--
 
 				*m.index(newPoint) = Bunny
 				m.bunnies[i] = newPoint
@@ -564,7 +581,31 @@ func (m *Model) tick(r *rand.Rand) {
 					*m.index(bunny) = Empty
 				}
 
+				goto bunnyEnd
+			}
+		}
+		for _, direction := range randomDirections(r) {
+			newPoint := add_points(bunny, direction)
+			newPoint = m.modPoint(newPoint)
+
+			if m.grid.is_valid_point(newPoint) && *m.index(newPoint) == Empty {
+				*m.index(newPoint) = Bunny
+				m.bunnies[i] = newPoint
+				*m.index(bunny) = Empty
 				break
+			}
+		}
+	bunnyEnd:
+	}
+
+	for i := range m.size {
+		for j := range m.size {
+			point := Point{x: i, y: j}
+			if *m.grassDex(point) == Empty {
+				if r.Float64() < GRASS_GROW {
+					*m.grassDex(point) = Grass
+					m.grasses++
+				}
 			}
 		}
 	}
@@ -599,7 +640,12 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 			data = append(
 				data,
-				DataPoint{Time: m.time, Bunnies: len(m.bunnies), Foxes: len(m.foxes)},
+				DataPoint{
+					Time:    m.time,
+					Bunnies: len(m.bunnies),
+					Foxes:   len(m.foxes),
+					Grass:   m.grasses,
+				},
 			)
 		}
 		// model.tick(r)
@@ -678,6 +724,7 @@ type DataPoint struct {
 	Time    int `json:"time"`
 	Bunnies int `json:"Bunnies"`
 	Foxes   int `json:"Foxes"`
+	Grass   int `json:"grass"`
 }
 
 type Data []DataPoint
@@ -688,7 +735,7 @@ func (d Data) WriteToCSV(filename string) {
 	var csv string
 
 	for _, point := range d {
-		csv += fmt.Sprintf("%d, %d, %d\n", point.Time, point.Bunnies, point.Foxes)
+		csv += fmt.Sprintf("%d, %d, %d, %d\n", point.Time, point.Bunnies, point.Foxes, point.Grass)
 	}
 
 	err := os.WriteFile(filename+".csv", []byte(csv), 0644)
@@ -711,16 +758,18 @@ func (d Data) WriteToJSON(filename string) {
 	encoder.Encode(d)
 }
 
-func (d Data) Fft() ([]complex128, []complex128) {
+func (d Data) Fft() ([]complex128, []complex128, []complex128) {
 	bunnies := make([]complex128, len(d))
 	foxes := make([]complex128, len(d))
+	grass := make([]complex128, len(d))
 
 	for i, point := range d {
 		bunnies[i] = complex(float64(point.Bunnies), 0)
 		foxes[i] = complex(float64(point.Foxes), 0)
+		grass[i] = complex(float64(point.Grass), 0)
 	}
 
-	return fft.Fft(bunnies, false), fft.Fft(foxes, false)
+	return fft.Fft(bunnies, false), fft.Fft(foxes, false), fft.Fft(grass, false)
 }
 
 func WriteToCSV(series stats.Series, filename string) {
@@ -1245,10 +1294,11 @@ func makeFFTChart(filename string, data Data) {
 	foxData := make([]opts.LineData, 0, numPoints)
 
 	time := make([]opts.LineData, 0, n/10)
-	badfftBunny, badfftFox := data.Fft()
+	badfftBunny, badfftFox, baddFftGrass := data.Fft()
 
 	fftBunny, phaseBunny := makeFFTUseful(badfftBunny)
 	fftFox, phaseFox := makeFFTUseful(badfftFox)
+	fftGrass, _ := makeFFTUseful(baddFftGrass)
 
 	csv := ""
 	maxBunny := 0.0
@@ -1270,10 +1320,11 @@ func makeFFTChart(filename string, data Data) {
 		time = append(time, opts.LineData{Value: float64(i) / float64(n)})
 
 		csv += fmt.Sprintf(
-			"%f, %f, %f, %f, %f\n",
+			"%f, %f, %f, %f, %f, %f\n",
 			float64(i)/float64(n),
 			bunny,
 			fox,
+			fftGrass[i],
 			phaseBunny[i],
 			phaseFox[i],
 		)
@@ -1324,13 +1375,17 @@ func makeFFTChart(filename string, data Data) {
 }
 
 func makeRaceChart(filename string, data Data) {
+	// data.WriteToCSV("data/" + filename)
+
 	bunnys := make([]opts.LineData, 0, len(data))
 	foxes := make([]opts.LineData, 0, len(data))
+	grass := make([]opts.LineData, 0, len(data))
 	time := make([]int, 0, len(data))
 
 	for _, point := range data {
 		bunnys = append(bunnys, opts.LineData{Value: point.Bunnies})
 		foxes = append(foxes, opts.LineData{Value: point.Foxes})
+		grass = append(grass, opts.LineData{Value: point.Grass})
 		time = append(time, point.Time)
 	}
 
