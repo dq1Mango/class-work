@@ -11,8 +11,10 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"slices"
 	"time"
 
+	vidio "github.com/AlexEidt/Vidio"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/montanaflynn/stats"
@@ -20,13 +22,22 @@ import (
 )
 
 const END_RATIO = 0.1
-const Size = 101
+const Size = 51
+
+const SACRIFICE = 0.2
+const SELFISH = 0.4
+
+const (
+	FPS = 60.0
+)
 
 type SiteState int
 
 const (
 	Empty SiteState = iota
 	Filled
+	Origin
+	Active
 	// Visited
 	// Immune
 )
@@ -44,6 +55,18 @@ var StateColor = map[SiteState]color.NRGBA{
 		B: 0,
 		A: 255,
 	},
+	Origin: {
+		R: 0,
+		G: 0,
+		B: 255,
+		A: 255,
+	},
+	Active: {
+		R: 0,
+		G: 255,
+		B: 0,
+		A: 255,
+	},
 }
 
 type Grid [][]SiteState
@@ -58,6 +81,74 @@ var CARDINALS = []Point{
 	{x: 0, y: 1},
 	{x: 1, y: 0},
 	{x: -1, y: 0},
+}
+
+func factorial(n int) int {
+	result := 1
+	for i := 1; i <= n; i++ {
+		result *= i
+	}
+	return result
+}
+
+func heaps(output *[][]int, A []int, k int) {
+	A = slices.Clone(A)
+
+	if k == 1 {
+		*output = append(*output, A)
+		return
+	}
+
+	heaps(output, A, k-1)
+
+	for i := range k - 1 {
+		if k%2 == 0 {
+			A[i], A[k-1] = A[k-1], A[i]
+		} else {
+			A[0], A[k-1] = A[k-1], A[0]
+		}
+		heaps(output, A, k-1)
+	}
+
+}
+
+func Permutations(n int) [][]int {
+	nPickN := factorial(n)
+	permutations := make([][]int, 0, nPickN)
+
+	// for i := range permutations {
+	// 	permutations[i] = make([]int, 0, n)
+	// }
+
+	initial := make([]int, n)
+	for i := range n {
+		initial[i] = i
+	}
+
+	heaps(&permutations, initial, n)
+
+	// for _, p := range permutations {
+	// 	fmt.Println(p)
+	// }
+
+	// fmt.Println(permutations)
+
+	return permutations
+
+}
+
+var PERMUTATIONS = Permutations(4)
+
+// returns the CARDINALS in a random order based on
+// precomputed permunations on n = 4
+func randomDirections(r *rand.Rand) []Point {
+	directions := make([]Point, 0, 4)
+
+	for _, value := range PERMUTATIONS[r.Int63n(24)] {
+		directions = append(directions, CARDINALS[value])
+	}
+
+	return directions
 }
 
 func mid_point() Point {
@@ -101,13 +192,15 @@ type Walker struct {
 }
 
 type Model struct {
-	grid     Grid
-	size     int
-	p        float64
-	people   int
-	infected int
-	radius   int
-	distance int
+	grid  Grid
+	grids []Grid
+	size  int
+	// p        float64
+	// people   int
+	// infected int
+	radius int
+	time   int
+	// distance int
 }
 
 // func remove[T any](slice []T, s int) []T {
@@ -251,12 +344,13 @@ func init_model(size int, p float64, distance int) Model {
 	var grid Grid
 	if !heart {
 		grid = gen_grid(size)
-		*grid.index(mid_point()) = 1
+		*grid.index(mid_point()) = Filled
 	} else {
 
 		heart_radius := 30.0
 		grid = gen_heart_grid(size, heart_radius)
 	}
+
 	// walkers := make([]Walker, 1)
 	// walkers[0] = Walker{
 	// 	location: middle,
@@ -264,13 +358,14 @@ func init_model(size int, p float64, distance int) Model {
 	// }
 
 	model := Model{
-		grid:     grid,
-		size:     size,
-		p:        p,
-		people:   size * size,
-		infected: 1,
-		radius:   0,
-		distance: distance,
+		grid:  grid,
+		grids: make([]Grid, 0, 100),
+		size:  size,
+		time:  0,
+		// p:        p,
+		// people:   size * size,
+		// infected: 1,
+		// distance: distance,
 	}
 
 	return model
@@ -281,30 +376,30 @@ func (m *Model) origin() Point {
 	return Point{x: 0, y: 0}
 }
 
-func (m *Model) random_start(r *rand.Rand) Point {
-	value := int(r.Float64() * float64(m.size))
-	value -= m.size / 2
-	spawn_radius := m.radius + m.distance
-
-	side := r.Int31n(4)
-
-	var point Point
-
-	switch side {
-	case 0:
-		point = Point{x: value, y: -spawn_radius}
-	case 1:
-		point = Point{x: value, y: spawn_radius}
-	case 2:
-		point = Point{x: -spawn_radius, y: value}
-	case 3:
-		point = Point{x: spawn_radius, y: value}
-	default:
-		panic("erm")
-	}
-
-	return point
-}
+// func (m *Model) random_start(r *rand.Rand) Point {
+// 	value := int(r.Float64() * float64(m.size))
+// 	value -= m.size / 2
+// 	spawn_radius := m.radius + m.distance
+//
+// 	side := r.Int31n(4)
+//
+// 	var point Point
+//
+// 	switch side {
+// 	case 0:
+// 		point = Point{x: value, y: -spawn_radius}
+// 	case 1:
+// 		point = Point{x: value, y: spawn_radius}
+// 	case 2:
+// 		point = Point{x: -spawn_radius, y: value}
+// 	case 3:
+// 		point = Point{x: spawn_radius, y: value}
+// 	default:
+// 		panic("erm")
+// 	}
+//
+// 	return point
+// }
 
 func (m *Model) countNeibors(point Point) int {
 	neighbors := 0
@@ -361,35 +456,6 @@ func (m *Model) countOnRadius(radius int) int {
 	return count
 }
 
-func (m *Model) walkers_on_perimiter() []Walker {
-
-	radius := m.radius + m.distance
-
-	var points []Point
-
-	for i := range radius*2 + 1 {
-		i -= radius
-		points = append(points, Point{x: i, y: -radius})
-		points = append(points, Point{x: i, y: radius})
-	}
-	// dont wanna double count the corners
-	for i := range radius*2 - 1 {
-		i -= radius
-
-		points = append(points, Point{x: -radius, y: i})
-		points = append(points, Point{x: radius, y: i})
-	}
-
-	walkers := make([]Walker, 0, len(points))
-
-	for _, walker := range points {
-		walkers = append(walkers, Walker{location: walker, ttl: 1})
-	}
-
-	return walkers
-
-}
-
 func (m *Model) tick(r *rand.Rand) bool {
 
 	walker := m.origin()
@@ -400,111 +466,142 @@ func (m *Model) tick(r *rand.Rand) bool {
 
 		// start := time.Now()
 
-		for {
-			step := random_step(r)
-			new_point = add_points(walker, step)
+		// step := random_step(r)
 
-			if !m.grid.is_valid_point(new_point) {
-				continue
-			}
+		directions := randomDirections(r)
+		for _, direction := range directions {
+			new_point = add_points(walker, direction)
+
+			// if !m.grid.is_valid_point(new_point) {
+			// 	continue
+			// }
 
 			if *m.grid.index(new_point) == Filled {
-				walker = new_point
+				if r.Float64() < SELFISH {
+					walker = new_point
+					break
+				}
 			} else {
-				*m.grid.index(new_point) = Filled
+				if r.Float64() < SACRIFICE {
 
-				if m.onPerimeter(new_point) {
-					return true
-				} else {
-					return false
+					*m.grid.index(new_point) = Filled
+
+					if m.onPerimeter(new_point) {
+						return true
+					} else {
+						return false
+					}
 				}
 			}
+
+			// if *m.grid.index(new_point) == Filled {
+			// 	walker = new_point
+			// } else {
+			// 	*m.grid.index(new_point) = Filled
+			//
+			// 	if m.onPerimeter(new_point) {
+			// 		return true
+			// 	} else {
+			// 		return false
+			// 	}
+			// }
 		}
 	}
 
 	panic("shouldnt reach this")
 }
 
-func (m *Model) different_tick(r *rand.Rand) bool {
-
-	walkers := m.walkers_on_perimiter()
-	// fmt.Println(walkers)
-
-	still_alive := true
-
-	for still_alive {
-		still_alive = false
-
-		for i := range walkers {
-			walker := &walkers[i]
-
-			if walker.ttl == 0 {
-				continue
-			}
-
-			still_alive = true
-
-			// start := time.Now()
-
-			var new_point Point
-
-			if m.countNeibors(walker.location) < 3 {
-				for {
-					step := random_step(r)
-					new_point = add_points(walker.location, step)
-
-					if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Empty {
-						walker.location = new_point
-						// m.walkers[index].location = new_point
-						break
-					}
-
-				}
-			} else {
-				new_point = walker.location
-			}
-
-			neihbors := m.countNeibors(new_point)
-			for range neihbors {
-				if r.Float64() <= m.p {
-					*m.grid.index(new_point) = SiteState(m.infected)
-					// *m.grid.index(new_point) = Filled
-					m.infected++
-
-					walker.ttl = 0
-					if walker.ttl != walkers[i].ttl {
-						panic("deep copy alert")
-					}
-
-					if new_point.radius() > m.radius {
-						m.radius = new_point.radius()
-					}
-
-					if m.radius+m.distance >= m.size/2 {
-						return true
-					}
-					// if m.onPerimeter(new_point) {
-					// 	return true
-					// } else {
-					// 	return false
-					// }
-
-				}
-			}
-
-		}
-
-	}
-	// fmt.Println("shouldnt reach this")
-	return false
-
-}
+// func (m *Model) different_tick(r *rand.Rand) bool {
+//
+// 	walkers := m.walkers_on_perimiter()
+// 	// fmt.Println(walkers)
+//
+// 	still_alive := true
+//
+// 	for still_alive {
+// 		still_alive = false
+//
+// 		for i := range walkers {
+// 			walker := &walkers[i]
+//
+// 			if walker.ttl == 0 {
+// 				continue
+// 			}
+//
+// 			still_alive = true
+//
+// 			// start := time.Now()
+//
+// 			var new_point Point
+//
+// 			if m.countNeibors(walker.location) < 3 {
+// 				for {
+// 					step := random_step(r)
+// 					new_point = add_points(walker.location, step)
+//
+// 					if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Empty {
+// 						walker.location = new_point
+// 						// m.walkers[index].location = new_point
+// 						break
+// 					}
+//
+// 				}
+// 			} else {
+// 				new_point = walker.location
+// 			}
+//
+// 			neihbors := m.countNeibors(new_point)
+// 			for range neihbors {
+// 				if r.Float64() <= m.p {
+// 					*m.grid.index(new_point) = SiteState(m.infected)
+// 					// *m.grid.index(new_point) = Filled
+// 					m.infected++
+//
+// 					walker.ttl = 0
+// 					if walker.ttl != walkers[i].ttl {
+// 						panic("deep copy alert")
+// 					}
+//
+// 					if new_point.radius() > m.radius {
+// 						m.radius = new_point.radius()
+// 					}
+//
+// 					if m.radius+m.distance >= m.size/2 {
+// 						return true
+// 					}
+// 					// if m.onPerimeter(new_point) {
+// 					// 	return true
+// 					// } else {
+// 					// 	return false
+// 					// }
+//
+// 				}
+// 			}
+//
+// 		}
+//
+// 	}
+// 	// fmt.Println("shouldnt reach this")
+// 	return false
+//
+// }
 
 func (m *Model) run_trial(r *rand.Rand) Data {
 	model := m
 
-	for {
+	for m.time < int(2e3) {
+		fmt.Println(m.time)
 		end := model.tick(r)
+
+		copied := make(Grid, m.size)
+		for i := range copied {
+			copied[i] = slices.Clone(m.grid[i])
+		}
+		// *copied.index(new_point) = Active
+
+		m.grids = append(m.grids, copied)
+
+		m.time++
 		// end := model.different_tick(r)
 
 		// fmt.Println("ticked me off")
@@ -561,6 +658,8 @@ func run_simulation() stats.Series {
 }
 
 func testing() {
+
+	// for
 	// // data := []int{0, 1, 2, 3}
 	// point := Point{row: 1, col: 1}
 	// data := []Point{point, point}
@@ -836,6 +935,8 @@ func one_trial(filename string) {
 	// fmt.Println(1.0 / float64(tps))
 
 	_ = model.run_trial(r)
+
+	model.makeVid(filename)
 	// for _, point := range data {
 	// 	fmt.Println(point.radius)
 	// }
@@ -874,6 +975,8 @@ func pretty_picture(model Model, name string, scale int) {
 
 	grid := model.grid
 
+	*grid.index(model.origin()) = Origin
+
 	// cropped := model.size - model.distance*2
 	cropped := model.size
 
@@ -884,13 +987,7 @@ func pretty_picture(model Model, name string, scale int) {
 	for y, row := range grid {
 		for x, value := range row {
 
-			var color color.Color
-			if value == Empty {
-				color = StateColor[Empty]
-			} else {
-				color = StateColor[Filled]
-				// color = calc_color(float64(grid[x][y]) / float64(model.infected))
-			}
+			var color = StateColor[value]
 
 			for i := range scale {
 				for j := range scale {
@@ -913,44 +1010,82 @@ func pretty_picture(model Model, name string, scale int) {
 	if err := f.Close(); err != nil {
 		// log.Fatal(err)
 	}
-
-	// file, err := os.Create(name + "-data.png")
-	//
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//
-	// defer file.Close()
-	//
-	// encoder := json.NewEncoder(file)
-	// encoder.SetIndent("", "  ")
-	// // encoder.Encode(model)
-	// encoder.Encode(struct {
-	// 	P          float64 `json:"p"`
-	// 	Size       int     `json:"size"`
-	// 	Infected   int     `json:"infected"`
-	// 	Population int     `json:"population"`
-	// }{
-	// 	model.p,
-	// 	model.size,
-	// 	model.infected,
-	// 	model.people,
-	// })
-
-	// exec.Command("chafa", "image.png").Run()
 }
 
-// func make_graph(grid Grid) {
-// 	chart := charts.NewHeatMap()
-// 	// set some global options like Title/Legend/ToolTip or anything else
-// 	chart.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
-// 		Title:    "My first bar chart generated by go-echarts",
-// 		Subtitle: "It's extremely easy to use, right?",
-// 	}))
-//
-// 	// Put data into instance
-// 	chart.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"})
-// 	// Where the magic happens
-// 	f, _ := os.Create("chart.html")
-// 	chart.Render(f)
-// }
+func grid2png(grid Grid) *image.NRGBA {
+
+	size := len(grid)
+	screen_size := 960
+
+	scale := screen_size / size
+
+	*grid.index(mid_point()) = Origin
+
+	// cropped := model.size - model.distance*2
+
+	img := image.NewNRGBA(image.Rect(0, 0, size*scale, size*scale))
+
+	// for y, row := range grid[model.distance : model.size-model.distance] {
+	// 	for x, value := range row[model.distance : model.size-model.distance] {
+	for y, row := range grid {
+		for x, value := range row {
+
+			var color color.Color = StateColor[value]
+
+			for i := range scale {
+				for j := range scale {
+					img.Set(x*scale+j, y*scale+i, color)
+				}
+			}
+		}
+	}
+
+	return img
+}
+
+func (m *Model) makeVid(name string) {
+
+	first := grid2png(m.grids[0])
+
+	bounds := first.Bounds()
+	w, h := bounds.Max.X, bounds.Max.Y
+
+	// options := vidio.Options{FPS: float64(fps), Loop: 0, Delay: 1000}
+	options := vidio.Options{FPS: float64(FPS)}
+	gif, _ := vidio.NewVideoWriter(name+".mp4", w, h, &options)
+	defer gif.Close()
+
+	// imgs := make(chan []uint8)
+	// go convertGrids(m, imgs)
+
+	// prettyTime := 0.0
+
+	fmt.Println("making video...")
+	progressLength := 30.0
+	for i := range m.grids {
+		// i := 0
+		// for img := range imgs {
+
+		progress := float64(i) / float64(len(m.grids))
+		clear_line()
+		fmt.Printf("Progress: %.1f%% ", progress*100)
+
+		fmt.Printf("[")
+		lines := int(progressLength * progress)
+		for range lines {
+			fmt.Printf("-")
+		}
+		fmt.Printf(">")
+		for range int(progressLength) - lines - 1 {
+			fmt.Printf(" ")
+		}
+		fmt.Printf("]")
+
+		// prettyStart := time.Now()
+		img := grid2png(m.grids[i]).Pix
+		// img := <-imgs
+		// prettyTime += time.Since(prettyStart).Seconds()
+		gif.Write(img)
+		// i++
+	}
+}
