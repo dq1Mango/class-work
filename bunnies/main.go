@@ -1223,6 +1223,18 @@ func (m *Model) makeVid(fps int, name string) {
 	// fmt.Println(prettyTime)
 }
 
+func makeFFTUseful(fft []complex128) ([]float64, []float64) {
+	amplitudes := make([]float64, len(fft))
+	phases := make([]float64, len(fft))
+
+	for i, value := range fft {
+		amplitudes[i] = math.Sqrt(real(value)*real(value) + imag(value)*imag(value))
+		phases[i] = math.Atan(imag(value) / real(value))
+	}
+
+	return amplitudes, phases
+}
+
 // func (m *Model)
 
 func makeFFTChart(filename string, data Data) {
@@ -1233,27 +1245,58 @@ func makeFFTChart(filename string, data Data) {
 	foxData := make([]opts.LineData, 0, numPoints)
 
 	time := make([]opts.LineData, 0, n/10)
-	fftBunny, fftFox := data.Fft()
+	badfftBunny, badfftFox := data.Fft()
+
+	fftBunny, phaseBunny := makeFFTUseful(badfftBunny)
+	fftFox, phaseFox := makeFFTUseful(badfftFox)
+
+	csv := ""
+	maxBunny := 0.0
+	maxBunnyDex := 0
+	maxFox := 0.0
+	maxFoxDex := 0
 
 	for i := 2; i < numPoints; i++ {
 
 		bunny := fftBunny[i]
 		fox := fftFox[i]
 
-		value := 0.0
-		if real(bunny) > 0 {
-			value = real(bunny)
-		}
+		value := bunny
 		bunnyData = append(bunnyData, opts.LineData{Value: value})
 
-		value = 0.0
-		if real(fox) > 0 {
-			value = real(fox)
-		}
+		value = fox
 		foxData = append(foxData, opts.LineData{Value: value})
 
 		time = append(time, opts.LineData{Value: float64(i) / float64(n)})
+
+		csv += fmt.Sprintf(
+			"%f, %f, %f, %f, %f\n",
+			float64(i)/float64(n),
+			bunny,
+			fox,
+			phaseBunny[i],
+			phaseFox[i],
+		)
+		if fftBunny[i] > maxBunny {
+			maxBunny = fftBunny[i]
+			maxBunnyDex = i
+		}
+		if fftFox[i] > maxFox {
+			maxFox = fftFox[i]
+			maxFoxDex = i
+		}
 	}
+
+	err := os.WriteFile(filename+"-fft.csv", []byte(csv), 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(maxBunnyDex)
+
+	fmt.Printf(
+		"max bunny phase: %f\n", phaseBunny[maxBunnyDex])
+	fmt.Println("max fox phase: ", phaseFox[maxFoxDex])
 
 	line := charts.NewLine()
 
@@ -1262,7 +1305,7 @@ func makeFFTChart(filename string, data Data) {
 			opts.Initialization{Theme: "dark", Width: "1400px", Height: "700px"},
 		),
 		charts.WithTitleOpts(opts.Title{
-			Title: "Population vs. Time",
+			Title: "Amplitude vs. Frequency",
 		}))
 
 	// chart.SetGlobalOptions(charts.WithColorsOpts({opts.RGBColor(255, 255, 255)}))
@@ -1308,10 +1351,10 @@ func makeRaceChart(filename string, data Data) {
 	options := line.RenderSnippet().Option
 
 	// line.Renderer = newSnippetRenderer(line, line.Validate)
-	// f, _ := os.Create(filename + ".html")
+	f, _ := os.Create(filename + ".html")
+	line.Render(f)
 	// json, _ := json.Marshal(options)
 	os.WriteFile(filename+".json", []byte(options), 0664)
-	// line.Render(f)
 	// snippet := line.RenderSnippet()
 	// var content []byte
 	//
