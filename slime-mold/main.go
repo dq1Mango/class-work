@@ -100,6 +100,16 @@ func (v *Vector) scale(r float64) {
 	v.y *= r
 }
 
+func (v *Vector) magnitude() float64 {
+	return math.Sqrt(v.x*v.x + v.y*v.y)
+}
+
+func (v *Vector) normalize() {
+	magnitude := v.magnitude()
+
+	v.scale(1 / magnitude)
+}
+
 func factorial(n int) int {
 	result := 1
 	for i := 1; i <= n; i++ {
@@ -303,6 +313,7 @@ func (g Grid) raw_index(point Point) *SiteState {
 }
 
 func (g Grid) index(point Point) *SiteState {
+	point.y *= -1
 	real_point := add_points(point, real_mid_point(len(g)))
 
 	return &g[real_point.y][real_point.x]
@@ -473,10 +484,10 @@ func (m *Model) countOnRadius(radius int) int {
 	return count
 }
 
-var WEIGHT_VECTOR = Vector{-1, 1}
+var WEIGHT_VECTOR = Vector{x: -1, y: 1}
 
 func dotProduct(v1, v2 Vector) float64 {
-	return v1.x*v2.x + v1.y + v2.y
+	return v1.x*v2.x + v1.y*v2.y
 }
 
 func weightedDirection(weight Vector, r *rand.Rand) Point {
@@ -492,20 +503,25 @@ func weightedDirection(weight Vector, r *rand.Rand) Point {
 		sumProbs += dot + 1
 	}
 
-	selection := r.ExpFloat64() * (sumProbs)
+	// fmt.Println(probabilites)
+
+	selection := r.Float64() * (sumProbs)
+
+	runningProb := sumProbs
 
 	i := len(probabilites) - 1
 
 	for i > 0 {
 
-		prob := probabilites[i]
-		if prob >= selection {
+		runningProb -= probabilites[i]
+		if selection > runningProb {
+			// fmt.Println(selection, prob)
 			return CARDINALS[i]
 		}
 		i--
 	}
 
-	return CARDINALS[i]
+	return CARDINALS[0]
 
 	// panic("ahhhhh")
 
@@ -855,7 +871,7 @@ func LinearRegression(s stats.Series) (float64, float64, error) {
 
 func main() {
 
-	WEIGHT_VECTOR.scale(1 / math.Sqrt2)
+	WEIGHT_VECTOR.normalize()
 	// testing()
 	// return
 
@@ -1023,7 +1039,7 @@ func one_trial(filename string) {
 
 	_ = model.run_trial(r)
 
-	// model.makeVid(filename)
+	model.makeVid(filename)
 	// for _, point := range data {
 	// 	fmt.Println(point.radius)
 	// }
