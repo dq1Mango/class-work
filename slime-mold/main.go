@@ -22,9 +22,9 @@ import (
 )
 
 const END_RATIO = 0.1
-const Size = 51
+const SIZE = 101
 
-const SACRIFICE = 0.01
+const SACRIFICE = 0.001
 const SELFISH = 0.9
 
 const (
@@ -90,6 +90,17 @@ type Vector struct {
 	y float64
 }
 
+func (v *Vector) rotate(theta float64) {
+	a, b, c, d := math.Cos(theta), -math.Sin(theta), math.Sin(theta), -math.Cos(theta)
+
+	output := v
+
+	output.x = a*v.x + b*v.y
+	output.y = c*v.x + d*v.y
+
+	v = output
+}
+
 var UNITS = []Vector{
 	{x: 0, y: -1},
 	{x: 0, y: 1},
@@ -110,6 +121,13 @@ func (v *Vector) normalize() {
 	magnitude := v.magnitude()
 
 	v.scale(1 / magnitude)
+}
+
+func vectorFromPoint(p Point) Vector {
+	return Vector{
+		x: float64(p.x),
+		y: float64(p.y),
+	}
 }
 
 func factorial(n int) int {
@@ -180,6 +198,39 @@ func randomDirections(r *rand.Rand) []Point {
 	return directions
 }
 
+func forceField(v Vector) Vector {
+
+	delat_theta := math.Acos(
+		dotProduct(v, WEIGHT_VECTOR) / v.magnitude() / WEIGHT_VECTOR.magnitude(),
+	)
+
+	weight_theta := math.Atan(WEIGHT_VECTOR.y / WEIGHT_VECTOR.x)
+
+	if WEIGHT_VECTOR.x < 0 {
+		weight_theta += math.Pi
+	}
+
+	v_theta := math.Atan(v.y / v.x)
+
+	if v.x < 0 {
+		v_theta += math.Pi
+	}
+
+	if v_theta < weight_theta {
+		delat_theta *= -1
+	}
+
+	radius_fraction := v.magnitude() / (SIZE / 2)
+
+	output := v
+
+	output.rotate(delat_theta * radius_fraction)
+
+	output.normalize()
+
+	return output
+}
+
 func mid_point() Point {
 	// mid := (size - 1) / 2
 
@@ -221,9 +272,10 @@ type Walker struct {
 }
 
 type Model struct {
-	grid  Grid
-	grids []Grid
-	size  int
+	grid     Grid
+	nextGrid Grid
+	grids    []Grid
+	size     int
 	// p        float64
 	// people   int
 	// infected int
@@ -372,9 +424,13 @@ func init_model(size int, p float64, distance int) Model {
 	heart := false
 
 	var grid Grid
+	var nextgrid Grid
 	if !heart {
 		grid = gen_grid(size)
 		*grid.index(mid_point()) = Filled
+
+		nextgrid = gen_grid(size)
+		*nextgrid.index(mid_point()) = Filled
 	} else {
 
 		heart_radius := 30.0
@@ -388,10 +444,11 @@ func init_model(size int, p float64, distance int) Model {
 	// }
 
 	model := Model{
-		grid:  grid,
-		grids: make([]Grid, 0, 100),
-		size:  size,
-		time:  0,
+		grid:     grid,
+		nextGrid: nextgrid,
+		grids:    make([]Grid, 0, 100),
+		size:     size,
+		time:     0,
 		// p:        p,
 		// people:   size * size,
 		// infected: 1,
@@ -523,7 +580,8 @@ func weightedDirection(weight Vector) []float64 {
 	for i, unit := range UNITS {
 		dot := dotProduct(weight, unit)
 
-		probabilites[i] = math.Exp(dot)
+		// probabilites[i] = math.Exp(dot)
+		probabilites[i] = 1 + (dot / 2)
 	}
 
 	return probabilites
@@ -579,58 +637,88 @@ func (m *Model) tick(r *rand.Rand) bool {
 	panic("shouldnt reach this")
 }
 
-// func (m *Model) alternate_tick(r *rand.Rand) bool {
-//
-// 	walker := m.origin()
-//
-// 	var new_point Point
-//
-// 	for true {
-//
-// 		// start := time.Now()
-//
-// 		// step := random_step(r)
-//
-// 		for {
-// 			// index := r.Int63n(4)
-// 			// if index == 3 {
-// 			// 	continue
-// 			// }
-// 			// direction := CARDINALS[index]
-// 			direction := weightedDirection(WEIGHT_VECTOR)
-//
-// 			new_point = add_points(walker, mid_point())
-//
-// 			if *m.grid.index(new_point) == Filled {
-// 				if r.Float64() < SELFISH {
-// 					walker = new_point
-// 					break
-// 				}
-// 			} else {
-// 				if r.Float64() < SACRIFICE {
-//
-// 					*m.grid.index(new_point) = Filled
-//
-// 					if m.onPerimeter(new_point) {
-// 						return true
-// 					} else {
-// 						return false
-// 					}
-// 				}
-// 			}
-//
-// 		}
-// 	}
-//
-// 	panic("shouldnt reach this")
-// }
+func (m *Model) alternate_tick(r *rand.Rand) bool {
+
+	fmt.Println("hi")
+	walker := m.origin()
+
+	var new_point Point
+
+	for true {
+		// time.Sleep(1 * time.Millisecond)
+		// fmt.Println(walker)
+
+		// start := time.Now()
+
+		// step := random_step(r)
+
+		// index := r.Int63n(4)
+		// if index == 3 {
+		// 	continue
+		// }
+		// direction := CARDINALS[index]
+
+		weight_vector := forceField(vectorFromPoint(walker))
+		// fmt.Println(walker)
+		// fmt.Println(weight_vector)
+		// println()
+		probs := weightedDirection(weight_vector)
+
+		probs2 := weightedDirection(WEIGHT_VECTOR)
+
+		for i := range probs2 {
+			// fmt.Println(i)
+
+			probs[i] += probs2[i]
+		}
+
+		for i := range probs {
+			// fmt.Println(i)
+
+			new_point = add_points(walker, CARDINALS[i])
+
+			if *m.grid.index(new_point) > 0 {
+				probs[i] *= float64(*m.grid.index(new_point))
+				// probs[i] *= SACRIFICE
+			}
+		}
+
+		fmt.Println(probs)
+
+		selection := CARDINALS[selectProbability(probs, r)]
+
+		new_point = add_points(walker, selection)
+
+		walker = new_point
+
+		if m.onPerimeter(new_point) {
+			return true
+		}
+
+		// if *m.grid.index(walker) == Empty {
+		// 	// fmt.Println("hi")
+		// 	*m.grid.index(walker) = Filled
+
+		// if m.onPerimeter(new_point) {
+		// 	return true
+		// } else {
+		// 	return false
+		// }
+		// }
+
+		*m.nextGrid.index(new_point) += 1
+	}
+
+	panic("shouldnt reach this")
+}
 
 func (m *Model) run_trial(r *rand.Rand) Data {
 	model := m
 
-	for m.time < int(2e3) {
+	for m.time < int(10) {
 		// fmt.Println(m.time)
-		end := model.tick(r)
+		// end := model.tick(r)
+		_ = model.alternate_tick(r)
 
 		copied := make(Grid, m.size)
 		for i := range copied {
@@ -645,9 +733,9 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 		// fmt.Println("ticked me off")
 
-		if end {
-			break
-		}
+		// if end {
+		// 	break
+		// }
 	}
 
 	data := make(Data, 0, model.radius)
@@ -675,7 +763,7 @@ func run_simulation() stats.Series {
 		clear_line()
 		fmt.Print("this much done: ", p*100, "%")
 
-		model := init_model(Size, p, distance)
+		model := init_model(SIZE, p, distance)
 
 		data := model.run_trial(r)
 		casted := data.toSeries()
@@ -961,10 +1049,9 @@ func make_3d_chart(data []opts.Chart3DData) {
 
 func one_trial(filename string) {
 	// parameters:
-	size := 101
 	p := 0.1
 	distance := 20
-	model := init_model(size, p, distance)
+	model := init_model(SIZE, p, distance)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// tps := 1
 
@@ -1001,7 +1088,7 @@ func one_trial(filename string) {
 }
 
 func calc_color(percent float64) color.NRGBA {
-	RStart, REnd := 255.0, 1.0
+	RStart, REnd := 1.0, 255.0
 
 	// WOW !!! great code
 	return color.NRGBA{
@@ -1060,6 +1147,15 @@ func grid2png(grid Grid) *image.NRGBA {
 
 	scale := screen_size / size
 
+	largest := 0.0
+	for _, row := range grid {
+		for _, value := range row {
+			if float64(value) > largest {
+				largest = float64(value)
+			}
+		}
+	}
+
 	*grid.index(mid_point()) = Origin
 
 	// cropped := model.size - model.distance*2
@@ -1071,7 +1167,12 @@ func grid2png(grid Grid) *image.NRGBA {
 	for y, row := range grid {
 		for x, value := range row {
 
-			var color color.Color = StateColor[value]
+			var color color.Color
+			if value == Empty {
+				color = StateColor[value]
+			} else {
+				color = calc_color(float64(value) / largest)
+			}
 
 			for i := range scale {
 				for j := range scale {
