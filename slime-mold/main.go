@@ -27,6 +27,8 @@ const SIZE = 101
 const SACRIFICE = 0.001
 const SELFISH = 0.9
 
+const SPLIT = 0.1
+
 const (
 	FPS = 20.0
 )
@@ -90,15 +92,20 @@ type Vector struct {
 	y float64
 }
 
-func (v *Vector) rotate(theta float64) {
-	a, b, c, d := math.Cos(theta), -math.Sin(theta), math.Sin(theta), -math.Cos(theta)
+func (v *Vector) add(v2 Vector) {
+	v.x += v2.x
+	v.y += v2.y
+}
 
-	output := v
+func (v *Vector) rotate(theta float64) {
+	a, b, c, d := math.Cos(theta), -math.Sin(theta), math.Sin(theta), math.Cos(theta)
+
+	output := *v
 
 	output.x = a*v.x + b*v.y
 	output.y = c*v.x + d*v.y
 
-	v = output
+	*v = output
 }
 
 var UNITS = []Vector{
@@ -120,6 +127,10 @@ func (v *Vector) magnitude() float64 {
 func (v *Vector) normalize() {
 	magnitude := v.magnitude()
 
+	if magnitude == 0 {
+		return
+	}
+
 	v.scale(1 / magnitude)
 }
 
@@ -132,9 +143,18 @@ func vectorFromPoint(p Point) Vector {
 
 func forceField(v Vector) Vector {
 
+	if v.magnitude() == 0 {
+		// return Vector{0, 0}
+		return WEIGHT_VECTOR
+	}
+
 	delat_theta := math.Acos(
 		dotProduct(v, WEIGHT_VECTOR) / v.magnitude() / WEIGHT_VECTOR.magnitude(),
 	)
+
+	if math.IsNaN(delat_theta) {
+		return WEIGHT_VECTOR
+	}
 
 	weight_theta := math.Atan(WEIGHT_VECTOR.y / WEIGHT_VECTOR.x)
 
@@ -160,6 +180,10 @@ func forceField(v Vector) Vector {
 
 	output.normalize()
 
+	fmt.Println("input:", v)
+	fmt.Println("output:", output)
+	fmt.Println()
+
 	return output
 }
 
@@ -178,6 +202,10 @@ func real_mid_point(size int) Point {
 
 func add_points(p1, p2 Point) Point {
 	return Point{x: p1.x + p2.x, y: p1.y + p2.y}
+}
+
+func add_vectors(v1, v2 Vector) Vector {
+	return Vector{x: v1.x + v2.x, y: v1.y + v2.y}
 }
 
 // func (p *Point) add(p2 Point) {
@@ -203,9 +231,16 @@ type Walker struct {
 	ttl      int
 }
 
+type TreeWalker struct {
+	location  Vector
+	intensity float64
+	velocity  Vector
+}
+
 type Model struct {
 	grid     Grid
 	nextGrid Grid
+	walkers  []TreeWalker
 	grids    []Grid
 	size     int
 	// p        float64
@@ -305,6 +340,17 @@ func (g Grid) index(point Point) *SiteState {
 	return &g[real_point.y][real_point.x]
 }
 
+func (v *Vector) roundToPoint() Point {
+	return Point{x: round(v.x), y: round(v.y)}
+}
+
+func (g Grid) vectorIndex(vector Vector) *SiteState {
+
+	copied := vector
+	return g.index(copied.roundToPoint())
+
+}
+
 func (g *Grid) is_valid_point(point Point) bool {
 
 	radius := len(*g) / 2
@@ -378,6 +424,7 @@ func init_model(size int, p float64, distance int) Model {
 	model := Model{
 		grid:     grid,
 		nextGrid: nextgrid,
+		walkers:  []TreeWalker{{location: vectorFromPoint(mid_point()), intensity: 100}},
 		grids:    make([]Grid, 0, 100),
 		size:     size,
 		time:     0,
@@ -405,7 +452,7 @@ func (m *Model) countNeibors(point Point) int {
 
 func (m *Model) onPerimeter(point Point) bool {
 
-	radius := (m.size - 1) / 2
+	radius := (m.size-1)/2 - 1
 	if point.x == radius || point.x == -radius || point.y == radius || point.y == -radius {
 		return true
 	} else {
@@ -576,19 +623,25 @@ func (m *Model) alternate_tick(r *rand.Rand) bool {
 			probs[i] += probs2[i]
 		}
 
+		maxTrail := 0.0
+		for _, bird := range CARDINALS {
+			maxTrail += float64(*m.grid.index(add_points(walker, bird)))
+		}
+
 		for i := range probs {
 			// fmt.Println(i)
 
 			new_point = add_points(walker, CARDINALS[i])
 
 			if *m.grid.index(new_point) > 0 {
-				probs[i] *= float64(*m.grid.index(new_point))
+				probs[i] *= float64(*m.grid.index(new_point)) / maxTrail
 				// probs[i] *= SACRIFICE
 			}
 		}
 
 		probs[(last_move+2)/4] = 0.0
-		// fmt.Println(probs)
+		fmt.Println(probs)
+		fmt.Println()
 
 		selection := selectProbability(probs, r)
 
@@ -619,15 +672,142 @@ func (m *Model) alternate_tick(r *rand.Rand) bool {
 	panic("shouldnt reach this")
 }
 
+func (m *Model) treeTick(r *rand.Rand) bool {
+
+	for i, walker := range m.walkers {
+		// fmt.Println()
+		// fmt.Printf("Walker: %v\n", walker)
+		var new_vec Vector
+		var new_point Point
+		// time.Sleep(1 * time.Millisecond)
+		// fmt.Println(walker)
+
+		// start := time.Now()
+
+		// step := random_step(r)
+
+		// index := r.Int63n(4)
+		// if index == 3 {
+		// 	continue
+		// }
+		// direction := CARDINALS[index]
+
+		velo := walker.velocity
+		force := forceField(walker.location)
+		velo.add(force)
+		// fmt.Println(weight_vector)
+		// println()
+		// velo.add(WEIGHT_VECTOR)
+
+		// probs2 := weightedDirection(WEIGHT_VECTOR)
+
+		// for i := range probs2 {
+		// 	// fmt.Println(i)
+		//
+		// 	probs[i] += probs2[i] * 2
+		// }
+
+		totalTrail := 0.0
+		for _, bird := range UNITS {
+			totalTrail += float64(*m.grid.vectorIndex(add_vectors(walker.location, bird)))
+		}
+
+		if totalTrail > 0 {
+			for i := range UNITS {
+				// fmt.Println(i)
+
+				new_vec = add_vectors(walker.location, UNITS[i])
+
+				new_point = new_vec.roundToPoint()
+
+				if *m.grid.index(new_point) > 0 {
+					direction := UNITS[i]
+					direction.scale(float64(*m.grid.index(new_point)) / totalTrail)
+					velo.add(direction)
+					// probs[i] *= SACRIFICE
+				}
+			}
+		}
+
+		// probs[(last_move+2)/4] = 0.0
+		// fmt.Println(probs)
+		// fmt.Println()
+
+		// selection := selectProbability(probs, r)
+
+		// last_move = selection
+
+		// new_vec = add_vectors(walker.location, UNITS[selection])
+
+		velo.normalize()
+		// fmt.Println("velo: ", velo)
+		m.walkers[i].location.add(velo)
+		m.walkers[i].velocity = velo
+
+		quantized := m.walkers[i].location.roundToPoint()
+		*m.nextGrid.index(quantized) += 1
+		// fmt.Println(new_vec)
+		// fmt.Println("quant", quantized)
+		// fmt.Println()
+
+		if m.onPerimeter(quantized) {
+			return true
+		}
+
+		if r.Float64() < SPLIT {
+			og := m.walkers[i]
+			newVelo := og.velocity
+			// fmt.Println("pretate:", newVelo)
+
+			if rand.Float64() < 0.5 {
+				newVelo.rotate(math.Pi / 2)
+			} else {
+				newVelo.rotate(-math.Pi / 2)
+			}
+
+			// fmt.Println("posttate:", newVelo)
+			// fmt.Println()
+			newVelo.scale(2)
+
+			m.walkers = append(
+				m.walkers,
+				TreeWalker{
+					location:  add_vectors(og.location, newVelo),
+					intensity: og.intensity / 2,
+					velocity:  newVelo,
+				},
+			)
+
+			m.walkers[i].intensity /= 2
+		}
+
+		// if *m.grid.index(walker) == Empty {
+		// 	// fmt.Println("hi")
+		// 	*m.grid.index(walker) = Filled
+
+		// if m.onPerimeter(new_point) {
+		// 	return true
+		// } else {
+		// 	return false
+		// }
+		// }
+
+	}
+
+	return false
+
+	// panic("shouldnt reach this")
+}
+
 func (m *Model) run_trial(r *rand.Rand) Data {
 	model := m
 
-	for m.time < int(1e2) {
+	for m.time < int(1000) {
 
 		model.nextGrid = gen_grid(m.size)
 		// fmt.Println(m.time)
 		// end := model.tick(r)
-		_ = model.alternate_tick(r)
+		end := model.treeTick(r)
 
 		for i := range m.size {
 			for j := range m.size {
@@ -648,9 +828,9 @@ func (m *Model) run_trial(r *rand.Rand) Data {
 
 		// fmt.Println("ticked me off")
 
-		// if end {
-		// 	break
-		// }
+		if end {
+			break
+		}
 	}
 
 	data := make(Data, 0, model.radius)
@@ -1083,7 +1263,7 @@ func grid2png(grid Grid) *image.NRGBA {
 		for x, value := range row {
 
 			var color color.Color
-			if value == Empty {
+			if value <= 0 {
 				color = StateColor[value]
 			} else {
 				color = calc_color(float64(value) / largest)
