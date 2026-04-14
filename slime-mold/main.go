@@ -28,7 +28,7 @@ const SACRIFICE = 0.001
 const SELFISH = 0.9
 
 const (
-	FPS = 60.0
+	FPS = 20.0
 )
 
 var WEIGHT_VECTOR = Vector{x: -1, y: 1}
@@ -79,10 +79,10 @@ type Point struct {
 }
 
 var CARDINALS = []Point{
-	{x: 0, y: -1},
-	{x: 0, y: 1},
 	{x: 1, y: 0},
+	{x: 0, y: 1},
 	{x: -1, y: 0},
+	{x: 0, y: -1},
 }
 
 type Vector struct {
@@ -102,10 +102,10 @@ func (v *Vector) rotate(theta float64) {
 }
 
 var UNITS = []Vector{
-	{x: 0, y: -1},
-	{x: 0, y: 1},
 	{x: 1, y: 0},
+	{x: 0, y: 1},
 	{x: -1, y: 0},
+	{x: 0, y: -1},
 }
 
 func (v *Vector) scale(r float64) {
@@ -128,74 +128,6 @@ func vectorFromPoint(p Point) Vector {
 		x: float64(p.x),
 		y: float64(p.y),
 	}
-}
-
-func factorial(n int) int {
-	result := 1
-	for i := 1; i <= n; i++ {
-		result *= i
-	}
-	return result
-}
-
-func heaps(output *[][]int, A []int, k int) {
-	A = slices.Clone(A)
-
-	if k == 1 {
-		*output = append(*output, A)
-		return
-	}
-
-	heaps(output, A, k-1)
-
-	for i := range k - 1 {
-		if k%2 == 0 {
-			A[i], A[k-1] = A[k-1], A[i]
-		} else {
-			A[0], A[k-1] = A[k-1], A[0]
-		}
-		heaps(output, A, k-1)
-	}
-
-}
-
-func Permutations(n int) [][]int {
-	nPickN := factorial(n)
-	permutations := make([][]int, 0, nPickN)
-
-	// for i := range permutations {
-	// 	permutations[i] = make([]int, 0, n)
-	// }
-
-	initial := make([]int, n)
-	for i := range n {
-		initial[i] = i
-	}
-
-	heaps(&permutations, initial, n)
-
-	// for _, p := range permutations {
-	// 	fmt.Println(p)
-	// }
-
-	// fmt.Println(permutations)
-
-	return permutations
-
-}
-
-var PERMUTATIONS = Permutations(4)
-
-// returns the CARDINALS in a random order based on
-// precomputed permunations on n = 4
-func randomDirections(r *rand.Rand) []Point {
-	directions := make([]Point, 0, 4)
-
-	for _, value := range PERMUTATIONS[r.Int63n(24)] {
-		directions = append(directions, CARDINALS[value])
-	}
-
-	return directions
 }
 
 func forceField(v Vector) Vector {
@@ -449,10 +381,6 @@ func init_model(size int, p float64, distance int) Model {
 		grids:    make([]Grid, 0, 100),
 		size:     size,
 		time:     0,
-		// p:        p,
-		// people:   size * size,
-		// infected: 1,
-		// distance: distance,
 	}
 
 	return model
@@ -462,31 +390,6 @@ func init_model(size int, p float64, distance int) Model {
 func (m *Model) origin() Point {
 	return Point{x: 0, y: 0}
 }
-
-// func (m *Model) random_start(r *rand.Rand) Point {
-// 	value := int(r.Float64() * float64(m.size))
-// 	value -= m.size / 2
-// 	spawn_radius := m.radius + m.distance
-//
-// 	side := r.Int31n(4)
-//
-// 	var point Point
-//
-// 	switch side {
-// 	case 0:
-// 		point = Point{x: value, y: -spawn_radius}
-// 	case 1:
-// 		point = Point{x: value, y: spawn_radius}
-// 	case 2:
-// 		point = Point{x: -spawn_radius, y: value}
-// 	case 3:
-// 		point = Point{x: spawn_radius, y: value}
-// 	default:
-// 		panic("erm")
-// 	}
-//
-// 	return point
-// }
 
 func (m *Model) countNeibors(point Point) int {
 	neighbors := 0
@@ -638,12 +541,13 @@ func (m *Model) tick(r *rand.Rand) bool {
 }
 
 func (m *Model) alternate_tick(r *rand.Rand) bool {
-
 	fmt.Println("hi")
+
 	walker := m.origin()
 
 	var new_point Point
 
+	last_move := 0
 	for true {
 		// time.Sleep(1 * time.Millisecond)
 		// fmt.Println(walker)
@@ -683,11 +587,14 @@ func (m *Model) alternate_tick(r *rand.Rand) bool {
 			}
 		}
 
-		fmt.Println(probs)
+		probs[(last_move+2)/4] = 0.0
+		// fmt.Println(probs)
 
-		selection := CARDINALS[selectProbability(probs, r)]
+		selection := selectProbability(probs, r)
 
-		new_point = add_points(walker, selection)
+		last_move = selection
+
+		new_point = add_points(walker, CARDINALS[selection])
 
 		walker = new_point
 
@@ -715,10 +622,18 @@ func (m *Model) alternate_tick(r *rand.Rand) bool {
 func (m *Model) run_trial(r *rand.Rand) Data {
 	model := m
 
-	for m.time < int(10) {
+	for m.time < int(1e2) {
+
+		model.nextGrid = gen_grid(m.size)
 		// fmt.Println(m.time)
 		// end := model.tick(r)
 		_ = model.alternate_tick(r)
+
+		for i := range m.size {
+			for j := range m.size {
+				model.grid[i][j] += model.nextGrid[i][j]
+			}
+		}
 
 		copied := make(Grid, m.size)
 		for i := range copied {
