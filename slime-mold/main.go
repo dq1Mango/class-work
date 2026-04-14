@@ -31,13 +31,15 @@ const (
 	FPS = 60.0
 )
 
+var WEIGHT_VECTOR = Vector{x: -1, y: 1}
+
 type SiteState int
 
 const (
 	Empty SiteState = iota
 	Filled
-	Origin
-	Active
+	Origin SiteState = -2
+	Active SiteState = -1
 	// Visited
 	// Immune
 )
@@ -484,45 +486,47 @@ func (m *Model) countOnRadius(radius int) int {
 	return count
 }
 
-var WEIGHT_VECTOR = Vector{x: -1, y: 1}
-
 func dotProduct(v1, v2 Vector) float64 {
 	return v1.x*v2.x + v1.y*v2.y
 }
 
-func weightedDirection(weight Vector, r *rand.Rand) Point {
-
-	probabilites := make([]float64, 4)
+func selectProbability(probs []float64, r *rand.Rand) int {
 
 	sumProbs := 0.0
-	for i, unit := range UNITS {
-		dot := dotProduct(weight, unit)
 
-		probabilites[i] = dot + 1
-
-		sumProbs += dot + 1
+	for _, value := range probs {
+		sumProbs += value
 	}
 
-	// fmt.Println(probabilites)
-
-	selection := r.Float64() * (sumProbs)
+	selection := r.Float64() * sumProbs
 
 	runningProb := sumProbs
 
-	i := len(probabilites) - 1
+	i := len(probs) - 1
 
 	for i > 0 {
 
-		runningProb -= probabilites[i]
+		runningProb -= probs[i]
 		if selection > runningProb {
 			// fmt.Println(selection, prob)
-			return CARDINALS[i]
+			return i
 		}
 		i--
 	}
+	return 0
+}
 
-	return CARDINALS[0]
+func weightedDirection(weight Vector) []float64 {
 
+	probabilites := make([]float64, 4)
+
+	for i, unit := range UNITS {
+		dot := dotProduct(weight, unit)
+
+		probabilites[i] = math.Exp(dot)
+	}
+
+	return probabilites
 	// panic("ahhhhh")
 
 }
@@ -539,152 +543,86 @@ func (m *Model) tick(r *rand.Rand) bool {
 
 		// step := random_step(r)
 
-		for {
-			// index := r.Int63n(4)
-			// if index == 3 {
-			// 	continue
-			// }
-			// direction := CARDINALS[index]
-			direction := weightedDirection(WEIGHT_VECTOR, r)
+		// index := r.Int63n(4)
+		// if index == 3 {
+		// 	continue
+		// }
+		// direction := CARDINALS[index]
+		probs := weightedDirection(WEIGHT_VECTOR)
 
-			new_point = add_points(walker, direction)
-
-			if *m.grid.index(new_point) == Filled {
-				if r.Float64() < SELFISH {
-					walker = new_point
-					break
-				}
+		for i := range probs {
+			if *m.grid.index(new_point) == Empty {
+				probs[i] *= SELFISH
 			} else {
-				if r.Float64() < SACRIFICE {
-
-					*m.grid.index(new_point) = Filled
-
-					if m.onPerimeter(new_point) {
-						return true
-					} else {
-						return false
-					}
-				}
+				probs[i] *= SACRIFICE
 			}
-
 		}
 
-		// directions := randomDirections(r)
-		// for _, direction := range directions {
-		// 	new_point = add_points(walker, direction)
-		//
-		// 	// if !m.grid.is_valid_point(new_point) {
-		// 	// 	continue
-		// 	// }
-		//
-		// 	if *m.grid.index(new_point) == Filled {
-		// 		if r.Float64() < SELFISH {
-		// 			walker = new_point
-		// 			break
-		// 		}
-		// 	} else {
-		// 		if r.Float64() < SACRIFICE {
-		//
-		// 			*m.grid.index(new_point) = Filled
-		//
-		// 			if m.onPerimeter(new_point) {
-		// 				return true
-		// 			} else {
-		// 				return false
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	// if *m.grid.index(new_point) == Filled {
-		// 	// 	walker = new_point
-		// 	// } else {
-		// 	// 	*m.grid.index(new_point) = Filled
-		// 	//
-		// 	// 	if m.onPerimeter(new_point) {
-		// 	// 		return true
-		// 	// 	} else {
-		// 	// 		return false
-		// 	// 	}
-		// 	// }
-		// }
+		selection := CARDINALS[selectProbability(probs, r)]
+
+		new_point = add_points(walker, selection)
+
+		walker = new_point
+
+		if *m.grid.index(walker) == Empty {
+			// fmt.Println("hi")
+			*m.grid.index(walker) = Filled
+
+			if m.onPerimeter(new_point) {
+				return true
+			} else {
+				return false
+			}
+		}
 	}
 
 	panic("shouldnt reach this")
 }
 
-// func (m *Model) different_tick(r *rand.Rand) bool {
+// func (m *Model) alternate_tick(r *rand.Rand) bool {
 //
-// 	walkers := m.walkers_on_perimiter()
-// 	// fmt.Println(walkers)
+// 	walker := m.origin()
 //
-// 	still_alive := true
+// 	var new_point Point
 //
-// 	for still_alive {
-// 		still_alive = false
+// 	for true {
 //
-// 		for i := range walkers {
-// 			walker := &walkers[i]
+// 		// start := time.Now()
 //
-// 			if walker.ttl == 0 {
-// 				continue
-// 			}
+// 		// step := random_step(r)
 //
-// 			still_alive = true
+// 		for {
+// 			// index := r.Int63n(4)
+// 			// if index == 3 {
+// 			// 	continue
+// 			// }
+// 			// direction := CARDINALS[index]
+// 			direction := weightedDirection(WEIGHT_VECTOR)
 //
-// 			// start := time.Now()
+// 			new_point = add_points(walker, mid_point())
 //
-// 			var new_point Point
-//
-// 			if m.countNeibors(walker.location) < 3 {
-// 				for {
-// 					step := random_step(r)
-// 					new_point = add_points(walker.location, step)
-//
-// 					if m.grid.is_valid_point(new_point) && *m.grid.index(new_point) == Empty {
-// 						walker.location = new_point
-// 						// m.walkers[index].location = new_point
-// 						break
-// 					}
-//
+// 			if *m.grid.index(new_point) == Filled {
+// 				if r.Float64() < SELFISH {
+// 					walker = new_point
+// 					break
 // 				}
 // 			} else {
-// 				new_point = walker.location
-// 			}
+// 				if r.Float64() < SACRIFICE {
 //
-// 			neihbors := m.countNeibors(new_point)
-// 			for range neihbors {
-// 				if r.Float64() <= m.p {
-// 					*m.grid.index(new_point) = SiteState(m.infected)
-// 					// *m.grid.index(new_point) = Filled
-// 					m.infected++
+// 					*m.grid.index(new_point) = Filled
 //
-// 					walker.ttl = 0
-// 					if walker.ttl != walkers[i].ttl {
-// 						panic("deep copy alert")
-// 					}
-//
-// 					if new_point.radius() > m.radius {
-// 						m.radius = new_point.radius()
-// 					}
-//
-// 					if m.radius+m.distance >= m.size/2 {
+// 					if m.onPerimeter(new_point) {
 // 						return true
+// 					} else {
+// 						return false
 // 					}
-// 					// if m.onPerimeter(new_point) {
-// 					// 	return true
-// 					// } else {
-// 					// 	return false
-// 					// }
-//
 // 				}
 // 			}
 //
 // 		}
-//
 // 	}
-// 	// fmt.Println("shouldnt reach this")
-// 	return false
 //
+// 	panic("shouldnt reach this")
 // }
 
 func (m *Model) run_trial(r *rand.Rand) Data {
